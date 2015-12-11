@@ -1,34 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <title>Shelf -- tool for SCRUM management</title>
+    <title>Shelf -- SCRUM tool</title>
+    <meta charset="utf-8" />
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Shelf">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <base href="/">
+    <link href="deps/bootstrap/bootstrap-3.3.5.min.css" rel="stylesheet">
 
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/shelf.css" rel="stylesheet">
+    <script type="text/javascript" src="deps/system/system.js"></script>
+    <script type="text/javascript" src="deps/typescript.js"></script>
+    <script type="text/javascript" src="deps/angular2/angular-2.0.0-alpha.50.dev.js"></script>
+    <script type="text/javascript" src="deps/angular2/angular-http-2.0.0-alpha.50.dev.js"></script>
 
-    <!--[if lt IE 9]>
-    <script src="js/html5shiv.min.js"></script>
-    <![endif]-->
-    <script src="js/traceur-runtime.js"></script>
-    <script src="js/system.js"></script>
-    <script src="js/typescript.js"></script>
-    <script src="js/angular2.min.js"></script>
-    <script>
+    <script type="text/javascript">
         System.config({
+            paths: {
+                'rxjs/observable/*' : './deps/rxjs/add/observable/*.js',
+                'rxjs/operator/*' : './deps/rxjs/add/operator/*.js',
+                'rxjs/*' : './deps/rxjs/*.js',
+                'app/*': "app/*.ts"
+            },
             transpiler: 'typescript',
-            typescriptOptions: {emitDecoratorMetadata: true}
+            typescriptOptions: { emitDecoratorMetadata: true }
         });
-        System.import('./shelf-application.ts');
+
+        System.import('app/shelf');
     </script>
 </head>
 <body>
-<div shelf-application class="container-fluid">Loading...</div>
+<div shelf-app class="container-fluid">loading...</div>
 </body>
 </html>

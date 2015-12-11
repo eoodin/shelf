@@ -4,14 +4,14 @@
 		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
     <display-name>shelf-server</display-name>
-
     <servlet>
-        <servlet-name>shelf-servlet</servlet-name>
-        <servlet-class>com.nokia.oss.mencius.ShelfServlet</servlet-class>
+        <servlet-name>api</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
     </servlet>
-
     <servlet-mapping>
-        <servlet-name>shelf-servlet</servlet-name>
-        <url-pattern>/shelf</url-pattern>
+        <servlet-name>api</servlet-name>
+        <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
+
 </web-app>
