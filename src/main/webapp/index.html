@@ -2,25 +2,29 @@
 <html>
 <head>
     <title>Shelf -- SCRUM tool</title>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
 
     <link href="deps/bootstrap/bootstrap-3.3.5.min.css" rel="stylesheet">
 
-    <script type="text/javascript" src="deps/system/system.js"></script>
-    <script type="text/javascript" src="deps/typescript.js"></script>
-    <script type="text/javascript" src="deps/angular2/angular-2.0.0-alpha.50.dev.js"></script>
-    <script type="text/javascript" src="deps/angular2/angular-http-2.0.0-alpha.50.dev.js"></script>
+    <script src="deps/traceur-runtime.js"></script>
+    <script src="deps/system/system.js"></script>
+    <script src="deps/typescript.js"></script>
+    <script src="deps/angular2/angular-2.0.0-alpha.48.min.js"></script>
+    <script src="deps/angular2/angular-http-2.0.0-alpha.48.min.js"></script>
 
     <script type="text/javascript">
+        window.angularDevMode = true;
         System.config({
             paths: {
-                'rxjs/observable/*' : './deps/rxjs/add/observable/*.js',
-                'rxjs/operator/*' : './deps/rxjs/add/operator/*.js',
-                'rxjs/*' : './deps/rxjs/*.js',
+                'rxjs/observable/*': './deps/rxjs/add/observable/*.js',
+                'rxjs/operator/*': './deps/rxjs/add/operator/*.js',
+                'rxjs/*': './deps/rxjs/*.js',
                 'app/*': "app/*.ts"
             },
             transpiler: 'typescript',
-            typescriptOptions: { emitDecoratorMetadata: true }
+            typescriptOptions: {
+                emitDecoratorMetadata: true
+            }
         });
 
         System.import('app/shelf');

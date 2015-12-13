@@ -3,10 +3,7 @@ package com.nokia.oss.mencius.shelf.web.controller;
 import com.nokia.oss.mencius.shelf.data.HibernateHelper;
 import com.nokia.oss.mencius.shelf.model.Project;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -18,7 +15,7 @@ public class ProjectController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseBody
-    private List<Project> getInfo() {
+    private List<Project> listProjects() {
         EntityManager em = HibernateHelper.createEntityManager();
         List<Project> projects = new ArrayList<Project>();
         List list = em.createQuery("select p from Project p").getResultList();
@@ -40,5 +37,18 @@ public class ProjectController {
         em.getTransaction().commit();
 
         return "deleted";
+    }
+
+    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @ResponseBody
+    private String createProject(@RequestBody String projectName) {
+        EntityManager em = HibernateHelper.createEntityManager();
+        em.getTransaction().begin();
+        Project project = new Project();
+        project.setName(projectName);
+        em.persist(project);
+        em.getTransaction().commit();
+        em.close();
+        return "created";
     }
 }
