@@ -3,7 +3,7 @@ import {bootstrap} from 'angular2/platform/browser';
 
 import {HTTP_PROVIDERS} from 'angular2/http';
 
-//import {Alert} from 'deps/ng2-bs/ng2-bootstrap.ts';
+import {Alert} from 'deps/ng2-bs/ng2-bootstrap.ts';
 
 import {ROUTER_DIRECTIVES,
     ROUTER_PROVIDERS,
@@ -59,16 +59,16 @@ import {Plans} from './pages/plans.ts';
             </div><!--/.nav-collapse -->
           </div>
         </nav>
-        <!--<alert [type]="'warning'" dismissible="true">
+        <alert [type]="'warning'" dismissible="true">
             <p>Notice: This tool is under development.</p>
-        </alert>-->
+        </alert>
         <div class="container-fluid"><router-outlet></router-outlet></div>
     </div>
 `,
     styles: [`
     .app-page { padding-top: 70px; }
     `],
-    directives: [/*Alert, */ROUTER_DIRECTIVES]
+    directives: [Alert, ROUTER_DIRECTIVES]
 })
 @RouteConfig([
     new Route({path: '/projects', component: Projects, name: 'Projects'}),

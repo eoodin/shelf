@@ -21,6 +21,25 @@
                 emitDecoratorMetadata: true
             }
         });
+
+        var systemNormalize = System.normalize;
+        System.normalize = function (dep, parent) {
+            var System = this;
+            return systemNormalize.call(this, dep, parent)
+                .then(function (normalized) {
+                    if ((parent && (parent.slice(-3) == '.ts')) && (dep[0] == ".")) {
+                        var depname = dep.slice(dep.lastIndexOf("/"));
+                        if (depname.indexOf('.') < 0)
+                            normalized = normalized + '.ts';
+                    }
+
+                    if ((normalized.slice(-6) == '.ts.js') || (normalized.slice(-6) == '.js.ts'))
+                        normalized = normalized.slice(0, normalized.length - 6) + ".ts";
+
+                    return normalized;
+                });
+        }
+
     </script>
 
 

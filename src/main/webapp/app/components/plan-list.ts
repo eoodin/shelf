@@ -19,7 +19,6 @@ export class PlanList {
     }
 
     private setPlans(plans) {
-        console.log(plans);
         this.plans = plans;
     }
 }
