@@ -1,6 +1,9 @@
-import {Component, provide, bootstrap, CORE_DIRECTIVES} from 'angular2/angular2';
+import {Component, View, provide} from 'angular2/core';
+import {bootstrap} from 'angular2/platform/browser';
+
 import {HTTP_PROVIDERS} from 'angular2/http';
-import {Alert} from 'deps/ng2-bootstrap/ng2-bootstrap.ts';
+
+//import {Alert} from 'deps/ng2-bs/ng2-bootstrap.ts';
 
 import {ROUTER_DIRECTIVES,
     ROUTER_PROVIDERS,
@@ -17,53 +20,58 @@ import {Plans} from './pages/plans.ts';
 @Component({
     selector: '[shelf-app]',
     template: `
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="javascript:void(0);">Shelf</a>
-        </div>
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li [class.active]="getLinkStyle('/dashboard')"><a [router-link]="['/Dashboard']" class="link">Dashboard</a></li>
-            <li [class.active]="getLinkStyle('/plans')"><a [router-link]="['/Plans/List']" class="link">Plans</a></li>
-            <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">My Tasks</a></li>
-            <li class="dropdown" [class.open]="ui.nav.projectList.show">
-              <a (click)="ui.nav.projectList.show = !ui.nav.projectList.show" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-              Projects <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu" >
-                <li><a href="#">System monitoring</a></li>
+    <div class="app-page">
+        <nav class="navbar navbar-default navbar-fixed-top">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="javascript:void(0);">Shelf</a>
+            </div>
+            <div class="collapse navbar-collapse">
+              <ul class="nav navbar-nav">
+                <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/Projects']" class="link">Dashboard</a></li>
+                <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/Plans/List']" class="link">Plans</a></li>
+                <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">My Tasks</a></li>
+                <li class="dropdown" [class.open]="ui.nav.projectList.show">
+                  <a (click)="ui.nav.projectList.show = !ui.nav.projectList.show" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                  Projects <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu" >
+                    <li><a href="#">System monitoring</a></li>
+                  </ul>
+                </li>
               </ul>
-            </li>
-          </ul>
 
-          <form class="navbar-form navbar-right">
-            <div class="form-group">
-              <input type="text" placeholder="Email" class="form-control">
-            </div>
-            <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-success">Sign in</button>
-          </form>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
-    <alert [type]="'warning'" dismissible="true">
-        <p>Notice: This tool is under development.</p>
-    </alert>
-    <div class="container-fluid"><router-outlet></router-outlet></div>
+              <form class="navbar-form navbar-right">
+                <div class="form-group">
+                  <input type="text" placeholder="Email" class="form-control">
+                </div>
+                <div class="form-group">
+                  <input type="password" placeholder="Password" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-success">Sign in</button>
+              </form>
+            </div><!--/.nav-collapse -->
+          </div>
+        </nav>
+        <!--<alert [type]="'warning'" dismissible="true">
+            <p>Notice: This tool is under development.</p>
+        </alert>-->
+        <div class="container-fluid"><router-outlet></router-outlet></div>
+    </div>
 `,
-    directives: [Alert, Projects, Plans, ROUTER_DIRECTIVES]
+    styles: [`
+    .app-page { padding-top: 70px; }
+    `],
+    directives: [/*Alert, */ROUTER_DIRECTIVES]
 })
 @RouteConfig([
-    new Route({path: '/dashboard', component: Projects, name: 'Dashboard'}),
+    new Route({path: '/projects', component: Projects, name: 'Projects'}),
     new Route({path: '/plans/...', component: Plans, name: 'Plans'})
 ])
 class ShelfApp {

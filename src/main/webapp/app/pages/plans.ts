@@ -1,4 +1,4 @@
-import {Component, ElementRef, NgModel, FORM_DIRECTIVES, CORE_DIRECTIVES} from 'angular2/angular2';
+import {Component} from 'angular2/core';
 import {Http, Response} from 'angular2/http';
 
 import {ROUTER_DIRECTIVES,
@@ -11,7 +11,7 @@ import {PlanList} from '../components/plan-list.ts';
 
 @Component({
     selector: 'plans',
-    directives: [PlanList, ROUTER_DIRECTIVES, FORM_DIRECTIVES, CORE_DIRECTIVES],
+    directives: [PlanList, ROUTER_DIRECTIVES],
     template: `
     <h1>Plans</h1>
     <router-outlet></router-outlet>

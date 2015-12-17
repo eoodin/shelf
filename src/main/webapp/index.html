@@ -3,18 +3,19 @@
     <title>Shelf -- SCRUM tool for Mencius</title>
 
     <script src="deps/custom-require.js"></script>
+    <script src="deps/es6-promise-3.0.2.min.js"></script>
+    <script src="deps/es6-shim-0.33.13.js"></script>
+    <script src="deps/zone.min.js"></script>
+
     <script src="deps/traceur-runtime.js"></script>
-    <script src="deps/system/system.js"></script>
-    <script src="deps/typescript.js"></script>
+    <script src="deps/system-0.19.6.js"></script>
+    <script src="deps/typescript-1.7.3.js"></script>
+    <script src="deps/Reflect.js"></script>
+    <script src="deps/angular2/Rx.min.js"></script>
 
     <script>
         System.config({
             defaultExtension: 'ts',
-            paths: {
-                'rxjs/observable/*': './deps/rxjs/add/observable/*.js',
-                'rxjs/operator/*': './deps/rxjs/add/operator/*.js',
-                'rxjs/*': './deps/rxjs/*.js'
-            },
             transpiler: 'typescript',
             typescriptOptions: {
                 emitDecoratorMetadata: true
@@ -22,9 +23,10 @@
         });
     </script>
 
-    <script src="deps/angular2/angular-2.0.0-alpha.48.min.js"></script>
-    <script src="deps/angular2/angular-http-2.0.0-alpha.48.min.js"></script>
-    <script src="deps/angular2/angular-router-2.0.0-alpha.48.min.js"></script>
+
+    <script src="deps/angular2/angular-2.0.0-beta.0.min.js"></script>
+    <script src="deps/angular2/angular-http-2.0.0-beta.0.min.js"></script>
+    <script src="deps/angular2/angular-router-2.0.0-beta.0.min.js"></script>
 
     <link href="deps/bootstrap/bootstrap-3.3.5.min.css" rel="stylesheet">
 

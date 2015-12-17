@@ -1,12 +1,11 @@
-import {Component, ElementRef, NgModel, FORM_DIRECTIVES, CORE_DIRECTIVES} from 'angular2/angular2';
+import {Component} from 'angular2/core';
 import {Http, Response} from 'angular2/http';
 
 @Component({
     selector: 'plan-list',
-    directives: [FORM_DIRECTIVES, CORE_DIRECTIVES],
     template: `
     <ul>
-        <li *ng-for="#plan of plans"> {{plan.name}}</li>
+        <li *ngFor="#plan of plans"> {{plan.name}}</li>
     </ul>
     `
 })
