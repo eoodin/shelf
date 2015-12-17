@@ -1,36 +1,40 @@
-<!DOCTYPE html>
 <html>
 <head>
-    <title>Shelf -- SCRUM tool</title>
-    <meta charset="utf-8"/>
+    <title>Shelf -- SCRUM tool for Mencius</title>
 
-    <link href="deps/bootstrap/bootstrap-3.3.5.min.css" rel="stylesheet">
-
+    <script src="deps/custom-require.js"></script>
     <script src="deps/traceur-runtime.js"></script>
     <script src="deps/system/system.js"></script>
     <script src="deps/typescript.js"></script>
-    <script src="deps/angular2/angular-2.0.0-alpha.48.min.js"></script>
-    <script src="deps/angular2/angular-http-2.0.0-alpha.48.min.js"></script>
 
-    <script type="text/javascript">
-        window.angularDevMode = true;
+    <script>
         System.config({
+            defaultExtension: 'ts',
             paths: {
                 'rxjs/observable/*': './deps/rxjs/add/observable/*.js',
                 'rxjs/operator/*': './deps/rxjs/add/operator/*.js',
-                'rxjs/*': './deps/rxjs/*.js',
-                'app/*': "app/*.ts"
+                'rxjs/*': './deps/rxjs/*.js'
             },
             transpiler: 'typescript',
             typescriptOptions: {
                 emitDecoratorMetadata: true
             }
         });
-
-        System.import('app/shelf');
     </script>
+
+    <script src="deps/angular2/angular-2.0.0-alpha.48.min.js"></script>
+    <script src="deps/angular2/angular-http-2.0.0-alpha.48.min.js"></script>
+    <script src="deps/angular2/angular-router-2.0.0-alpha.48.min.js"></script>
+
+    <link href="deps/bootstrap/bootstrap-3.3.5.min.css" rel="stylesheet">
+
 </head>
 <body>
-<div shelf-app class="container-fluid">loading...</div>
+
+<div shelf-app>loading...</div>
+
+<script>
+    System.import('app/shelf.ts');
+</script>
 </body>
 </html>

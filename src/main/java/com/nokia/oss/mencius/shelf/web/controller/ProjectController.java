@@ -18,6 +18,7 @@ public class ProjectController {
     private List<Project> listProjects() {
         EntityManager em = HibernateHelper.createEntityManager();
         List<Project> projects = new ArrayList<Project>();
+
         List list = em.createQuery("select p from Project p").getResultList();
         em.close();
 

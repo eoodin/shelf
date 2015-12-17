@@ -1,91 +1,90 @@
-import {Component, ElementRef, bootstrap, NgModel ,FormBuilder, Validators, FORM_DIRECTIVES, CORE_DIRECTIVES} from 'angular2/angular2';
-import {Http, Response, HTTP_PROVIDERS} from 'angular2/http';
-import {Alert} from 'deps/ng2-bootstrap/ng2-bootstrap.ts'
+import {Component, provide, bootstrap, CORE_DIRECTIVES} from 'angular2/angular2';
+import {HTTP_PROVIDERS} from 'angular2/http';
+import {Alert} from 'deps/ng2-bootstrap/ng2-bootstrap.ts';
 
-class Project {
-    public id;
-    public name;
-}
+import {ROUTER_DIRECTIVES,
+    ROUTER_PROVIDERS,
+    RouteConfig,
+    Location,
+    LocationStrategy,
+    HashLocationStrategy,
+    Route,
+    Router} from 'angular2/router';
+
+import {Projects} from './pages/projects.ts';
+import {Plans} from './pages/plans.ts';
 
 @Component({
     selector: '[shelf-app]',
-    directives: [Alert, FORM_DIRECTIVES, CORE_DIRECTIVES],
     template: `
-    <h1>Welcome to Shelf</h1>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="javascript:void(0);">Shelf</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li [class.active]="getLinkStyle('/dashboard')"><a [router-link]="['/Dashboard']" class="link">Dashboard</a></li>
+            <li [class.active]="getLinkStyle('/plans')"><a [router-link]="['/Plans/List']" class="link">Plans</a></li>
+            <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">My Tasks</a></li>
+            <li class="dropdown" [class.open]="ui.nav.projectList.show">
+              <a (click)="ui.nav.projectList.show = !ui.nav.projectList.show" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+              Projects <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" >
+                <li><a href="#">System monitoring</a></li>
+              </ul>
+            </li>
+          </ul>
 
+          <form class="navbar-form navbar-right">
+            <div class="form-group">
+              <input type="text" placeholder="Email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </form>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
     <alert [type]="'warning'" dismissible="true">
         <p>Notice: This tool is under development.</p>
     </alert>
-
-    <ul>
-        <li *ng-for="#project of projects" >
-            <span class="project-title">{{project.name}}</span> <button class="btn btn-danger" (click)="deleteProject(project)">Delete</button>
-        </li>
-    </ul>
-
-    <button class="btn btn-primary" (click)="ui.createProjectDialog.show = true;">New Project</button>
-
-    <div class="modal fade in" *ng-if="ui.createProjectDialog.show" [style.display]="ui.createProjectDialog.show ? 'block' : 'block'" role="dialog">
-        <div class="modal-dialog">
-            <form #f="form" (ng-submit)="onCreateProjectSubmit(f.value)">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" (click)="ui.createProjectDialog.show = false" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Add New Project</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-sm-3">Project name:</div><div class="col-sm-5"> <input type="text" ng-control="projectName"></div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-default" data-dismiss="modal">Create</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    `,
-    styles: [`
-    h1 {font-color: #aaa;}
-    ul {padding: 0;}
-    ul li { list-style: none; margin: 5px 0;}
-    .project-title { font-size: 2.4em; }
-    `],
+    <div class="container-fluid"><router-outlet></router-outlet></div>
+`,
+    directives: [Alert, Projects, Plans, ROUTER_DIRECTIVES]
 })
-class ShelfApp{
-    private projects: Project[];
+@RouteConfig([
+    new Route({path: '/dashboard', component: Projects, name: 'Dashboard'}),
+    new Route({path: '/plans/...', component: Plans, name: 'Plans'})
+])
+class ShelfApp {
+    router:Router;
+    location:Location;
     private ui;
 
-    constructor(private http: Http) {
-        this.ui = {createProjectDialog : { show : false, projectName: '' }};
-        this.refreshProjectList();
+    constructor(router:Router, location:Location) {
+        this.router = router;
+        this.location = location;
+        this.ui = {"nav" : {"projectList" : {"show": false}}};
     }
 
-    refreshProjectList() {
-        this.http.get('/api/projects/').subscribe(res => this.projects = res.json());
-    }
-
-    deleteProject(p: Project) {
-        this.http.delete('/api/projects/' + p.id)
-            .subscribe(response => this.projectDeleted(response));
-    }
-
-    projectDeleted(resp) {
-        console.log(resp);
-        this.refreshProjectList();
-    }
-
-    onCreateProjectSubmit(data) {
-        this.http.post('/api/projects/', data.projectName)
-            .subscribe(resp => this.onProjectCreated(resp));
-
-        this.ui.createProjectDialog.show = false;
-    }
-
-    onProjectCreated(resp) {
-        this.refreshProjectList();
+    getLinkStyle(path) {
+        if (path === this.location.path()) {
+            return true;
+        }
+        else if (path.length > 0) {
+            return this.location.path().indexOf(path) > -1;
+        }
     }
 }
 
-bootstrap(ShelfApp, HTTP_PROVIDERS);
+bootstrap(ShelfApp, [ROUTER_PROVIDERS, HTTP_PROVIDERS, provide(LocationStrategy, {useClass: HashLocationStrategy})]);
