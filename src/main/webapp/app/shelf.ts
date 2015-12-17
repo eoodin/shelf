@@ -35,7 +35,7 @@ import {Plans} from './pages/plans.ts';
             <div class="collapse navbar-collapse">
               <ul class="nav navbar-nav">
                 <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/Projects']" class="link">Dashboard</a></li>
-                <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/Plans/List']" class="link">Plans</a></li>
+                <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/Plans']" class="link">Plans</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">My Tasks</a></li>
                 <li class="dropdown" [class.open]="ui.nav.projectList.show">
                   <a (click)="ui.nav.projectList.show = !ui.nav.projectList.show" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -72,7 +72,7 @@ import {Plans} from './pages/plans.ts';
 })
 @RouteConfig([
     new Route({path: '/projects', component: Projects, name: 'Projects'}),
-    new Route({path: '/plans/...', component: Plans, name: 'Plans'})
+    new Route({path: '/plans', component: Plans, name: 'Plans'})
 ])
 class ShelfApp {
     router:Router;
@@ -95,4 +95,12 @@ class ShelfApp {
     }
 }
 
-bootstrap(ShelfApp, [ROUTER_PROVIDERS, HTTP_PROVIDERS, provide(LocationStrategy, {useClass: HashLocationStrategy})]);
+
+import {ProjectService} from './services/project-service.ts'
+
+bootstrap(ShelfApp, [
+    ROUTER_PROVIDERS,
+    HTTP_PROVIDERS,
+    provide(LocationStrategy, {useClass: HashLocationStrategy}),
+    ProjectService,
+]);

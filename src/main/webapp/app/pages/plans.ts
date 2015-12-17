@@ -1,27 +1,28 @@
 import {Component} from 'angular2/core';
 import {Http, Response} from 'angular2/http';
 
-import {ROUTER_DIRECTIVES,
-    RouteConfig,
-    Location,
-    Route
-    } from 'angular2/router';
-
 import {PlanList} from '../components/plan-list.ts';
+import {ProjectService} from '../services/project-service.ts';
 
 @Component({
     selector: 'plans',
-    directives: [PlanList, ROUTER_DIRECTIVES],
+    directives: [PlanList],
     template: `
-    <h1>Plans</h1>
-    <router-outlet></router-outlet>
+    <plan-list [project]="currentProject"></plan-list>
     `
 })
-@RouteConfig([
-    new Route({path: 'list', component: PlanList, name: 'List'})
-])
 export class Plans {
+    private currentProject = {};
 
-    constructor(private http: Http, private location:Location) {
+    constructor(private http: Http, private projectService: ProjectService) {
+
+        projectService.listProjects()
+            .subscribe(resp => this.setProjects(resp.json()));
+    }
+
+    setProjects(projects) {
+        if (projects && projects.length > 0) {
+            this.currentProject = projects[0];
+        }
     }
 }

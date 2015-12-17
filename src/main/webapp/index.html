@@ -55,7 +55,7 @@
 <div shelf-app>loading...</div>
 
 <script>
-    System.import('app/shelf.ts');
+    System.import('app/shelf.ts').then(null, console.error.bind(console));;
 </script>
 </body>
 </html>

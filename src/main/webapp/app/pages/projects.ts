@@ -1,4 +1,3 @@
-//import {Component, ElementRef, NgModel, FORM_DIRECTIVES, CORE_DIRECTIVES} from 'angular2/angular2';
 import {Component} from 'angular2/core';
 import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/common'
 import {Http, Response} from 'angular2/http';
