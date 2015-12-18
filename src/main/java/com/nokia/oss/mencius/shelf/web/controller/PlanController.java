@@ -16,11 +16,11 @@ public class PlanController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseBody
-    private List<Plan> listProjects() {
+    private List<Plan> getPlans(@RequestParam("project") String projectId) {
         EntityManager em = HibernateHelper.createEntityManager();
         List<Plan> plans = new ArrayList<>();
 
-        List list = em.createQuery("select p from Plan p").getResultList();
+        List list = em.createQuery("select p from Plan p where p.project=" + projectId).getResultList();
         em.close();
 
         plans.addAll(list);
@@ -29,7 +29,7 @@ public class PlanController {
 
     @RequestMapping(value = "/{planId}", method = RequestMethod.DELETE)
     @ResponseBody
-    private String deleteProject(@PathVariable String planId) {
+    private String deletePlan(@PathVariable String planId) {
         Long id = Long.valueOf(planId);
 
         EntityManager em = HibernateHelper.createEntityManager();

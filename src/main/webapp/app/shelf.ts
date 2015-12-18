@@ -3,7 +3,7 @@ import {bootstrap} from 'angular2/platform/browser';
 
 import {HTTP_PROVIDERS} from 'angular2/http';
 
-import {Alert} from 'deps/ng2-bs/ng2-bootstrap.ts';
+import {Alert, DROPDOWN_DIRECTIVES} from 'deps/ng2-bs/ng2-bootstrap.ts';
 
 import {ROUTER_DIRECTIVES,
     ROUTER_PROVIDERS,
@@ -38,14 +38,17 @@ import {Plans} from './pages/plans.ts';
                 <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/Projects']" class="link">Dashboard</a></li>
                 <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/Plans']" class="link">Plans</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">My Tasks</a></li>
-                <li class="dropdown" [class.open]="ui.nav.projectList.show">
-                  <a (click)="ui.nav.projectList.show = !ui.nav.projectList.show" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    {{projectService.current.name}} <span class="caret"></span>
-                  </a>
-                  <ul class="dropdown-menu" >
-                    <li *ngFor="#p of projectService.projects"><a href="#">{{p.name}}</a></li>
-                  </ul>
-                </li>
+
+                <li class="dropdown" dropdown keyboard-nav>
+                    <a href="javascript:void(0);" class="dropdown-toggle" dropdown-toggle>
+                        {{projectService.current.name}} <span *ngIf="!projectService.current.id">No Project </span><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
+                      <li *ngFor="#p of projectService.projects" role="menuitem">
+                        <a (click)="projectService.current=p;">{{p.name}}</a>
+                      </li>
+                    </ul>
+                 </li>
               </ul>
 
               <form class="navbar-form navbar-right">
@@ -69,7 +72,7 @@ import {Plans} from './pages/plans.ts';
     styles: [`
     .app-page { padding-top: 70px; }
     `],
-    directives: [Alert, ROUTER_DIRECTIVES]
+    directives: [Alert, ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES]
 })
 @RouteConfig([
     new Route({path: '/projects', component: Projects, name: 'Projects'}),

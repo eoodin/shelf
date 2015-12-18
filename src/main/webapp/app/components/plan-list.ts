@@ -5,8 +5,8 @@ import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/c
 @Component({
     selector: 'plan-list',
     template: `
-    <ul>
-        <li *ngFor="#plan of plans"> {{plan.name}}</li>
+    <ul class="list-group">
+      <li class="list-group-item" *ngFor="#plan of plans" > {{plan.name}} </li>
     </ul>
 
     <button class="btn btn-primary" (click)="ui.cpd.show = true;">New Plan</button>
