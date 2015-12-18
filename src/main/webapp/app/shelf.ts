@@ -14,6 +14,7 @@ import {ROUTER_DIRECTIVES,
     Route,
     Router} from 'angular2/router';
 
+import {ProjectService} from './services/project-service.ts';
 import {Projects} from './pages/projects.ts';
 import {Plans} from './pages/plans.ts';
 
@@ -39,10 +40,10 @@ import {Plans} from './pages/plans.ts';
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">My Tasks</a></li>
                 <li class="dropdown" [class.open]="ui.nav.projectList.show">
                   <a (click)="ui.nav.projectList.show = !ui.nav.projectList.show" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                  Projects <span class="caret"></span>
+                    {{projectService.current.name}} <span class="caret"></span>
                   </a>
                   <ul class="dropdown-menu" >
-                    <li><a href="#">System monitoring</a></li>
+                    <li *ngFor="#p of projectService.projects"><a href="#">{{p.name}}</a></li>
                   </ul>
                 </li>
               </ul>
@@ -77,12 +78,15 @@ import {Plans} from './pages/plans.ts';
 class ShelfApp {
     router:Router;
     location:Location;
+    private projectService : ProjectService;
     private ui;
 
-    constructor(router:Router, location:Location) {
+    constructor(router:Router, location:Location, projectService: ProjectService) {
         this.router = router;
         this.location = location;
+        this.projectService = projectService;
         this.ui = {"nav" : {"projectList" : {"show": false}}};
+        this.projectService.load();
     }
 
     getLinkStyle(path) {

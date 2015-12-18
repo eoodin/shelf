@@ -6,9 +6,6 @@ class Project {
     public id;
     public name;
 }
-var oldTemplate = `
-
-`;
 
 @Component({
     selector: 'projects',

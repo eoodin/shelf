@@ -8,21 +8,10 @@ import {ProjectService} from '../services/project-service.ts';
     selector: 'plans',
     directives: [PlanList],
     template: `
-    <plan-list [project]="currentProject"></plan-list>
+    <plan-list [project]="projectService.current"></plan-list>
     `
 })
 export class Plans {
-    private currentProject = {};
-
     constructor(private http: Http, private projectService: ProjectService) {
-
-        projectService.listProjects()
-            .subscribe(resp => this.setProjects(resp.json()));
-    }
-
-    setProjects(projects) {
-        if (projects && projects.length > 0) {
-            this.currentProject = projects[0];
-        }
     }
 }

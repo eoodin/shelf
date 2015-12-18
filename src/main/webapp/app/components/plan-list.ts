@@ -5,7 +5,6 @@ import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/c
 @Component({
     selector: 'plan-list',
     template: `
-    <h2>{{_project.name}}</h2>
     <ul>
         <li *ngFor="#plan of plans"> {{plan.name}}</li>
     </ul>
