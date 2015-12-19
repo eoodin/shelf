@@ -28,6 +28,8 @@
                         <bean class="com.nokia.oss.smu.web.json.HibernateAwareObjectMapper"/>
                     </property>
                     -->
+                    <property name="prefixJson" value="false"/>
+                    <property name="supportedMediaTypes" value="application/json"/>
                 </bean>
             </list>
         </property>

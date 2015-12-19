@@ -1,13 +1,13 @@
-import {Component, Input} from 'angular2/core';
+import {Component, OnInit, Input, Output, EventEmitter} from 'angular2/core';
 import {Http, Request, Response, RequestMethod, RequestOptions} from 'angular2/http';
 import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/common'
 
 @Component({
     selector: 'plan-list',
     template: `
-    <ul class="list-group">
-      <li class="list-group-item" *ngFor="#plan of plans" > {{plan.name}} </li>
-    </ul>
+    <div class="list-group">
+      <a class="list-group-item" *ngFor="#plan of plans" [class.active]="plan == selected" (click)="onClick($event, plan)"> {{plan.name}} </a>
+    </div>
 
     <button class="btn btn-primary" (click)="ui.cpd.show = true;">New Plan</button>
     <div class="modal fade in" *ngIf="ui.cpd.show" [style.display]="ui.cpd.show ? 'block' : 'block'" role="dialog">
@@ -46,6 +46,9 @@ export class PlanList {
     private _project: Object = {};
     private plans: Array = [];
     private ui: {};
+    @Output() public select: EventEmitter<PlanList> = new EventEmitter();
+
+    private selected: any;
 
     constructor(private http: Http) {
         this.ui = {cpd: {show: false}};
@@ -86,5 +89,10 @@ export class PlanList {
 
     planCreated(resp) {
         this.loadPlans();
+    }
+
+    onClick(e, plan) {
+        this.selected = plan;
+        this.select.next(plan);
     }
 }

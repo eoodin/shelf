@@ -36,6 +36,7 @@ public class ProjectController {
         Project project = em.find(Project.class, id);
         em.remove(project);
         em.getTransaction().commit();
+        em.close();
 
         return "deleted";
     }
@@ -50,6 +51,7 @@ public class ProjectController {
         em.persist(project);
         em.getTransaction().commit();
         em.close();
+
         return "created";
     }
 }

@@ -1,6 +1,9 @@
 package com.nokia.oss.mencius.shelf.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Plan {
@@ -16,6 +19,10 @@ public class Plan {
 
     @ManyToOne
     Project project;
+
+    @OneToMany(mappedBy = "plan")
+    @JsonIgnore
+    Set<WorkItem> workItems;
 
     public Long getId() {
         return id;
@@ -48,4 +55,13 @@ public class Plan {
     public void setProject(Project project) {
         this.project = project;
     }
+
+    public Set<WorkItem> getWorkItems() {
+        return workItems;
+    }
+
+    public void setWorkItems(Set<WorkItem> workItems) {
+        this.workItems = workItems;
+    }
+
 }

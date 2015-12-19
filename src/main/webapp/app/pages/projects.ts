@@ -20,7 +20,7 @@ class Project {
       <div class="panel-body">
         <ul class="project-list">
             <li *ngFor="#project of projects" >
-                <a href="#/plans/list?pid={{project.id}}"><span class="project-title">{{project.name}}</span></a>
+                <a href="#/plans/?pid={{project.id}}"><span class="project-title">{{project.name}}</span></a>
                 <button class="btn btn-danger btn-sm" (click)="deleteProject(project)">Delete</button>
             </li>
         </ul>
