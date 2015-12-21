@@ -15,7 +15,10 @@ public class WorkItem {
     private String title;
 
     @Column
-    private String type;
+    private int estimation;
+
+    @Column
+    private String description;
 
     @ManyToOne
     private Plan plan;
@@ -38,12 +41,20 @@ public class WorkItem {
         this.title = title;
     }
 
-    public String getType() {
-        return type;
+    public int getEstimation() {
+        return estimation;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setEstimation(int estimation) {
+        this.estimation = estimation;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Plan getPlan() {

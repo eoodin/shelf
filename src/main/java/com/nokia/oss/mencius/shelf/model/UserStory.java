@@ -6,13 +6,13 @@ import javax.persistence.*;
 @DiscriminatorValue("US")
 public class UserStory extends WorkItem {
     @Column
-    private int storyPoint;
+    private int points;
 
-    public int getStoryPoint() {
-        return storyPoint;
+    public int getPoints() {
+        return points;
     }
 
-    public void setStoryPoint(int storyPoint) {
-        this.storyPoint = storyPoint;
+    public void setPoints(int points) {
+        this.points = points;
     }
 }
