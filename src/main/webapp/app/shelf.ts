@@ -70,6 +70,7 @@ import {Plans} from './pages/plans.ts';
     </div>
 `,
     styles: [`
+    a:hover {cursor: pointer;}
     .app-page { padding-top: 70px; }
     `],
     directives: [Alert, ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES]

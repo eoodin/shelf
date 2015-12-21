@@ -1,12 +1,23 @@
 package com.nokia.oss.mencius.shelf.model;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
-@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn
 @DiscriminatorValue("WI")
-public class WorkItem {
+abstract public class WorkItem {
+    public enum Status {
+        New,
+        InProgress,
+        Finished,
+        Pending,
+        Dropped
+    }
+
     @Id
     @GeneratedValue
     private Long id;
@@ -20,7 +31,11 @@ public class WorkItem {
     @Column
     private String description;
 
+    @Column
+    private Status status;
+
     @ManyToOne
+    @JsonIgnore
     private Plan plan;
 
     public WorkItem() {}
@@ -63,5 +78,16 @@ public class WorkItem {
 
     public void setPlan(Plan plan) {
         this.plan = plan;
+    }
+
+    @JsonGetter
+    public abstract String getType();
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }
