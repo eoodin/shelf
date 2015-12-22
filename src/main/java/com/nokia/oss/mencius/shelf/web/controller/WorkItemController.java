@@ -38,10 +38,20 @@ public class WorkItemController {
         if (wi == null)
             return -1L;
 
-        wi.setPlan(plan);
-        em.persist(wi);
+        em.getTransaction().begin();
+        try {
+            wi.setPlan(plan);
+            em.persist(wi);
+            em.getTransaction().commit();
+            return wi.getId();
+        } catch (Exception ex) {
+            System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+        }
 
-        return wi.getId();
+        return -1L;
     }
 
     @RequestMapping(value = "/{wiid}", method = RequestMethod.DELETE)
@@ -70,6 +80,7 @@ public class WorkItemController {
             em.merge(wi);
             em.getTransaction().commit();
         } catch (Exception ex) {
+            System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
             em.getTransaction().rollback();
         } finally {
             em.close();
