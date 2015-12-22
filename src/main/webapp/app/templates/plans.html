@@ -2,12 +2,16 @@
     <div class="col-sm-2">
         <plan-list [project]="projectService.current" (select)="onSelect($event)"></plan-list>
     </div>
-    <div class="col-sm-offset-2 right">
-        <div class="row">
+    <div class="col-sm-offset-2 col-md-offset-2 right">
+        <div class="row item-table">
+            <div class="loading-mask" *ngIf="ui.loading.show">
+                <div class="spinner-loader"></div>
+            </div>
             <div class="panel panel-default">
                 <div class="panel-heading">{{current.name}}</div>
                 <table class="table">
                     <tr>
+                        <th></th>
                         <th>ID</th>
                         <th>Type</th>
                         <th>title</th>
@@ -16,19 +20,39 @@
                         <th>Operations</th>
                     </tr>
                     <tr *ngFor="#item of worItems">
+                        <td><input class="checkbox" [(value)]="item.checked" type="checkbox">
+                            <!-- TODO: why this 2-way binding not working? -->
+                        </td>
                         <td>{{item.id}}</td>
                         <td>{{item.type}}</td>
                         <td><a (click)="showItem(item)">{{item.title}}</a></td>
-                        <td>{{item.status}}</td>
+                        <td>
+                            <div class="btn-group" dropdown keyboard-nav>
+                                <button class="btn btn-default btn-sm dropdown-toggle" dropdown-toggle type="button"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {{item.status}} <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li role="menuitem"
+                                        *ngFor="#st of ['New','InProgress','','Finished','Pending','Dropped']"
+                                        [class.hidden]="st == item.status"><a
+                                            (click)="changeStatus(item, st)">{{st}}</a></li>
+                                </ul>
+                            </div>
+                        </td>
                         <td>{{item.owner}}</td>
-                        <td><a (click)="removeItem(item)">Delete</a></td>
+                        <td><a (click)="removeItem(item)"><span class="glyphicon glyphicon-remove"></span></a></td>
                     </tr>
                 </table>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-4">
-                <button class="btn btn-primary" (click)="showAddWorkitemDlg()">Add Workitem...</button>
+            <div class="col-sm-2">
+                <button class="btn btn-primary" (click)="showAddWorkitemDlg()">Add Work Item...</button>
+            </div>
+            <div class="col-sm-6">
+                <button class="btn btn-primary"><span class="glyphicon glyphicon-remove"></span> Remove</button>
+                <button class="btn btn-primary">Move To...</button>
             </div>
         </div>
     </div>

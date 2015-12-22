@@ -2,28 +2,33 @@ import {Component} from 'angular2/core';
 import {Http, Response, Request, RequestMethod, RequestOptions} from 'angular2/http';
 import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/common'
 
+import {DROPDOWN_DIRECTIVES} from 'deps/ng2-bs/ng2-bootstrap.ts';
+
 import {PlanList} from '../components/plan-list.ts';
 import {ProjectService} from '../services/project-service.ts';
 
 @Component({
     selector: 'plans',
-    directives: [PlanList],
+    directives: [PlanList, DROPDOWN_DIRECTIVES],
     templateUrl: 'app/templates/plans.html',
     styles: [`.right{ padding: 0 15px; }
     .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
     [ngcontrol='title'] { width: 100%; }
     [ngcontrol='description'] { width: 100%; height: 8em; }
-    `]
+    .item-table{position:relative;}
+    .checkbox{margin:0; width: 22px; height: 22px;}
+    .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
+    `],
+    styleUrls: ['../../deps/css/css-spinner.css']
 })
 export class Plans {
     private current = {};
     private worItems = [];
-
     private ui;
 
     constructor(private http: Http, private projectService: ProjectService) {
-        this.ui = {"awd": {"show": false}, "showDetailDlg": {"show": false}};
+        this.ui = {"awd": {"show": false}, "showDetailDlg": {"show": false}, "loading": {"show": false}};
     }
 
     public onSelect(plan): void {
@@ -62,6 +67,13 @@ export class Plans {
             .subscribe(resp => this.onWorkItemRemoved(resp));
     }
 
+    changeStatus(item, status) {
+        console.log("TODO: change status not implemented");
+        this.ui.loading.show = true;
+        this.http.put('api/work-items/' + item.id + '/status', status)
+            .subscribe(resp => this.onStatusUpdate(resp));
+    }
+
     onWorkItemCreated(resp) {
         this.ui.awd.show = false;
         this.loadWorkItems();
@@ -69,6 +81,11 @@ export class Plans {
 
     onWorkItemRemoved(resp) {
         console.log("Item deleted.", resp);
+        this.loadWorkItems();
+    }
+
+    onStatusUpdate(resp) {
+        this.ui.loading.show = false;
         this.loadWorkItems();
     }
 

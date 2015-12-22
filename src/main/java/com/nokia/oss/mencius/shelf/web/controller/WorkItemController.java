@@ -56,6 +56,28 @@ public class WorkItemController {
         return true;
     }
 
+    @RequestMapping(value = "/{wiid}/status", method = RequestMethod.PUT)
+    @ResponseBody
+    public boolean changeStatus(@PathVariable("wiid") Long wiid, @RequestBody String status) {
+        EntityManager em = HibernateHelper.createEntityManager();
+        WorkItem wi = em.find(WorkItem.class, wiid);
+        if (wi == null)
+            return false;
+
+        wi.setStatus(WorkItem.Status.valueOf(status));
+        em.getTransaction().begin();
+        try {
+            em.merge(wi);
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+        }
+
+        return true;
+    }
+
     private WorkItem createItem(ItemSpec spec){
         WorkItem workItem;
         String typeName = spec.type.toUpperCase().trim();
