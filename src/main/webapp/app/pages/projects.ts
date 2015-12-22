@@ -12,12 +12,12 @@ class Project {
     directives: [FORM_DIRECTIVES],
     template: `
     <div class="row">
-    <div class="col-sm-3">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Projects</h3>
-      </div>
-      <div class="panel-body">
+     <div class="col-sm-3">
+      <div class="panel panel-default">
+       <div class="panel-heading">
+         <h3 class="panel-title">Projects</h3>
+       </div>
+       <div class="panel-body">
         <ul class="project-list">
             <li *ngFor="#project of projects" >
                 <a href="#/plans/?pid={{project.id}}"><span class="project-title">{{project.name}}</span></a>
@@ -49,6 +49,52 @@ class Project {
         </div>
        </div>
       </div>
+
+
+      <div class="panel panel-default">
+       <div class="panel-heading">
+         <h3 class="panel-title">Teams</h3>
+       </div>
+       <div class="panel-body">
+        <ul class="project-list">
+            <li *ngFor="#t of ['Mencius']" > {{t}}</li>
+        </ul>
+       </div>
+      </div>
+
+      <div class="panel panel-default">
+       <div class="panel-heading">
+         <h3 class="panel-title">References</h3>
+       </div>
+       <div class="panel-body">
+        <ul class="project-list">
+            <li *ngFor="#ref of [1,2,3,4]" > Reference #{{ref}}</li>
+        </ul>
+       </div>
+      </div>
+     </div> <!-- col-sm-3 -->
+
+     <div class="col-sm-offset-3">
+      <div class="panel panel-default">
+       <div class="panel-heading">
+         <h3 class="panel-title">Project description</h3>
+       </div>
+       <div class="panel-body" class="project-description">
+        <p>This is description for the project TODO: add more meaningful description here.</p>
+       </div>
+      </div>
+
+      <div class="panel panel-default">
+       <div class="panel-heading">
+         <h3 class="panel-title">Plans</h3>
+       </div>
+       <div class="panel-body project-plans">
+        <ul class="project-list">
+            <li *ngFor="#plan of ['Product backlog', 'Sprint 1', 'Sprint 2', 'Sprint 3']" > &gt;&gt; {{plan}}</li>
+        </ul>
+       </div>
+      </div>
+
      </div>
     </div>
     `,
@@ -58,6 +104,8 @@ class Project {
     .project-list li { list-style: none; margin: 5px 0;}
     .project-list li button {float: right; }
     .project-title { font-size: 1.6em; }
+    .project-description {height: 120px;}
+    .project-plans {height: 120px;}
     `],
 })
 export class Projects {

@@ -37,7 +37,10 @@ import {Plans} from './pages/plans.ts';
               <ul class="nav navbar-nav">
                 <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/Projects']" class="link">Dashboard</a></li>
                 <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/Plans']" class="link">Plans</a></li>
-                <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">My Tasks</a></li>
+                <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Work Items</a></li>
+                <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">CI Status</a></li>
+                <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Promotion Status</a></li>
+                <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Reports</a></li>
 
                 <li class="dropdown" dropdown keyboard-nav>
                     <a href="javascript:void(0);" class="dropdown-toggle" dropdown-toggle>

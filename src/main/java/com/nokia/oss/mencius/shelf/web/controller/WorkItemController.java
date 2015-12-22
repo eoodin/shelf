@@ -29,51 +29,35 @@ public class WorkItemController {
     @ResponseBody
     public Long addWorkItem(@RequestBody ItemSpec is, @RequestParam("plan") Long planId) {
         EntityManager em = HibernateHelper.createEntityManager();
-        Long addedId = -1L;
 
-        try {
-            em.getTransaction().begin();
-            Plan plan = em.find(Plan.class, planId);
-            WorkItem wi = createItem(is);
-            wi.setPlan(plan);
-            em.persist(wi);
-            addedId = wi.getId();
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            // TODO:  log exception & notify rolled back.
-            em.getTransaction().rollback();
-            return 0L;
-        }
-        finally {
-            em.close();
-        }
+        Plan plan = em.find(Plan.class, planId);
+        if (plan == null)
+            return -1L;
 
-        return addedId;
+        WorkItem wi = createItem(is);
+        if (wi == null)
+            return -1L;
+
+        wi.setPlan(plan);
+        em.persist(wi);
+
+        return wi.getId();
     }
 
     @RequestMapping(value = "/{wiid}", method = RequestMethod.DELETE)
     @ResponseBody
     public boolean removeWorkItem(@PathVariable("wiid") Long wiid) {
         EntityManager em = HibernateHelper.createEntityManager();
-
-        try {
-            em.getTransaction().begin();
-            WorkItem wi = em.find(WorkItem.class, wiid);
-            em.remove(wi);
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            // TODO:  log exception & notify rolled back.
-            em.getTransaction().rollback();
+        WorkItem wi = em.find(WorkItem.class, wiid);
+        if (wi == null)
             return false;
-        } finally {
-            em.close();
-        }
+        em.remove(wi);
 
         return true;
     }
 
-    private WorkItem createItem(ItemSpec spec) throws UnkownWorkItemTypeException {
-        WorkItem workItem = null;
+    private WorkItem createItem(ItemSpec spec){
+        WorkItem workItem;
         String typeName = spec.type.toUpperCase().trim();
         switch (typeName) {
             case "US": // TODO: better way to create instance?
@@ -87,10 +71,9 @@ public class WorkItemController {
             case "TA":
                 workItem = new Task();
                 break;
+            default:
+                return null;
         }
-
-        if (workItem == null)
-            throw new UnkownWorkItemTypeException(spec.type);
 
         workItem.setStatus(WorkItem.Status.New);
         workItem.setEstimation(Integer.valueOf(spec.estimation));
@@ -98,12 +81,6 @@ public class WorkItemController {
         workItem.setDescription(spec.description);
 
         return workItem;
-    }
-
-    public class UnkownWorkItemTypeException extends Exception {
-        public UnkownWorkItemTypeException(String type) {
-            super("Unkown type given: " + type);
-        }
     }
 
     static class ItemSpec {

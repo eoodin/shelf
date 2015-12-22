@@ -47,7 +47,7 @@
                     <div class="row">
                         <div class="col-sm-3">Type:</div>
                         <div class="col-sm-8">
-                            <select ngControl="type">
+                            <select #type ngControl="type">
                                 <option value="US">User Story</option>
                                 <option value="TA">Task</option>
                                 <option value="DE">Defect</option>
@@ -71,7 +71,7 @@
                         </div>
                     </div>
 
-                    <div class="row"> <!-- TODO: ngIf type='us' -->
+                    <div class="row" *ngIf="type.value == 'US'">
                         <div class="col-sm-3">Story Points</div>
                         <div class="col-sm-8">
                             <input type="text" ngControl="points" value="0">
