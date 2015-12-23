@@ -3,7 +3,7 @@ package com.nokia.oss.mencius.shelf.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 public class Plan {
@@ -21,8 +21,9 @@ public class Plan {
     Project project;
 
     @OneToMany(mappedBy = "plan")
+    // @OrderBy("id ASC")
     @JsonIgnore
-    Set<WorkItem> workItems;
+    List<WorkItem> workItems;
 
     public Long getId() {
         return id;
@@ -56,11 +57,11 @@ public class Plan {
         this.project = project;
     }
 
-    public Set<WorkItem> getWorkItems() {
+    public List<WorkItem> getWorkItems() {
         return workItems;
     }
 
-    public void setWorkItems(Set<WorkItem> workItems) {
+    public void setWorkItems(List<WorkItem> workItems) {
         this.workItems = workItems;
     }
 
