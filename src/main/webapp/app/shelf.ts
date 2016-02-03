@@ -53,7 +53,7 @@ import {Plans} from './pages/plans.ts';
                     </ul>
                  </li>
               </ul>
-
+<!-- TODO: show user name/user settings entry here
               <form class="navbar-form navbar-right">
                 <div class="form-group">
                   <input type="text" placeholder="Email" class="form-control">
@@ -63,6 +63,7 @@ import {Plans} from './pages/plans.ts';
                 </div>
                 <button type="submit" class="btn btn-success">Sign in</button>
               </form>
+              -->
             </div><!--/.nav-collapse -->
           </div>
         </nav>

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -21,6 +22,9 @@ public class WorkItemController {
         list = plan.getWorkItems();
         list.size(); // force load
         em.close();
+        for (WorkItem item : list) {
+            item.setTitle(item.getTitle());
+        }
 
         return list;
     }

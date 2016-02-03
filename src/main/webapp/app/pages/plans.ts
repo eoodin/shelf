@@ -25,10 +25,14 @@ import {ProjectService} from '../services/project-service.ts';
 export class Plans {
     private current = {};
     private worItems = [];
+    private plans = null;
     private ui;
 
     constructor(private http: Http, private projectService: ProjectService) {
-        this.ui = {"awd": {"show": false}, "showDetailDlg": {"show": false}, "loading": {"show": false}};
+        this.ui = {
+            "awd": {"show": false},
+            "mtd": {"show": false},
+            "showDetailDlg": {"show": false}, "loading": {"show": false}};
     }
 
     public onSelect(plan): void {
@@ -36,6 +40,36 @@ export class Plans {
             this.current = plan;
             this.loadWorkItems();
         }
+    }
+
+    showMoveToDialog() {
+        this.ui.mtd.show = true;
+        if (!this.plans) {
+            this.http.get('/api/plans/?project=' + this.projectService.current.id)
+                .subscribe(resp => this.setPlans(resp.json()));
+        }
+    }
+
+    listPlans() {
+        this.http.get('/api/plans/?project=' + this.projectService.current.id)
+            .subscribe(resp => this.setPlans(resp.json()));
+    }
+
+    setPlans(plans) {
+        this.plans = plans;
+    }
+
+    moveItemsToPlan(planId) {
+        // TODO: compose selected ids
+        //var ids = {"workItemIds": ["1"]};
+        var ids = ["1"];
+        this.http.post('/api/plans/' + planId + '/move-in', JSON.stringify(ids))
+            .subscribe(resp => this.onMoveToPlanResponse(resp.json()));
+    }
+
+    onMoveToPlanResponse(response) {
+        this.ui.mtd.show = false;
+        this.loadWorkItems();
     }
 
     showAddWorkitemDlg() {
@@ -62,7 +96,6 @@ export class Plans {
     }
 
     removeItem(item) {
-        console.log("Deleting item", item);
         this.http.delete('/api/work-items/' + item.id)
             .subscribe(resp => this.onWorkItemRemoved(resp));
     }
@@ -80,7 +113,6 @@ export class Plans {
     }
 
     onWorkItemRemoved(resp) {
-        console.log("Item deleted.", resp);
         this.loadWorkItems();
     }
 

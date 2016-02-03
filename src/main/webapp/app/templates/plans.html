@@ -52,7 +52,7 @@
             </div>
             <div class="col-sm-6">
                 <button class="btn btn-primary"><span class="glyphicon glyphicon-remove"></span> Remove</button>
-                <button class="btn btn-primary">Move To...</button>
+                <button class="btn btn-primary" (click)="showMoveToDialog();">Move To...</button>
             </div>
         </div>
     </div>
@@ -127,6 +127,28 @@
             <div class="modal-footer">
                 <button (click)="ui.showDetailDlg.show=false;" class="btn btn-default" data-dismiss="modal">Close
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade in awd" *ngIf="ui.mtd.show" [style.display]="ui.mtd.show ? 'block' : 'block'"
+     role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="ui.mtd.show = false"
+                        data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Move selected items to plan</h4>
+            </div>
+            <div class="modal-body">
+                <select #moveTo class="form-control" required>
+                    <option *ngFor="#p of plans" [value]="p.id">{{p.name}}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button (click)="ui.mtd.show=false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button (click)="moveItemsToPlan(moveTo.value)" class="btn btn-default" data-dismiss="modal">Move</button>
             </div>
         </div>
     </div>
