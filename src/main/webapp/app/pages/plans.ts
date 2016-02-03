@@ -24,7 +24,7 @@ import {ProjectService} from '../services/project-service.ts';
 })
 export class Plans {
     private current = {};
-    private worItems = [];
+    private workItems = [];
     private plans = null;
     private ui;
 
@@ -60,11 +60,19 @@ export class Plans {
     }
 
     moveItemsToPlan(planId) {
-        // TODO: compose selected ids
-        //var ids = {"workItemIds": ["1"]};
-        var ids = ["1"];
-        this.http.post('/api/plans/' + planId + '/move-in', JSON.stringify(ids))
-            .subscribe(resp => this.onMoveToPlanResponse(resp.json()));
+        var ids = this.getSelectedWorkItemIds();
+        if ( ! ids.length) {
+            alert("No selected work item.");
+            return;
+        }
+
+        this.http.request(new Request(new RequestOptions(
+            {
+                url: '/api/plans/' + planId + '/move-in',
+                method: RequestMethod.Post,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(ids)
+            }))).subscribe(resp => this.onMoveToPlanResponse(resp));
     }
 
     onMoveToPlanResponse(response) {
@@ -127,6 +135,17 @@ export class Plans {
     }
 
     setWorkItems(items) {
-        this.worItems = items;
+        this.workItems = items;
+    }
+
+    private getSelectedWorkItemIds() {
+        var selected = [];
+        this.workItems.forEach( wi=> {
+            if(wi.checked) {
+                selected.push(wi.id);
+            }
+        });
+
+        return selected;
     }
 }

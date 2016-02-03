@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -88,24 +89,36 @@ public class PlanController {
 
     @RequestMapping(value = "/{planId}/move-in", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public String moveIn(@PathVariable Long planId, @RequestBody String[] workItemIds) {
+    public String moveIn(@PathVariable Long planId, @RequestBody String[] ids) {
         EntityManager em = HibernateHelper.createEntityManager();
         Plan plan = em.find(Plan.class, planId);
         if (plan == null)
             return "plan not exist";
 
-        String ids = "(" + String.join(",", workItemIds) + ")";
+        List<Long> wiIds = new ArrayList<>(ids.length);
+        for (String id : ids) {
+            wiIds.add(Long.valueOf(id));
+        }
 
-        Query query = em.createQuery("SELECT WorkItem w from WorkItem WHERE w.id in " + ids);
+        Query query = em.createQuery("SELECT wi FROM WorkItem wi WHERE wi.id IN :ids", WorkItem.class);
+        query.setParameter("ids", wiIds);
         List result = query.getResultList();
 
         em.getTransaction().begin();
-        for (Object wi : result) {
-            ((WorkItem)wi).setPlan(plan);
-        }
+        try {
+            for (Object wi : result) {
+                ((WorkItem) wi).setPlan(plan);
+            }
 
-        em.getTransaction().commit();
-        em.close();
+            em.getTransaction().commit();
+        }
+        catch (Exception ex) {
+            em.getTransaction().rollback();
+            return "Failed";
+        }
+        finally {
+            em.close();
+        }
 
         return "OK";
     }
@@ -141,18 +154,6 @@ public class PlanController {
 
         public String toString() {
             return "[name:" + name + ",type:" + type + "]";
-        }
-    }
-
-    public static class WorkItemSelection {
-        private List<String> workItemIds;
-
-        public List<String> getWorkItemIds() {
-            return workItemIds;
-        }
-
-        public void setWorkItemIds(List<String> workItemIds) {
-            this.workItemIds = workItemIds;
         }
     }
 }

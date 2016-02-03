@@ -19,8 +19,8 @@
                         <th>Owner</th>
                         <th>Operations</th>
                     </tr>
-                    <tr *ngFor="#item of worItems">
-                        <td><input class="checkbox" [(value)]="item.checked" type="checkbox">
+                    <tr *ngFor="#item of workItems">
+                        <td><input class="checkbox" [(ngModel)]="item.checked" type="checkbox">
                             <!-- TODO: why this 2-way binding not working? -->
                         </td>
                         <td>{{item.id}}</td>
