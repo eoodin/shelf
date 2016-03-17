@@ -78,13 +78,14 @@ import {Plans} from './pages/plans.ts';
     .app-page { padding-top: 70px; }
     .nav-logo {width: 32px; height:32px;}
     `],
-    directives: [Alert, ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES]
+    directives: [Alert, ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
+    providers: [ProjectService]
 })
 @RouteConfig([
     new Route({path: '/projects', component: Projects, name: 'Projects'}),
     new Route({path: '/plans', component: Plans, name: 'Plans'})
 ])
-class ShelfApp {
+export class ShelfApp {
     router:Router;
     location:Location;
     private projectService : ProjectService;
@@ -108,11 +109,8 @@ class ShelfApp {
     }
 }
 
-import {ProjectService} from './services/project-service.ts'
-
 bootstrap(ShelfApp, [
     ROUTER_PROVIDERS,
     HTTP_PROVIDERS,
-    provide(LocationStrategy, {useClass: HashLocationStrategy}),
-    ProjectService,
+    provide(LocationStrategy, {useClass: HashLocationStrategy})
 ]);

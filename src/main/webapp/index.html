@@ -1,24 +1,28 @@
+<!DOCTYPE html>
 <html>
 <head>
     <title>Shelf -- SCRUM tool for Mencius</title>
 
-    <script src="deps/custom-require.js"></script>
-    <script src="deps/es6-promise-3.0.2.min.js"></script>
-    <script src="deps/es6-shim-0.33.13.js"></script>
-    <script src="deps/zone.min.js"></script>
+    <script src="deps/es6-shim-0.35.0.min.js"></script>
+    <script src="deps/system-polyfills-0.19.20.min.js"></script>
+    <script src="deps/shims_for_IE.js"></script>
 
-    <script src="deps/traceur-runtime.js"></script>
+    <script src="deps/angular2-polyfills.js"></script>
     <script src="deps/system-0.19.6.js"></script>
-    <script src="deps/typescript-1.7.3.js"></script>
-    <script src="deps/Reflect.js"></script>
-    <script src="deps/angular2/Rx.min.js"></script>
-
+    <script src="deps/typescript-1.8.2.js"></script>
+    <script src="deps/Rx.js"></script>
+    <script src="deps/angular2-2.0.0-beta.9.dev.js"></script>
+    <script src="deps/angular2-http-2.0.0-beta.9.min.js"></script>
+    <script src="deps/angular2-router-2.0.0-beta.9.dev.js"></script>
     <script>
         System.config({
             defaultExtension: 'ts',
             transpiler: 'typescript',
             typescriptOptions: {
                 emitDecoratorMetadata: true
+            },
+            "paths": {
+                "moment": "deps/moment-2.12.0.min.js"
             }
         });
 
@@ -29,7 +33,11 @@
                 .then(function (normalized) {
                     if ((parent && (parent.slice(-3) == '.ts')) && (dep[0] == ".")) {
                         var depname = dep.slice(dep.lastIndexOf("/"));
-                        if (depname.indexOf('.') < 0)
+                        if (depname.indexOf('.') < 0 ||
+                                depname.indexOf('.component') > 0 ||
+                                depname.indexOf('.directive') > 0 ||
+                                depname.indexOf('.service') > 0 ||
+                                depname.indexOf('.class') > 0)
                             normalized = normalized + '.ts';
                     }
 
@@ -41,21 +49,15 @@
         }
 
     </script>
-
-
-    <script src="deps/angular2/angular-2.0.0-beta.0.min.js"></script>
-    <script src="deps/angular2/angular-http-2.0.0-beta.0.min.js"></script>
-    <script src="deps/angular2/angular-router-2.0.0-beta.0.min.js"></script>
-
     <link href="deps/bootstrap/bootstrap-3.3.5.min.css" rel="stylesheet">
-
+    <base href="/">
 </head>
 <body>
 
 <div shelf-app>loading...</div>
 
 <script>
-    System.import('app/shelf.ts').then(null, console.error.bind(console));;
+    System.import('app/shelf.ts').then(null, console.error.bind(console));
 </script>
 </body>
 </html>

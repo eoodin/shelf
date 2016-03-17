@@ -1,6 +1,6 @@
-import {Component, OnInit, Input, Output, EventEmitter} from 'angular2/core';
+import {Component, Input, Output, EventEmitter} from 'angular2/core';
 import {Http, Request, Response, RequestMethod, RequestOptions} from 'angular2/http';
-import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/common'
+import {NgForm} from 'angular2/common'
 
 @Component({
     selector: 'plan-list',
@@ -10,9 +10,9 @@ import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/c
     </div>
 
     <button class="btn btn-primary" (click)="ui.cpd.show = true;">New Plan</button>
-    <div class="modal fade in" *ngIf="ui.cpd.show" [style.display]="ui.cpd.show ? 'block' : 'block'" role="dialog">
+    <div class="modal fade in" [style.display]="ui.cpd.show ? 'block' : 'none'" role="dialog">
         <div class="modal-dialog">
-            <form #f="ngForm" (ngSubmit)="createPlan(f.value)">
+            <form #f="ngForm" (ngSubmit)="createPlan(f.name, f.type)">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" (click)="ui.cpd.show = false" data-dismiss="modal">&times;</button>
@@ -23,10 +23,10 @@ import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/c
                             <div class="col-sm-3">Project:</div><div class="col-sm-5"><span>{{_project.name}}</span></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Plan name:</div><div class="col-sm-5"> <input type="text" ngControl="name"></div>
+                            <div class="col-sm-3">Plan name:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="f.name"></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Type:</div><div class="col-sm-5"> <input type="text" ngControl="type"></div>
+                            <div class="col-sm-3">Type:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="f.type"></div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -70,11 +70,11 @@ export class PlanList {
         this.plans = plans;
     }
 
-    createPlan(data) {
+    createPlan(name, type) {
         // TODO: simpler  way to specify 'Content-Type'?
         //this.http.post('/api/plans/', JSON.stringify(data), options.merge({}))
         //    .subscribe(resp => this.planCreated(resp));
-        data['projectId'] = this._project.id;
+        var data = {'projectId' : this._project.id, 'name': name, 'type': type};
 
         this.http.request(new Request(new RequestOptions(
             {url: '/api/plans/',

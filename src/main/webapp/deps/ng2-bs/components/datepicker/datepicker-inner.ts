@@ -1,13 +1,7 @@
+import {Component, OnInit, EventEmitter, Input} from 'angular2/core';
 import {
-  Component, View, Host,
-  OnInit, EventEmitter,
-  DefaultValueAccessor,
-  ElementRef, ViewContainerRef,
-  NgIf, NgClass, FORM_DIRECTIVES, CORE_DIRECTIVES,
-  Self, NgModel, Renderer
-} from 'angular2/core';
-
-import * as moment from 'moment';
+    CORE_DIRECTIVES, FORM_DIRECTIVES, NgClass, NgModel
+} from 'angular2/common';
 
 import {DateFormatter} from './date-formatter';
 
@@ -21,6 +15,7 @@ const DATEPICKER_MODE:string = 'day';
 const MIN_MODE:string = 'day';
 const MAX_MODE:string = 'year';
 const SHOW_WEEKS:boolean = true;
+const ONLY_CURRENT_MONTH:boolean = false;
 const STARTING_DAY:number = 0;
 const YEAR_RANGE:number = 20;
 const MIN_DATE:Date = null;
@@ -45,40 +40,19 @@ const KEYS = {
 @Component({
   selector: 'datepicker-inner',
   events: ['update'],
-  properties: [
-    'activeDate',
-    'datepickerMode',
-    'initDate',
-    'minDate',
-    'maxDate',
-    'minMode',
-    'maxMode',
-    'showWeeks',
-    'formatDay',
-    'formatMonth',
-    'formatYear',
-    'formatDayHeader',
-    'formatDayTitle',
-    'formatMonthTitle',
-    'startingDay',
-    'yearRange',
-    'shortcutPropagation',
-    'customClass',
-    'dateDisabled',
-    'templateUrl'
-  ]
-})
-@View({
   template: `
-<div [hidden]="!datepickerMode" class="well well-sm bg-faded p-a card" role="application" ><!--&lt;!&ndash;ng-keydown="keydown($event)"&ndash;&gt;-->
-  <ng-content></ng-content>
-</div>
+    <div [hidden]="!datepickerMode" class="well well-sm bg-faded p-a card" role="application" ><!--&lt;!&ndash;ng-keydown="keydown($event)"&ndash;&gt;-->
+      <ng-content></ng-content>
+    </div>
   `,
   directives: [FORM_DIRECTIVES, CORE_DIRECTIVES, NgClass, NgModel]
 })
 export class DatePickerInner implements OnInit {
+  @Input()
   public datepickerMode:string;
+  @Input()
   public startingDay:number;
+  @Input()
   public yearRange:number;
   public stepDay:any = {};
   public stepMonth:any = {};
@@ -87,25 +61,43 @@ export class DatePickerInner implements OnInit {
   private modes:Array<string> = ['day', 'month', 'year'];
   private dateFormatter:DateFormatter = new DateFormatter();
   private uniqueId:string;
-  private _initDate:Date;
   private _activeDate:Date;
+  private selectedDate:Date;
+  private _initDate:Date;
   private activeDateId:string;
+  @Input()
   private minDate:Date;
+  @Input()
   private maxDate:Date;
+  @Input()
   private minMode:string;
+  @Input()
   private maxMode:string;
+  @Input()
   private showWeeks:boolean;
+  @Input()
   private formatDay:string;
+  @Input()
   private formatMonth:string;
+  @Input()
   private formatYear:string;
+  @Input()
   private formatDayHeader:string;
+  @Input()
   private formatDayTitle:string;
+  @Input()
   private formatMonthTitle:string;
+  @Input()
+  private onlyCurrentMonth:boolean;
+  @Input()
   private shortcutPropagation:boolean;
   // todo: change type during implementation
+  @Input()
   private customClass:any;
   // todo: change type during implementation
+  @Input()
   private dateDisabled:any;
+  @Input()
   private templateUrl:string;
 
   private refreshViewHandlerDay:Function;
@@ -116,6 +108,7 @@ export class DatePickerInner implements OnInit {
   private compareHandlerYear:Function;
   private update:EventEmitter<Date> = new EventEmitter();
 
+  @Input()
   private get initDate():Date {
     return this._initDate;
   }
@@ -124,6 +117,7 @@ export class DatePickerInner implements OnInit {
     this._initDate = value;
   }
 
+  @Input()
   private get activeDate():Date {
     return this._activeDate;
   }
@@ -141,7 +135,8 @@ export class DatePickerInner implements OnInit {
     this.formatDayHeader = this.formatDayHeader || FORMAT_DAY_HEADER;
     this.formatDayTitle = this.formatDayTitle || FORMAT_DAY_TITLE;
     this.formatMonthTitle = this.formatMonthTitle || FORMAT_MONTH_TITLE;
-    this.showWeeks = this.showWeeks || SHOW_WEEKS;
+    this.showWeeks = (this.showWeeks === undefined ? SHOW_WEEKS : this.showWeeks);
+    this.onlyCurrentMonth = (this.onlyCurrentMonth === undefined ? ONLY_CURRENT_MONTH : this.onlyCurrentMonth);
     this.startingDay = this.startingDay || STARTING_DAY;
     this.yearRange = this.yearRange || YEAR_RANGE;
     this.shortcutPropagation = this.shortcutPropagation || SHORTCUT_PROPAGATION;
@@ -157,8 +152,9 @@ export class DatePickerInner implements OnInit {
     } else {
       this.activeDate = new Date();
     }
+    this.selectedDate = new Date(this.activeDate.valueOf());
 
-    this.update.next(this.activeDate);
+    this.update.emit(this.activeDate);
     this.refreshView();
   }
 
@@ -185,7 +181,7 @@ export class DatePickerInner implements OnInit {
       return this.compareHandlerMonth(date1, date2);
     }
 
-    if (this.datepickerMode === 'year' && this.compareHandlerMonth) {
+    if (this.datepickerMode === 'year' && this.compareHandlerYear) {
       return this.compareHandlerYear(date1, date2);
     }
 
@@ -237,7 +233,7 @@ export class DatePickerInner implements OnInit {
     let dateObject:any = {};
     dateObject.date = date;
     dateObject.label = this.dateFilter(date, format);
-    dateObject.selected = this.compare(date, this.activeDate) === 0;
+    dateObject.selected = this.compare(date, this.selectedDate) === 0;
     dateObject.disabled = this.isDisabled(date);
     dateObject.current = this.compare(date, new Date()) === 0;
     // todo: do it
@@ -282,12 +278,13 @@ export class DatePickerInner implements OnInit {
       this.datepickerMode = this.modes[this.modes.indexOf(this.datepickerMode) - 1];
     }
 
-    this.update.next(this.activeDate);
+    this.selectedDate = new Date(this.activeDate.valueOf());
+    this.update.emit(this.activeDate);
     this.refreshView();
   }
 
   public move(direction:number) {
-    let expectedStep;
+    let expectedStep:any;
     if (this.datepickerMode === 'day') {
       expectedStep = this.stepDay;
     }
@@ -305,7 +302,6 @@ export class DatePickerInner implements OnInit {
       let month = this.activeDate.getMonth() + direction * (expectedStep.months || 0);
       this.activeDate.setFullYear(year, month, 1);
 
-      this.update.next(this.activeDate);
       this.refreshView();
     }
   }

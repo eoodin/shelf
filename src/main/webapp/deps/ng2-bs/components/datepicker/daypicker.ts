@@ -1,90 +1,96 @@
-import {
-  Component, View, Host, Directive,
-  OnInit, EventEmitter,
-  DefaultValueAccessor,
-  ElementRef, ViewContainerRef,
-  NgIf, NgClass, FORM_DIRECTIVES, CORE_DIRECTIVES,
-  Self, NgModel, Renderer
-} from 'angular2/core';
+import {Component, OnInit} from 'angular2/core';
+import {CORE_DIRECTIVES, FORM_DIRECTIVES, NgClass} from 'angular2/common';
 
 import {Ng2BootstrapConfig, Ng2BootstrapTheme} from '../ng2-bootstrap-config';
 import {DatePickerInner} from './datepicker-inner';
 
-const TEMPLATE_OPTIONS = {
+//write an interface for template options
+const TEMPLATE_OPTIONS:any = {
   [Ng2BootstrapTheme.BS4]: {
-    DAY_BUTTON: `
-        <button type="button" style="min-width:100%;" class="btn btn-sm"
-                [ngClass]="{'btn-secondary': !dtz.selected && !datePicker.isActive(dtz), 'btn-info': dtz.selected || !dtz.selected && datePicker.isActive(dtz), disabled: dtz.disabled}"
-                [disabled]="dtz.disabled"
-                (click)="datePicker.select(dtz.date)" tabindex="-1">
-          <span [ngClass]="{'text-muted': dtz.secondary || dtz.current}">{{dtz.label}}</span>
-        </button>
-    `
+    DAY_TITLE: `
+        <th *ngFor="#labelz of labels" class="text-xs-center"><small aria-label="labelz.full"><b>{{labelz.abbr}}</b></small></th>
+    `,
+    WEEK_ROW: `
+        <td [hidden]="!datePicker.showWeeks" class="text-xs-center h6"><em>{{ weekNumbers[index] }}</em></td>
+        <!--  [ngClass]="dtz.customClass" -->
+        <td *ngFor="#dtz of rowz" class="text-xs-center" role="gridcell" [id]="dtz.uid">
+          <button type="button" style="min-width:100%;" class="btn btn-sm"
+                  *ngIf="!(datePicker.onlyCurrentMonth && dtz.secondary)"
+                  [ngClass]="{'btn-secondary': !dtz.selected && !datePicker.isActive(dtz), 'btn-info': dtz.selected, disabled: dtz.disabled}"
+                  [disabled]="dtz.disabled"
+                  (click)="datePicker.select(dtz.date)" tabindex="-1">
+            <span [ngClass]="{'text-muted': dtz.secondary || dtz.current}">{{dtz.label}}</span>
+          </button>
+        </td>
+    `,
+    ARROW_LEFT: '&lt;',
+    ARROW_RIGHT: '&gt;'
   },
   [Ng2BootstrapTheme.BS3]: {
-    DAY_BUTTON: `
-        <button type="button" style="min-width:100%;" class="btn btn-default btn-sm"
-                [ngClass]="{'btn-info': dtz.selected, active: datePicker.isActive(dtz), disabled: dtz.disabled}"
-                [disabled]="dtz.disabled"
-                (click)="datePicker.select(dtz.date)" tabindex="-1">
-          <span [ngClass]="{'text-muted': dtz.secondary, 'text-info': dtz.current}">{{dtz.label}}</span>
-        </button>
+    DAY_TITLE: `
+        <th *ngFor="#labelz of labels" class="text-center"><small aria-label="labelz.full"><b>{{labelz.abbr}}</b></small></th>
+    `,
+    WEEK_ROW: `
+        <td [hidden]="!datePicker.showWeeks" class="text-center h6"><em>{{ weekNumbers[index] }}</em></td>
+        <!--  [ngClass]="dtz.customClass" -->
+        <td *ngFor="#dtz of rowz" class="text-center" role="gridcell" [id]="dtz.uid">
+          <button type="button" style="min-width:100%;" class="btn btn-default btn-sm"
+                  *ngIf="!(datePicker.onlyCurrentMonth && dtz.secondary)"
+                  [ngClass]="{'btn-info': dtz.selected, active: datePicker.isActive(dtz), disabled: dtz.disabled}"
+                  [disabled]="dtz.disabled"
+                  (click)="datePicker.select(dtz.date)" tabindex="-1">
+            <span [ngClass]="{'text-muted': dtz.secondary, 'text-info': dtz.current}">{{dtz.label}}</span>
+          </button>
+        </td>
+    `,
+    ARROW_LEFT: `
+    <i class="glyphicon glyphicon-chevron-left"></i>
+    `,
+    ARROW_RIGHT: `
+    <i class="glyphicon glyphicon-chevron-right"></i>
     `
   }
 };
 
-const CURRENT_THEME_TEMPLATE = TEMPLATE_OPTIONS[Ng2BootstrapConfig.theme || Ng2BootstrapTheme.BS3];
+const CURRENT_THEME_TEMPLATE:any = TEMPLATE_OPTIONS[Ng2BootstrapConfig.theme || Ng2BootstrapTheme.BS3];
 
 @Component({
-  selector: 'daypicker, [daypicker]'
-})
-@View({
+  selector: 'daypicker, [daypicker]',
   template: `
 <table [hidden]="datePicker.datepickerMode!=='day'" role="grid" aria-labelledby="uniqueId+'-title'" aria-activedescendant="activeDateId">
   <thead>
     <tr>
       <th>
         <button type="button" class="btn btn-default btn-secondary btn-sm pull-left" (click)="datePicker.move(-1)" tabindex="-1">
-          <i class="glyphicon glyphicon-chevron-left"></i>
+        ${CURRENT_THEME_TEMPLATE.ARROW_LEFT}
         </button>
       </th>
-      <th colspan="5" [hidden]="datePicker.showWeeks">
+      <th [attr.colspan]="5 + datePicker.showWeeks">
         <button [id]="datePicker.uniqueId + '-title'"
                 type="button" class="btn btn-default btn-secondary btn-sm"
                 (click)="datePicker.toggleMode()"
-                [disabled]="datePicker.datepickerMode === maxMode"
-                [ngClass]="{disabled: datePicker.datepickerMode === maxMode}" tabindex="-1" style="width:100%;">
-          <strong>{{title}}</strong>
-        </button>
-      </th>
-      <th colspan="6" [hidden]="!datePicker.showWeeks">
-        <button [id]="datePicker.uniqueId + '-title'"
-                type="button" class="btn btn-default btn-secondary btn-sm"
-                (click)="datePicker.toggleMode()"
-                [disabled]="datePicker.datepickerMode === maxMode"
-                [ngClass]="{disabled: datePicker.datepickerMode === maxMode}" tabindex="-1" style="width:100%;">
+                [disabled]="datePicker.datepickerMode === datePicker.maxMode"
+                [ngClass]="{disabled: datePicker.datepickerMode === datePicker.maxMode}" tabindex="-1" style="width:100%;">
           <strong>{{title}}</strong>
         </button>
       </th>
       <th>
         <button type="button" class="btn btn-default btn-secondary btn-sm pull-right" (click)="datePicker.move(1)" tabindex="-1">
-          <i class="glyphicon glyphicon-chevron-right"></i>
+        ${CURRENT_THEME_TEMPLATE.ARROW_RIGHT}
         </button>
       </th>
     </tr>
     <tr>
-      <th [hidden]="!datePicker.showWeeks" class="text-center"></th>
-      <th *ngFor="#labelz of labels" class="text-center"><small aria-label="labelz.full"><b>{{labelz.abbr}}</b></small></th>
+      <th [hidden]="!datePicker.showWeeks"></th>
+      ${CURRENT_THEME_TEMPLATE.DAY_TITLE}
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="#rowz of rows;#index=index">
-      <td [hidden]="!datePicker.showWeeks" class="text-center h6"><em>{{ weekNumbers[index] }}</em></td>
-      <!--  [ngClass]="dtz.customClass" -->
-      <td *ngFor="#dtz of rowz" class="text-center" role="gridcell" [id]="dtz.uid">
-        ${CURRENT_THEME_TEMPLATE.DAY_BUTTON}
-      </td>
-    </tr>
+    <template ngFor [ngForOf]="rows" #rowz="$implicit" #index="index">
+      <tr *ngIf="!(datePicker.onlyCurrentMonth && rowz[0].secondary && rowz[6].secondary)">
+        ${CURRENT_THEME_TEMPLATE.WEEK_ROW}
+      </tr>
+    </template>
   </tbody>
 </table>
   `,
@@ -97,7 +103,7 @@ export class DayPicker implements OnInit {
   public rows:Array<any> = [];
   public weekNumbers:Array<number> = [];
 
-  constructor(public datePicker: DatePickerInner) {
+  constructor(public datePicker:DatePickerInner) {
   }
 
   /*private getDaysInMonth(year:number, month:number) {
@@ -109,7 +115,7 @@ export class DayPicker implements OnInit {
     let dates:Array<Date> = new Array(n);
     let current = new Date(startDate.getTime());
     let i = 0;
-    let date;
+    let date:Date;
     while (i < n) {
       date = new Date(current.getTime());
       this.datePicker.fixTimeZone(date);
@@ -147,7 +153,7 @@ export class DayPicker implements OnInit {
         firstDate.setDate(-numDisplayedFromPreviousMonth + 1);
       }
 
-      // 42 is the number of days on a six-month calendar
+      // 42 is the number of days on a six-week calendar
       let _days:Array<Date> = self.getDates(firstDate, 42);
       let days:Array<any> = [];
       for (let i = 0; i < 42; i++) {
@@ -177,7 +183,7 @@ export class DayPicker implements OnInit {
       }
     }, 'day');
 
-    this.datePicker.setCompareHandler(function (date1, date2) {
+    this.datePicker.setCompareHandler(function (date1:Date, date2:Date) {
       let d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
       let d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
       return d1.getTime() - d2.getTime();
