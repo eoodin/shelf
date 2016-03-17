@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -65,9 +64,20 @@ public class WorkItemController {
         WorkItem wi = em.find(WorkItem.class, wiid);
         if (wi == null)
             return false;
-        em.remove(wi);
 
-        return true;
+        em.getTransaction().begin();
+        try {
+            em.remove(wi);
+            em.getTransaction().commit();
+            return true;
+        } catch (Exception ex) {
+            System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+        }
+
+        return false;
     }
 
     @RequestMapping(value = "/{wiid}/status", method = RequestMethod.PUT)

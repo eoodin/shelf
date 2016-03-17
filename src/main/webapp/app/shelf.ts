@@ -31,7 +31,7 @@ import {Plans} from './pages/plans.ts';
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="javascript:void(0);">Shelf</a>
+              <a class="navbar-brand" href="javascript:void(0);"><img class="nav-logo" src="/app/images/icon-large.png"/></a>
             </div>
             <div class="collapse navbar-collapse">
               <ul class="nav navbar-nav">
@@ -76,6 +76,7 @@ import {Plans} from './pages/plans.ts';
     styles: [`
     a:hover {cursor: pointer;}
     .app-page { padding-top: 70px; }
+    .nav-logo {width: 32px; height:32px;}
     `],
     directives: [Alert, ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES]
 })
@@ -106,7 +107,6 @@ class ShelfApp {
         }
     }
 }
-
 
 import {ProjectService} from './services/project-service.ts'
 

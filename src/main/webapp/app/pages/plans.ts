@@ -6,10 +6,12 @@ import {DROPDOWN_DIRECTIVES} from 'deps/ng2-bs/ng2-bootstrap.ts';
 
 import {PlanList} from '../components/plan-list.ts';
 import {ProjectService} from '../services/project-service.ts';
+import {WorkItemDetail} from '../components/work-item-detail.ts';
+import {ModalDialog} from '../components/modal-dialog.ts';
 
 @Component({
     selector: 'plans',
-    directives: [PlanList, DROPDOWN_DIRECTIVES],
+    directives: [PlanList, WorkItemDetail, ModalDialog, DROPDOWN_DIRECTIVES],
     templateUrl: 'app/templates/plans.html',
     styles: [`.right{ padding: 0 15px; }
     .awd .modal-body .row {padding: 5px 0;}
@@ -101,11 +103,17 @@ export class Plans {
     showItem(item) {
         this.ui.showDetailDlg.item = item;
         this.ui.showDetailDlg.show = true;
+        console.log(this.ui.showDetailDlg);
     }
 
     removeItem(item) {
         this.http.delete('/api/work-items/' + item.id)
             .subscribe(resp => this.onWorkItemRemoved(resp));
+    }
+
+    moveItems() {
+        console.log("TODO: not implemented.");
+        console.log(this.workItems);
     }
 
     changeStatus(item, status) {
