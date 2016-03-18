@@ -40,19 +40,13 @@ public class ProjectController {
         em.getTransaction().begin();
         try {
             Project project = em.find(Project.class, id);
-            List plans = em.createQuery("select p from Plan p where p.project=" + projectId).getResultList();
-            for (Object plan : plans)
-                em.remove(plan);
-
             em.remove(project);
             em.getTransaction().commit();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Unable to delete project due to exception: " + ex.getMessage(), ex);
             em.getTransaction().rollback();
             return "failed";
-        }
-        finally {
+        } finally {
             em.close();
         }
 
@@ -69,13 +63,11 @@ public class ProjectController {
             project.setName(projectName);
             em.persist(project);
             em.getTransaction().commit();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Unable to create project due to exception: " + ex.getMessage(), ex);
             em.getTransaction().rollback();
             return "failed";
-        }
-        finally {
+        } finally {
             em.close();
         }
 

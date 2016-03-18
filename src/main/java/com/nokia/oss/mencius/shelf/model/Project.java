@@ -1,9 +1,9 @@
 package com.nokia.oss.mencius.shelf.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Project {
@@ -13,6 +13,11 @@ public class Project {
 
     @Column
     private String name;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
+    // @OrderBy("id ASC")
+    @JsonIgnore
+    private List<Plan> plans;
 
     public Long getId() {
         return id;
@@ -30,4 +35,11 @@ public class Project {
         this.name = name;
     }
 
+    public List<Plan> getPlans() {
+        return plans;
+    }
+
+    public void setPlans(List<Plan> plans) {
+        this.plans = plans;
+    }
 }
