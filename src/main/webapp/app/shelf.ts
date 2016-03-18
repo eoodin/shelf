@@ -43,7 +43,7 @@ import {Plans} from './pages/plans.ts';
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Reports</a></li>
 
                 <li class="dropdown" dropdown keyboard-nav>
-                    <a href="javascript:void(0);" class="dropdown-toggle" dropdown-toggle>
+                    <a href="javascript:void(0);" class="dropdown-toggle" dropdownToggle>
                         {{projectService.current.name}} <span *ngIf="!projectService.current.id">No Project </span><span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
