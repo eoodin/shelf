@@ -44,32 +44,22 @@ export class AccordionPanel implements OnInit, OnDestroy {
 
     private _isOpen:boolean;
 
-    constructor(@Inject(Accordion) private
-
-    accordion:Accordion
-) {
-}
-
-ngOnInit();
-{
-    this.panelClass = this.panelClass || 'panel-default';
-    this.accordion.addGroup(this);
-}
-
-ngOnDestroy();
-{
-    this.accordion.removeGroup(this);
-}
-
-public
-toggleOpen(event
-:
-MouseEvent
-)
-{
-    event.preventDefault();
-    if (!this.isDisabled) {
-        this.isOpen = !this.isOpen;
+    constructor(@Inject(Accordion) private accordion:Accordion) {
     }
-}
+
+    ngOnInit() {
+        this.panelClass = this.panelClass || 'panel-default';
+        this.accordion.addGroup(this);
+    }
+
+    ngOnDestroy() {
+        this.accordion.removeGroup(this);
+    }
+
+    public toggleOpen(event:MouseEvent) {
+        event.preventDefault();
+        if (!this.isDisabled) {
+            this.isOpen = !this.isOpen;
+        }
+    }
 }

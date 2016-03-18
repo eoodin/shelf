@@ -3,7 +3,7 @@ import {Alert} from './components/alert';
 import {BUTTON_DIRECTIVES} from './components/buttons';
 import {CAROUSEL_DIRECTIVES} from './components/carousel';
 import {Collapse} from './components/collapse';
-import {DATEPICKER_DIRECTIVES} from './components/datepicker';
+//import {DATEPICKER_DIRECTIVES} from './components/datepicker';
 import {DROPDOWN_DIRECTIVES} from './components/dropdown';
 import {PAGINATION_DIRECTIVES} from './components/pagination';
 import {PROGRESSBAR_DIRECTIVES} from './components/progressbar';
@@ -18,7 +18,7 @@ export * from './components/alert';
 export * from './components/buttons';
 export * from './components/carousel';
 export * from './components/collapse';
-export * from './components/datepicker';
+// export * from './components/datepicker';
 export * from './components/dropdown';
 export * from './components/pagination';
 export * from './components/progressbar';
@@ -38,7 +38,7 @@ export default {
     BUTTON_DIRECTIVES,
     CAROUSEL_DIRECTIVES,
     Collapse,
-    DATEPICKER_DIRECTIVES,
+//    DATEPICKER_DIRECTIVES,
     DROPDOWN_DIRECTIVES,
     PAGINATION_DIRECTIVES,
     PROGRESSBAR_DIRECTIVES,

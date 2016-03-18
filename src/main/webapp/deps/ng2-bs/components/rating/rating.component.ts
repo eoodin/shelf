@@ -48,8 +48,7 @@ export class Rating implements ControlValueAccessor, OnInit {
     cd.valueAccessor = this;
   }
 
-ngOnInit();
-{
+  ngOnInit() {
     this.max = typeof this.max !== 'undefined' ? this.max : 5;
     this.readonly = this.readonly === true;
     this.stateOn = typeof this.stateOn !== 'undefined' ? this.stateOn : 'glyphicon-star';
@@ -99,11 +98,9 @@ ngOnInit();
     }
   }
 
-private
-reset();
-{
+  private reset() {
     this.value = this.preValue;
-  this.onLeave.emit(this.value);
+    this.onLeave.emit(this.value);
   }
 
   onChange = (_:any) => {

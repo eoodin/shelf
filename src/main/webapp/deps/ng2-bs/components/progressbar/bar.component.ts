@@ -41,33 +41,26 @@ export class Bar implements OnInit, OnDestroy {
 
     private _value:number;
 
-    constructor(@Host() public
-
-    progress:Progress
-) {
-}
-
-ngOnInit();
-{
-    this.progress.addBar(this);
-}
-
-ngOnDestroy();
-{
-    this.progress.removeBar(this);
-}
-
-public
-recalculatePercentage();
-{
-    this.percent = +(100 * this.value / this.progress.max).toFixed(2);
-
-    let totalPercentage = this.progress.bars.reduce(function (total, bar) {
-        return total + bar.percent;
-    }, 0);
-
-    if (totalPercentage > 100) {
-        this.percent -= totalPercentage - 100;
+    constructor(@Host() public progress:Progress) {
     }
-}
+
+    ngOnInit() {
+        this.progress.addBar(this);
+    }
+
+    ngOnDestroy() {
+        this.progress.removeBar(this);
+    }
+
+    public recalculatePercentage() {
+        this.percent = +(100 * this.value / this.progress.max).toFixed(2);
+
+        let totalPercentage = this.progress.bars.reduce(function (total, bar) {
+            return total + bar.percent;
+        }, 0);
+
+        if (totalPercentage > 100) {
+            this.percent -= totalPercentage - 100;
+        }
+    }
 }

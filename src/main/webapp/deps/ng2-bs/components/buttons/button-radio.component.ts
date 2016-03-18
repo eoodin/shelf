@@ -26,24 +26,16 @@ export class ButtonRadio implements ControlValueAccessor, OnInit {
     cd.valueAccessor = this;
   }
 
-public
-ngOnInit();
-{
+  public ngOnInit() {
     this.uncheckable = typeof this.uncheckable !== 'undefined';
   }
 
   // hack view model!
-protected
-get;
-value();
-{
+  protected get value() {
     return this.cd.viewModel;
   }
 
-protected
-set;
-value(value);
-{
+  protected set value(value) {
     this.cd.viewModel = value;
   }
 

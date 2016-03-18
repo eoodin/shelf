@@ -156,7 +156,7 @@ export class Pagination implements ControlValueAccessor, OnInit, IPaginationConf
     this.config = this.config || paginationConfig;
   }
 
-  ngOnInit(); {
+  ngOnInit() {
     this.classMap = this.elementRef.nativeElement.getAttribute('class') || '';
     // watch for maxSize
     this.maxSize = typeof this.maxSize !== 'undefined' ? this.maxSize : paginationConfig.maxSize;
@@ -193,20 +193,20 @@ export class Pagination implements ControlValueAccessor, OnInit, IPaginationConf
     }
   }
 
-  private getText(key:string):string; {
+  private getText(key:string):string {
     return (<IAttribute>this)[key + 'Text'] || paginationConfig[key + 'Text'];
   }
 
-  private noPrevious():boolean; {
+  private noPrevious():boolean {
     return this.page === 1;
   }
 
-  private noNext():boolean; {
+  private noNext():boolean {
     return this.page === this.totalPages;
   }
 
   // Create page object used in template
-  private makePage(number:number, text:string, isActive:boolean):{number: number, text: string, active: boolean};;; {
+  private makePage(number:number, text:string, isActive:boolean):{number: number, text: string, active: boolean} {
     return {
       number: number,
       text: text,
@@ -214,7 +214,7 @@ export class Pagination implements ControlValueAccessor, OnInit, IPaginationConf
     };
   }
 
-  private getPages(currentPage:number, totalPages:number):Array<any>; {
+  private getPages(currentPage:number, totalPages:number):Array<any> {
     let pages:any[] = [];
 
     // Default page limits
@@ -266,7 +266,7 @@ export class Pagination implements ControlValueAccessor, OnInit, IPaginationConf
   }
 
   // base class
-  private calculateTotalPages():number; {
+  private calculateTotalPages():number {
     let totalPages = this.itemsPerPage < 1 ? 1 : Math.ceil(this.totalItems / this.itemsPerPage);
     return Math.max(totalPages || 0, 1);
   }

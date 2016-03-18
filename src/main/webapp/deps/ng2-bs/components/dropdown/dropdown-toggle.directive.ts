@@ -17,17 +17,12 @@ export class DropdownToggle implements OnInit {
   constructor(@Host() public dropdown:Dropdown, public el:ElementRef) {
   }
 
-public
-ngOnInit();
-{
+  public ngOnInit() {
     this.dropdown.dropDownToggle = this;
   }
 
   @HostBinding('attr.aria-expanded')
-  public
-get;
-isOpen();
-{
+  public get isOpen() {
     return this.dropdown.isOpen;
   }
 
