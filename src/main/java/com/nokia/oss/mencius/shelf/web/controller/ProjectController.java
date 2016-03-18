@@ -8,10 +8,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static java.util.logging.Logger.getLogger;
 
 @Controller
 @RequestMapping("/projects")
 public class ProjectController {
+    private static final Logger LOG = getLogger(ProjectController.class.getName());
+
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseBody
@@ -30,13 +36,25 @@ public class ProjectController {
     @ResponseBody
     private String deleteProject(@PathVariable String projectId) {
         Long id = Long.valueOf(projectId);
-
         EntityManager em = HibernateHelper.createEntityManager();
         em.getTransaction().begin();
-        Project project = em.find(Project.class, id);
-        em.remove(project);
-        em.getTransaction().commit();
-        em.close();
+        try {
+            Project project = em.find(Project.class, id);
+            List plans = em.createQuery("select p from Plan p where p.project=" + projectId).getResultList();
+            for (Object plan : plans)
+                em.remove(plan);
+
+            em.remove(project);
+            em.getTransaction().commit();
+        }
+        catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Unable to delete project due to exception: " + ex.getMessage(), ex);
+            em.getTransaction().rollback();
+            return "failed";
+        }
+        finally {
+            em.close();
+        }
 
         return "deleted";
     }
@@ -46,11 +64,20 @@ public class ProjectController {
     private String createProject(@RequestBody String projectName) {
         EntityManager em = HibernateHelper.createEntityManager();
         em.getTransaction().begin();
-        Project project = new Project();
-        project.setName(projectName);
-        em.persist(project);
-        em.getTransaction().commit();
-        em.close();
+        try {
+            Project project = new Project();
+            project.setName(projectName);
+            em.persist(project);
+            em.getTransaction().commit();
+        }
+        catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Unable to create project due to exception: " + ex.getMessage(), ex);
+            em.getTransaction().rollback();
+            return "failed";
+        }
+        finally {
+            em.close();
+        }
 
         return "created";
     }

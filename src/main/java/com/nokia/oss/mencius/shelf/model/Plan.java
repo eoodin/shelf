@@ -20,7 +20,7 @@ public class Plan {
     @ManyToOne
     Project project;
 
-    @OneToMany(mappedBy = "plan")
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.REMOVE)
     // @OrderBy("id ASC")
     @JsonIgnore
     List<WorkItem> workItems;

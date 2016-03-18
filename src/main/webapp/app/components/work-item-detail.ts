@@ -28,8 +28,7 @@ import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/c
         </div>
     </div>
     `,
-    styles: [`
-    `]
+    styles: [` `]
 })
 export class WorkItemDetail {
     private _show: boolean;
