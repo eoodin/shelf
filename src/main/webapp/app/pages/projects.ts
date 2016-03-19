@@ -1,6 +1,7 @@
 import {Component} from 'angular2/core';
 import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/common'
 import {Http, Response} from 'angular2/http';
+import {ProjectService} from '../services/project-service.ts';
 
 class Project {
     public id;
@@ -19,8 +20,8 @@ class Project {
        </div>
        <div class="panel-body">
         <ul class="project-list">
-            <li *ngFor="#project of projects" >
-                <a href="#/plans/?pid={{project.id}}"><span class="project-title">{{project.name}}</span></a>
+            <li *ngFor="#project of projectService.projects" >
+                <a href="#/plans?pid={{project.id}}"><span class="project-title">{{project.name}}</span></a>
                 <button class="btn btn-danger btn-sm" (click)="deleteProject(project)">Delete</button>
             </li>
         </ul>
@@ -106,19 +107,13 @@ class Project {
     .project-title { font-size: 1.6em; }
     .project-description {height: 120px;}
     .project-plans {height: 120px;}
-    `],
+    `]
 })
 export class Projects {
-    private projects:Array;
     private ui;
 
-    constructor(private http:Http) {
+    constructor(private http:Http, private projectService: ProjectService) {
         this.ui = {createProjectDialog: {show: false, projectName: ''}};
-        this.refreshProjectList();
-    }
-
-    refreshProjectList() {
-        this.http.get('/api/projects/').subscribe(res => this.projects = res.json());
     }
 
     deleteProject(p:Project) {
@@ -127,7 +122,7 @@ export class Projects {
     }
 
     projectDeleted(resp) {
-        this.refreshProjectList();
+        this.projectService.reload();
     }
 
     onCreateProjectSubmit(data) {
@@ -138,6 +133,6 @@ export class Projects {
     }
 
     onProjectCreated(resp) {
-        this.refreshProjectList();
+        this.projectService.reload();
     }
 }

@@ -44,7 +44,8 @@ import {Plans} from './pages/plans.ts';
 
                 <li class="dropdown" dropdown keyboard-nav>
                     <a href="javascript:void(0);" class="dropdown-toggle" dropdownToggle>
-                        {{projectService.current.name}} <span *ngIf="!projectService.current.id">No Project </span><span class="caret"></span>
+                        <span *ngIf="projectService.current">{{projectService.current.name}}</span>
+                        <span *ngIf="!projectService.current">No Project </span><span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
                       <li *ngFor="#p of projectService.projects" role="menuitem">

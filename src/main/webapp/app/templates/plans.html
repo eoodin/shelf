@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" *ngIf="projectService.current">
     <div class="col-sm-2">
         <plan-list [project]="projectService.current" (select)="onSelect($event)"></plan-list>
     </div>
@@ -56,6 +56,10 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="row" *ngIf="projectService.current == null">
+    <h1 class="no-content-notice">No project.</h1>
 </div>
 
 <div class="modal fade in awd" *ngIf="ui.awd.show" [style.display]="ui.awd.show ? 'block' : 'block'" role="dialog">

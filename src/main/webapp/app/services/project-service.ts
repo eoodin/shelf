@@ -3,7 +3,7 @@ import {Http, Response} from 'angular2/http';
 
 @Injectable()
 export class ProjectService {
-    private _current = {};
+    private _current = null;
     private _projects = [];
 
     constructor(private http: Http) {
@@ -23,16 +23,31 @@ export class ProjectService {
 
     set projects(projects:Object[]) {
         this._projects = projects;
-        if (this._projects && this._projects.length)
-            this._current =this._projects[0];
+        if (!this._projects.length) {
+            this._current = null;
+        }
+        else {
+            var np = null;
+            if (this._current) {
+                for(var p of this._projects) {
+                    if (p.id == this._current.id) {
+                        np = p;
+                        break;
+                    }
+                }
+            }
+            this._current = np ? np : this._projects[0];
+        }
     }
 
     public load() {
         this.http.get('/api/projects/')
-            .subscribe(resp => this.receiveProjects(resp.json()));
+            .subscribe(resp => this.projects = resp.json());
     }
 
-    private receiveProjects(ps) {
-        this.projects = ps;
+    public reload() {
+        //TODO: update only changed/added/removed.
+        this.load();
     }
+
 }

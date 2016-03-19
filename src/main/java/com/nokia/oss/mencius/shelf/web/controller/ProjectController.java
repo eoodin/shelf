@@ -1,6 +1,7 @@
 package com.nokia.oss.mencius.shelf.web.controller;
 
 import com.nokia.oss.mencius.shelf.data.HibernateHelper;
+import com.nokia.oss.mencius.shelf.model.Plan;
 import com.nokia.oss.mencius.shelf.model.Project;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +62,11 @@ public class ProjectController {
         try {
             Project project = new Project();
             project.setName(projectName);
+            Plan backlog = new Plan();
+            backlog.setName("Product backlog");
+            backlog.setType("backlog");
+            backlog.setProject(project);
+            em.persist(backlog);
             em.persist(project);
             em.getTransaction().commit();
         } catch (Exception ex) {
