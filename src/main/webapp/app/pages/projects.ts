@@ -111,9 +111,12 @@ class Project {
 })
 export class Projects {
     private ui;
+    private user;
 
     constructor(private http:Http, private projectService: ProjectService) {
         this.ui = {createProjectDialog: {show: false, projectName: ''}};
+        this.http.get('/api/users/me')
+            .subscribe(response => this.user = response.json());
     }
 
     deleteProject(p:Project) {

@@ -7,8 +7,4 @@ import javax.persistence.Entity;
 @DiscriminatorValue("DE")
 public class Defect extends WorkItem {
 
-    @Override
-    public String getType() {
-        return "DE";
-    }
 }

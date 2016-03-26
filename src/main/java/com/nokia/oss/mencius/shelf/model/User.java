@@ -1,9 +1,9 @@
 package com.nokia.oss.mencius.shelf.model;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.Date;
 
 @Entity
 public class User {
@@ -16,6 +16,9 @@ public class User {
 
     @Column
     private String email;
+
+    @Column(nullable = false)
+    private Date createdAt;
 
     public String getUserId() {
         return userId;
@@ -39,5 +42,13 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
     }
 }

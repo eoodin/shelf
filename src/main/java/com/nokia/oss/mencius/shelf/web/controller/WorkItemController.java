@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
-import java.util.List;
+import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/work-items")
@@ -14,17 +14,12 @@ public class WorkItemController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
-    public List<WorkItem> getWorkItems(@RequestParam("planId") Long planId) {
-        List<WorkItem> list;
+    public WorkItemList getWorkItems(@RequestParam("planId") Long planId) {
+        WorkItemList list = new WorkItemList();
         EntityManager em = HibernateHelper.createEntityManager();
         Plan plan = em.find(Plan.class, planId);
-        list = plan.getWorkItems();
-        list.size(); // force load
+        list.addAll(plan.getWorkItems());
         em.close();
-        for (WorkItem item : list) {
-            item.setTitle(item.getTitle());
-        }
-
         return list;
     }
 
@@ -136,5 +131,9 @@ public class WorkItemController {
         public String description;
         public String estimation;
         public String points;
+    }
+
+    public static class WorkItemList extends ArrayList<WorkItem> {
+
     }
 }

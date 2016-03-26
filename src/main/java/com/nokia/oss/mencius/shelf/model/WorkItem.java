@@ -1,14 +1,23 @@
 package com.nokia.oss.mencius.shelf.model;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.ManyToOne;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn
-@DiscriminatorValue("WI")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type")
 abstract public class WorkItem {
     public enum Status {
         New,
@@ -79,9 +88,6 @@ abstract public class WorkItem {
     public void setPlan(Plan plan) {
         this.plan = plan;
     }
-
-    @JsonGetter
-    public abstract String getType();
 
     public Status getStatus() {
         return status;

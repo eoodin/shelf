@@ -17,9 +17,4 @@ public class UserStory extends WorkItem {
     public void setPoints(int points) {
         this.points = points;
     }
-
-    @Override
-    public String getType() {
-        return "US";
-    }
 }

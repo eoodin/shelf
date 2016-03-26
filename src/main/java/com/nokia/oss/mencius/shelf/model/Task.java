@@ -7,8 +7,4 @@ import javax.persistence.Entity;
 @DiscriminatorValue("TA")
 public class Task extends WorkItem {
 
-    @Override
-    public String getType() {
-        return "TA";
-    }
 }
