@@ -41,6 +41,14 @@ class Project {
                             <div class="row">
                                 <div class="col-sm-3">Project name:</div><div class="col-sm-5"> <input type="text" ngControl="projectName"></div>
                             </div>
+                            <div class="row">
+                                <div class="col-sm-3">Team:</div>
+                                <div class="col-sm-5">
+                                   <select class="form-control" required ngControl="teamId">
+                                      <option *ngFor="#t of teamService.teams" [value]="t.id">{{t.name}}</option>
+                                   </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-default" data-dismiss="modal">Create</button>
@@ -166,15 +174,17 @@ export class Projects {
     }
 
     onCreateProjectSubmit(data) {
-        this.http.post('/api/projects/', data.projectName)
-            .subscribe(resp => this.onProjectCreated(resp));
+        this.http.request(new Request(new RequestOptions(
+            {url: '/api/projects/',
+                method: RequestMethod.Post,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })))
+            .subscribe(resp => this.projectService.reload());
 
         this.ui.createProjectDialog.show = false;
     }
 
-    onProjectCreated(resp) {
-        this.projectService.reload();
-    }
 
     onCreateTeamSubmit(data) {
         data.users = data.users.split(',');
@@ -185,13 +195,9 @@ export class Projects {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             })))
-            .subscribe(resp => this.onTeamCreated(resp));
+            .subscribe(resp => this.teamService.reload());
 
         this.ui.createTeamDialog.show = false;
-    }
-
-    onTeamCreated(resp) {
-        this.teamService.reload();
     }
 
     deleteTeam(team) {

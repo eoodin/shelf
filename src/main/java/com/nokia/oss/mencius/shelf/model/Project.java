@@ -14,6 +14,9 @@ public class Project {
     @Column
     private String name;
 
+    @OneToOne
+    private Team team;
+
     @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
     // @OrderBy("id ASC")
     @JsonIgnore
@@ -33,6 +36,14 @@ public class Project {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
     public List<Plan> getPlans() {

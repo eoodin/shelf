@@ -3,6 +3,7 @@ package com.nokia.oss.mencius.shelf.web.controller;
 import com.nokia.oss.mencius.shelf.data.HibernateHelper;
 import com.nokia.oss.mencius.shelf.model.Plan;
 import com.nokia.oss.mencius.shelf.model.Project;
+import com.nokia.oss.mencius.shelf.model.Team;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,17 +57,21 @@ public class ProjectController {
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ResponseBody
-    private String createProject(@RequestBody String projectName) {
+    private String createProject(@RequestBody ProjectSpec spec) {
         EntityManager em = HibernateHelper.createEntityManager();
         em.getTransaction().begin();
         try {
             Project project = new Project();
-            project.setName(projectName);
+            project.setName(spec.projectName);
             Plan backlog = new Plan();
             backlog.setName("Product backlog");
             backlog.setType("backlog");
             backlog.setProject(project);
             em.persist(backlog);
+
+            Team team = em.find(Team.class, spec.teamId);
+            project.setTeam(team);
+
             em.persist(project);
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -78,5 +83,10 @@ public class ProjectController {
         }
 
         return "created";
+    }
+
+    public static class ProjectSpec {
+        public String projectName;
+        public Long teamId;
     }
 }
