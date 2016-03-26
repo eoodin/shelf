@@ -3,6 +3,7 @@ import {Http, Response, Request, RequestMethod, RequestOptions} from 'angular2/h
 import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/common'
 
 import {DROPDOWN_DIRECTIVES} from 'deps/ng2-bs/ng2-bootstrap.ts';
+import moment from 'moment';
 
 import {PlanList} from '../components/plan-list.ts';
 import {ProjectService} from '../services/project-service.ts';
@@ -18,6 +19,10 @@ import {ModalDialog} from '../components/modal-dialog.ts';
     a:hover {cursor: pointer;}
     [ngcontrol='title'] { width: 100%; }
     [ngcontrol='description'] { width: 100%; height: 8em; }
+    .plan-head h1 {font-size: 18px;}
+    .plan-head ul {padding-left: 0;}
+    .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 148px}
+    .plan-head ul li span {font-weight: normal}
     .item-table{position:relative;}
     .checkbox{margin:0; width: 22px; height: 22px;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
@@ -144,6 +149,13 @@ export class Plans {
 
     setWorkItems(items) {
         this.workItems = items;
+    }
+
+    date(epoch) {
+        if (!epoch && epoch !== 0)
+            return '----------';
+
+        return moment(epoch).format("YYYY-MM-DD");
     }
 
     private getSelectedWorkItemIds() {

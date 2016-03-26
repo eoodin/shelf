@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -57,7 +56,9 @@ public class PlanController {
         em.getTransaction().begin();
         Plan plan = new Plan();
         plan.setName(spec.getName());
-        plan.setType(spec.getType());
+        plan.setType("sprint");
+        plan.setStart(spec.getStart());
+        plan.setEnd(spec.getEnd());
         plan.setProject(project);
         em.persist(plan);
         em.getTransaction().commit();
@@ -126,7 +127,8 @@ public class PlanController {
     public static class PlanSpec {
         private Long projectId;
         private String name;
-        private String type;
+        private Date start;
+        private Date end;
 
         public Long getProjectId() {
             return projectId;
@@ -144,16 +146,24 @@ public class PlanController {
             this.name = name;
         }
 
-        public String getType() {
-            return type;
+        public Date getStart() {
+            return start;
         }
 
-        public void setType(String type) {
-            this.type = type;
+        public void setStart(Date start) {
+            this.start = start;
+        }
+
+        public Date getEnd() {
+            return end;
+        }
+
+        public void setEnd(Date end) {
+            this.end = end;
         }
 
         public String toString() {
-            return "[name:" + name + ",type:" + type + "]";
+            return "[name:" + name + ",start:" + start + ",end:" + end + "]";
         }
     }
 }

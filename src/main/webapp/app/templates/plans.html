@@ -3,7 +3,16 @@
         <plan-list [project]="projectService.current" (select)="onSelect($event)"></plan-list>
     </div>
     <div class="col-sm-offset-2 col-md-offset-2 right">
-        <div class="row item-table">
+        <div class="plan-head" *ngIf="current.id">
+            <h1>{{current.name}}</h1>
+            <ul class="summary">
+                <li>ID: <span>{{current.id}}</span></li>
+                <li>Type: <span>{{current.type}}</span></li>
+                <li>Start: <span>{{date(current.start)}}</span></li>
+                <li>Deadline: <span>{{date(current.end)}}</span></li>
+            </ul>
+        </div>
+        <div class="item-table">
             <div class="loading-mask" *ngIf="ui.loading.show">
                 <div class="spinner-loader"></div>
             </div>
@@ -69,7 +78,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" (click)="ui.awd.show = false"
                             data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Add Workitem to {{current.name}}</h4>
+                    <h4 class="modal-title">Add Work Item to {{current.name}}</h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">

@@ -3,6 +3,7 @@ package com.nokia.oss.mencius.shelf.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -11,14 +12,20 @@ public class Plan {
     @GeneratedValue
     private Long id;
 
+    @ManyToOne
+    Project project;
+
     @Column
     private String name;
 
     @Column
     private String type;
 
-    @ManyToOne
-    Project project;
+    @Column
+    private Date start;
+
+    @Column
+    private Date end;
 
     @OneToMany(mappedBy = "plan", cascade = CascadeType.REMOVE)
     // @OrderBy("id ASC")
@@ -65,4 +72,19 @@ public class Plan {
         this.workItems = workItems;
     }
 
+    public Date getStart() {
+        return start;
+    }
+
+    public void setStart(Date start) {
+        this.start = start;
+    }
+
+    public Date getEnd() {
+        return end;
+    }
+
+    public void setEnd(Date end) {
+        this.end = end;
+    }
 }

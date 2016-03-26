@@ -9,28 +9,31 @@ import {NgForm} from 'angular2/common'
       <a class="list-group-item" *ngFor="#plan of plans" [class.active]="plan == selected" (click)="onClick($event, plan)"> {{plan.name}} </a>
     </div>
 
-    <button class="btn btn-primary" (click)="ui.cpd.show = true;">New Plan</button>
+    <button class="btn btn-primary" (click)="ui.cpd.show = true;">Add New Sprint...</button>
     <div class="modal fade in" [style.display]="ui.cpd.show ? 'block' : 'none'" role="dialog">
         <div class="modal-dialog">
-            <form #f="ngForm" (ngSubmit)="createPlan(f.name, f.type)">
+            <form #f="ngForm" (ngSubmit)="createPlan(f.name, f.start, f.end)">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" (click)="ui.cpd.show = false" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Add New Plan</h4>
+                        <h4 class="modal-title">Add New Sprint</h4>
                     </div>
                     <div class="modal-body">
                         <div class="row plan-field-row">
                             <div class="col-sm-3">Project:</div><div class="col-sm-5"><span>{{_project.name}}</span></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Plan name:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="f.name"></div>
+                            <div class="col-sm-3">Sprint name:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="f.name"></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Type:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="f.type"></div>
+                            <div class="col-sm-3">Start from:</div><div class="col-sm-5"> <input type="date" [(ngModel)]="f.start"></div>
+                        </div>
+                        <div class="row plan-field-row">
+                            <div class="col-sm-3">Due date:</div><div class="col-sm-5"> <input type="date" [(ngModel)]="f.end"></div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-default" data-dismiss="modal">Create</button>
+                        <button type="submit" class="btn btn-default" data-dismiss="modal">Add</button>
                     </div>
                 </div>
             </form>
@@ -70,11 +73,11 @@ export class PlanList {
         this.plans = plans;
     }
 
-    createPlan(name, type) {
+    createPlan(name, start, end) {
         // TODO: simpler  way to specify 'Content-Type'?
         //this.http.post('/api/plans/', JSON.stringify(data), options.merge({}))
         //    .subscribe(resp => this.planCreated(resp));
-        var data = {'projectId' : this._project.id, 'name': name, 'type': type};
+        var data = {'projectId' : this._project.id, 'name': name, 'start': start, 'end': end};
 
         this.http.request(new Request(new RequestOptions(
             {url: '/api/plans/',

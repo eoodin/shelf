@@ -17,6 +17,7 @@ import {ROUTER_DIRECTIVES,
 import {ProjectService} from './services/project-service.ts';
 import {Projects} from './pages/projects.ts';
 import {Plans} from './pages/plans.ts';
+import {WorkItems} from './pages/workitems.ts';
 
 @Component({
     selector: '[shelf-app]',
@@ -37,7 +38,7 @@ import {Plans} from './pages/plans.ts';
               <ul class="nav navbar-nav">
                 <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/Projects']" class="link">Dashboard</a></li>
                 <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/Plans']" class="link">Plans</a></li>
-                <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Work Items</a></li>
+                <li [class.active]="getLinkStyle('/workitems')"><a [routerLink]="['/WorkItems']" class="link">Work Items</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">CI Status</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Promotion Status</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Reports</a></li>
@@ -83,8 +84,9 @@ import {Plans} from './pages/plans.ts';
     providers: [ProjectService]
 })
 @RouteConfig([
-    new Route({path: '/projects', component: Projects, name: 'Projects'}),
-    new Route({path: '/plans', component: Plans, name: 'Plans'})
+    {path: '/projects', component: Projects, name: 'Projects'},
+    {path: '/plans', component: Plans, name: 'Plans'},
+    {path: '/workitems', component: WorkItems, name: 'WorkItems'}
 ])
 export class ShelfApp {
     router:Router;
