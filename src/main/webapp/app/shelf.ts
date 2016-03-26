@@ -15,6 +15,7 @@ import {ROUTER_DIRECTIVES,
     Router} from 'angular2/router';
 
 import {ProjectService} from './services/project-service.ts';
+import {TeamService} from './services/team-service.ts';
 import {Projects} from './pages/projects.ts';
 import {Plans} from './pages/plans.ts';
 import {WorkItems} from './pages/workitems.ts';
@@ -81,7 +82,7 @@ import {WorkItems} from './pages/workitems.ts';
     .nav-logo {width: 32px; height:32px;}
     `],
     directives: [Alert, ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
-    providers: [ProjectService]
+    providers: [ProjectService, TeamService]
 })
 @RouteConfig([
     {path: '/projects', component: Projects, name: 'Projects'},
