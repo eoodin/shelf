@@ -31,7 +31,10 @@ public class Plan {
     @OneToMany(mappedBy = "plan", cascade = CascadeType.REMOVE)
     // @OrderBy("id ASC")
     @JsonIgnore
-    List<WorkItem> workItems;
+    private List<WorkItem> workItems;
+
+    @OneToOne(mappedBy = "sprint")
+    private Allocation allocation;
 
     public Long getId() {
         return id;
@@ -87,5 +90,13 @@ public class Plan {
 
     public void setEnd(Date end) {
         this.end = end;
+    }
+
+    public Allocation getAllocation() {
+        return allocation;
+    }
+
+    public void setAllocation(Allocation allocation) {
+        this.allocation = allocation;
     }
 }

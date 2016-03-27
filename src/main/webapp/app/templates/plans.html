@@ -6,10 +6,10 @@
         <div class="plan-head" *ngIf="current.id">
             <h1>{{current.name}}</h1>
             <ul class="summary">
-                <li>ID: <span>{{current.id}}</span></li>
-                <li>Type: <span>{{current.type}}</span></li>
                 <li>Start: <span>{{date(current.start)}}</span></li>
                 <li>Deadline: <span>{{date(current.end)}}</span></li>
+                <li *ngIf="current.allocation">Developer time: <span>{{current.allocation.developerHours}}</span></li>
+                <li *ngIf="current.allocation">Tester time: <span>{{current.allocation.testerHours}}</span></li>
             </ul>
         </div>
         <div class="item-table">

@@ -52,6 +52,7 @@ public class Allocation {
         this.sprint = sprint;
     }
 
+
     public Long getDeveloperHours() {
         return developerHours;
     }

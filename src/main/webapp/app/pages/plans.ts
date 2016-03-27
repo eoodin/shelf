@@ -21,7 +21,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
     [ngcontrol='description'] { width: 100%; height: 8em; }
     .plan-head h1 {font-size: 18px;}
     .plan-head ul {padding-left: 0;}
-    .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 148px}
+    .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
     .plan-head ul li span {font-weight: normal}
     .item-table{position:relative;}
     .checkbox{margin:0; width: 22px; height: 22px;}
