@@ -70,10 +70,13 @@ import {WorkItems} from './pages/workitems.ts';
             </div><!--/.nav-collapse -->
           </div>
         </nav>
-        <alert [type]="'warning'" dismissible="true">
-            <p>Notice: This tool is under development.</p>
-        </alert>
-        <div class="container-fluid"><router-outlet></router-outlet></div>
+
+        <div class="container-fluid">
+            <alert [type]="'warning'" dismissible="true">
+                <p>Notice: This tool is under development.</p>
+            </alert>
+            <router-outlet></router-outlet>
+        </div>
     </div>
 `,
     styles: [`
