@@ -48,9 +48,24 @@ public class TeamController {
         return teams;
     }
 
+    @RequestMapping(value = "/{teamId}/members", method = RequestMethod.GET)
+    @ResponseBody
+    public List<User> getMembers(@PathVariable("teamId") Long teamId) {
+        EntityManager em = HibernateHelper.createEntityManager();
+        try {
+            Team team = em.find(Team.class, teamId);
+            List<User> members = new ArrayList<>();
+            members.addAll(team.getMembers());
+            return members;
+        }
+        finally {
+            em.close();
+        }
+    }
+
     @RequestMapping(value = "/", method = RequestMethod.POST, headers = {"Content-type=application/json"})
     @ResponseBody
-    public Team createPlan(@RequestBody TeamSpec spec, HttpServletRequest request) throws ShelfException {
+    public Team createTeam(@RequestBody TeamSpec spec, HttpServletRequest request) throws ShelfException {
         Collection<User> users = UserUtils.findOrCreateUsers(spec.getUsers());
         User scrumMaster = UserUtils.findOrCreateUser(spec.getScrumMaster());
         User currentUser = UserUtils.findOrCreateUser(request.getRemoteUser());
@@ -81,7 +96,7 @@ public class TeamController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public String deletePlan(@PathVariable("id") Long teamId) {
+    public String deleteTeam(@PathVariable("id") Long teamId) {
         EntityManager em = HibernateHelper.createEntityManager();
 
         em.getTransaction().begin();

@@ -2,17 +2,21 @@ package com.nokia.oss.mencius.shelf.web.controller;
 
 import com.nokia.oss.mencius.shelf.data.HibernateHelper;
 import com.nokia.oss.mencius.shelf.model.*;
+import com.nokia.oss.mencius.shelf.utils.UserUtils;
+import com.nokia.oss.mencius.shelf.web.security.ShelfException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/work-items")
 public class WorkItemController {
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseBody
     public WorkItemList getWorkItems(@RequestParam("planId") Long planId) {
         WorkItemList list = new WorkItemList();
@@ -23,29 +27,38 @@ public class WorkItemController {
         return list;
     }
 
-    @RequestMapping(value="/add")
+    @RequestMapping(value="/", method = RequestMethod.POST)
     @ResponseBody
-    public Long addWorkItem(@RequestBody ItemSpec is, @RequestParam("plan") Long planId) {
+    public Long addWorkItem(@RequestBody ItemSpec spec, HttpServletRequest request) throws ShelfException {
         EntityManager em = HibernateHelper.createEntityManager();
 
-        Plan plan = em.find(Plan.class, planId);
-        if (plan == null)
-            return -1L;
-
-        WorkItem wi = createItem(is);
-        if (wi == null)
-            return -1L;
-
-        em.getTransaction().begin();
         try {
-            wi.setPlan(plan);
-            em.persist(wi);
-            em.getTransaction().commit();
-            return wi.getId();
-        } catch (Exception ex) {
-            System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
-            em.getTransaction().rollback();
-        } finally {
+            Plan plan = em.find(Plan.class, spec.planId);
+            if (plan == null) {
+                Project project = em.find(Project.class, spec.projectId);
+                plan = project.getBacklog();
+            }
+
+            WorkItem wi = createItem(spec);
+            if (wi == null)
+                return -1L;
+
+            User currentUser = UserUtils.findOrCreateUser(request.getRemoteUser());
+            em.getTransaction().begin();
+            try {
+                wi.setCreatedBy(currentUser);
+                wi.setOwner(currentUser);
+                wi.setPlan(plan);
+                em.persist(wi);
+                em.getTransaction().commit();
+                return wi.getId();
+            } catch (Exception ex) {
+                System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
+                em.getTransaction().rollback();
+            }
+
+        }
+        finally {
             em.close();
         }
 
@@ -56,42 +69,53 @@ public class WorkItemController {
     @ResponseBody
     public boolean removeWorkItem(@PathVariable("wiid") Long wiid) {
         EntityManager em = HibernateHelper.createEntityManager();
-        WorkItem wi = em.find(WorkItem.class, wiid);
-        if (wi == null)
-            return false;
-
-        em.getTransaction().begin();
         try {
-            em.remove(wi);
-            em.getTransaction().commit();
-            return true;
-        } catch (Exception ex) {
-            System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
-            em.getTransaction().rollback();
-        } finally {
+            WorkItem wi = em.find(WorkItem.class, wiid);
+            if (wi == null)
+                return false;
+
+            em.getTransaction().begin();
+            try {
+                em.remove(wi);
+                em.getTransaction().commit();
+                return true;
+            } catch (Exception ex) {
+                System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
+                em.getTransaction().rollback();
+            }
+        }
+        finally {
             em.close();
         }
 
         return false;
     }
 
-    @RequestMapping(value = "/{wiid}/status", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{wiid}", method = RequestMethod.PUT)
     @ResponseBody
-    public boolean changeStatus(@PathVariable("wiid") Long wiid, @RequestBody String status) {
+    public boolean changeStatus(@PathVariable("wiid") Long wiid, @RequestBody ChangeSpec spec) {
         EntityManager em = HibernateHelper.createEntityManager();
-        WorkItem wi = em.find(WorkItem.class, wiid);
-        if (wi == null)
-            return false;
-
-        wi.setStatus(WorkItem.Status.valueOf(status));
-        em.getTransaction().begin();
         try {
+            em.getTransaction().begin();
+            WorkItem wi = em.find(WorkItem.class, wiid);
+            if (wi == null)
+                return false;
+
+            if (spec.status != null)
+                wi.setStatus(WorkItem.Status.valueOf(spec.status));
+
+            if (spec.ownerId != null)
+                wi.setOwner(em.find(User.class, spec.ownerId));
+
             em.merge(wi);
             em.getTransaction().commit();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
             em.getTransaction().rollback();
-        } finally {
+            return false;
+        }
+        finally {
             em.close();
         }
 
@@ -126,11 +150,18 @@ public class WorkItemController {
     }
 
     static class ItemSpec {
+        public Long projectId;
+        public Long planId;
         public String type;
         public String title;
         public String description;
         public String estimation;
         public String points;
+    }
+
+    static class ChangeSpec {
+        public String ownerId;
+        public String status;
     }
 
     public static class WorkItemList extends ArrayList<WorkItem> {

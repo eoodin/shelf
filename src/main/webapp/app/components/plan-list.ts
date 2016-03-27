@@ -5,14 +5,17 @@ import {NgForm} from 'angular2/common'
 @Component({
     selector: 'plan-list',
     template: `
+    <div class="list-group" *ngIf="backlog">
+      <a class="list-group-item" [class.active]="backlog == selected" (click)="selectBacklog()"> {{backlog.name}} </a>
+    </div>
     <div class="list-group">
       <a class="list-group-item" *ngFor="#plan of plans" [class.active]="plan == selected" (click)="onClick($event, plan)"> {{plan.name}} </a>
     </div>
 
-    <button class="btn btn-primary" (click)="ui.cpd.show = true;">Add New Sprint...</button>
+    <button class="btn btn-primary" (click)="ui.cpd.show = true;">New Sprint...</button>
     <div class="modal fade in" [style.display]="ui.cpd.show ? 'block' : 'none'" role="dialog">
         <div class="modal-dialog">
-            <form #f="ngForm" (ngSubmit)="createPlan(f.name, f.start, f.end)">
+            <form #f="ngForm" (ngSubmit)="createPlan(f.value)">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" (click)="ui.cpd.show = false" data-dismiss="modal">&times;</button>
@@ -23,13 +26,20 @@ import {NgForm} from 'angular2/common'
                             <div class="col-sm-3">Project:</div><div class="col-sm-5"><span>{{_project.name}}</span></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Sprint name:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="f.name"></div>
+                            <div class="col-sm-3">Sprint name:</div><div class="col-sm-5"> <input type="text" ngControl="name"></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Start from:</div><div class="col-sm-5"> <input type="date" [(ngModel)]="f.start"></div>
+                            <div class="col-sm-3">Start from:</div><div class="col-sm-5"> <input type="date" ngControl="start"></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Due date:</div><div class="col-sm-5"> <input type="date" [(ngModel)]="f.end"></div>
+                            <div class="col-sm-3">Due date:</div><div class="col-sm-5"> <input type="date" ngControl="end"></div>
+                        </div>
+                        <div class="row"></div>
+                        <div class="row plan-field-row">
+                            <div class="col-sm-3">Developer hours:</div><div class="col-sm-5"> <input type="text" ngControl="devHours"></div>
+                        </div>
+                        <div class="row plan-field-row">
+                            <div class="col-sm-3">Tester hours:</div><div class="col-sm-5"> <input type="text" ngControl="tstHours"></div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -48,6 +58,7 @@ import {NgForm} from 'angular2/common'
 export class PlanList {
     private _project: Object = {};
     private plans: Array = [];
+    private backlog;
     private ui: {};
     @Output() public select: EventEmitter<PlanList> = new EventEmitter();
 
@@ -64,6 +75,9 @@ export class PlanList {
 
     private loadPlans() {
         if (this._project.id) {
+            this.http.get('/api/backlogs/' + this._project.backlog.id)
+                .subscribe(resp => this.backlog = resp.json());
+
             this.http.get('/api/plans/?project=' + this._project.id)
                 .subscribe(resp => this.setPlans(resp.json()));
         }
@@ -73,12 +87,8 @@ export class PlanList {
         this.plans = plans;
     }
 
-    createPlan(name, start, end) {
-        // TODO: simpler  way to specify 'Content-Type'?
-        //this.http.post('/api/plans/', JSON.stringify(data), options.merge({}))
-        //    .subscribe(resp => this.planCreated(resp));
-        var data = {'projectId' : this._project.id, 'name': name, 'start': start, 'end': end};
-
+    createPlan(data) {
+        data['projectId'] = this._project.id;
         this.http.request(new Request(new RequestOptions(
             {url: '/api/plans/',
                 method: RequestMethod.Post,
@@ -97,5 +107,10 @@ export class PlanList {
     onClick(e, plan) {
         this.selected = plan;
         this.select.next(plan);
+    }
+
+    selectBacklog() {
+        this.selected = this.backlog;
+        this.select.next(this.backlog)
     }
 }

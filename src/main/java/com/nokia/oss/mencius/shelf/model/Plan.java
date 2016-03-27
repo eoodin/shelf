@@ -12,6 +12,7 @@ public class Plan {
     @GeneratedValue
     private Long id;
 
+    @JsonIgnore
     @ManyToOne
     Project project;
 

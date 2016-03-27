@@ -33,6 +33,7 @@ export class Plans {
     private current = {};
     private workItems = [];
     private plans = null;
+    private members;
     private ui;
 
     constructor(private http: Http, private projectService: ProjectService) {
@@ -40,12 +41,19 @@ export class Plans {
             "awd": {"show": false},
             "mtd": {"show": false},
             "showDetailDlg": {"show": false}, "loading": {"show": false}};
+
+
     }
 
     public onSelect(plan): void {
         if (this.current != plan) {
             this.current = plan;
             this.loadWorkItems();
+
+            if (!this.members) {
+                this.http.get('/api/teams/' + this.projectService.current.team.id + '/members')
+                    .subscribe(resp => this.members = resp.json());
+            }
         }
     }
 
@@ -53,17 +61,8 @@ export class Plans {
         this.ui.mtd.show = true;
         if (!this.plans) {
             this.http.get('/api/plans/?project=' + this.projectService.current.id)
-                .subscribe(resp => this.setPlans(resp.json()));
+                .subscribe(resp => this.plans = resp.json());
         }
-    }
-
-    listPlans() {
-        this.http.get('/api/plans/?project=' + this.projectService.current.id)
-            .subscribe(resp => this.setPlans(resp.json()));
-    }
-
-    setPlans(plans) {
-        this.plans = plans;
     }
 
     moveItemsToPlan(planId) {
@@ -97,8 +96,10 @@ export class Plans {
             return;
         }
 
+        data['projectId'] = this.projectService.current.id;
+        data['planId'] = this.current.id;
         this.http.request(new Request(new RequestOptions(
-            {url: '/api/work-items/add?plan=' + this.current.id,
+            {url: '/api/work-items/',
                 method: RequestMethod.Post,
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
@@ -122,10 +123,30 @@ export class Plans {
     }
 
     changeStatus(item, status) {
-        console.log("TODO: change status not implemented");
         this.ui.loading.show = true;
-        this.http.put('api/work-items/' + item.id + '/status', status)
-            .subscribe(resp => this.onStatusUpdate(resp));
+
+        var change = {'status': status};
+        this.http.request(new Request(new RequestOptions(
+            {
+                url: 'api/work-items/' + item.id,
+                method: RequestMethod.Put,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(change)
+            }
+        ))).subscribe(resp => this.onStatusUpdate(resp));
+    }
+
+    assignTo(item, member) {
+        this.ui.loading.show = true;
+        var change = {'ownerId': member.userId};
+        this.http.request(new Request(new RequestOptions(
+            {
+                url: 'api/work-items/' + item.id,
+                method: RequestMethod.Put,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(change)
+            }
+        ))).subscribe(resp => this.onStatusUpdate(resp));
     }
 
     onWorkItemCreated(resp) {
@@ -143,7 +164,7 @@ export class Plans {
     }
 
     loadWorkItems() {
-        this.http.get('/api/work-items/list?planId=' + this.current.id)
+        this.http.get('/api/work-items/?planId=' + this.current.id)
             .subscribe(resp => this.setWorkItems(resp.json()));
     }
 

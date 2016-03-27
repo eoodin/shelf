@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -46,6 +47,12 @@ abstract public class WorkItem {
     @ManyToOne
     @JsonIgnore
     private Plan plan;
+
+    @OneToOne
+    private User owner;
+
+    @OneToOne
+    private User createdBy;
 
     public WorkItem() {}
 
@@ -95,5 +102,21 @@ abstract public class WorkItem {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 }

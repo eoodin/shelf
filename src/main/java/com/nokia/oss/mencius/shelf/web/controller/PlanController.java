@@ -1,11 +1,17 @@
 package com.nokia.oss.mencius.shelf.web.controller;
 
 import com.nokia.oss.mencius.shelf.data.HibernateHelper;
+import com.nokia.oss.mencius.shelf.model.Allocation;
 import com.nokia.oss.mencius.shelf.model.Plan;
 import com.nokia.oss.mencius.shelf.model.Project;
 import com.nokia.oss.mencius.shelf.model.WorkItem;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -19,73 +25,52 @@ public class PlanController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseBody
-    public List<Plan> getPlans(@RequestParam("project") String projectId) {
+    public List<Plan> getPlans(@RequestParam("project") Long projectId) {
         EntityManager em = HibernateHelper.createEntityManager();
         List<Plan> plans = new ArrayList<>();
-        List list = em.createQuery("select p from Plan p where p.project=" + projectId).getResultList();
+        Project project = em.find(Project.class, projectId);
+        List list = em.createQuery("SELECT p FROM Plan p WHERE p.type = 'sprint' AND p.project=:projectId")
+                .setParameter("projectId", project).getResultList();
         plans.addAll(list);
 
         em.close();
         return plans;
     }
 
-    @RequestMapping(value = "/{planId}", method = RequestMethod.DELETE)
-    @ResponseBody
-    public String deletePlan(@PathVariable String planId) {
-        Long id = Long.valueOf(planId);
-
-        EntityManager em = HibernateHelper.createEntityManager();
-        em.getTransaction().begin();
-        Plan plan = em.find(Plan.class, id);
-        em.remove(plan);
-        em.getTransaction().commit();
-        em.close();
-
-        return "deleted";
-    }
-
     @RequestMapping(value = "/", method = RequestMethod.POST, headers = {"Content-type=application/json"})
     @ResponseBody
     public Plan createPlan(@RequestBody PlanSpec spec) {
         EntityManager em = HibernateHelper.createEntityManager();
-        Project project = em.find(Project.class, spec.getProjectId());
+        Project project = em.find(Project.class, spec.projectId);
         if (project == null) {
             return null;
         }
 
         em.getTransaction().begin();
-        Plan plan = new Plan();
-        plan.setName(spec.getName());
-        plan.setType("sprint");
-        plan.setStart(spec.getStart());
-        plan.setEnd(spec.getEnd());
-        plan.setProject(project);
-        em.persist(plan);
-        em.getTransaction().commit();
-        em.close();
+        try {
+            Plan plan = new Plan();
+            plan.setName(spec.name);
+            plan.setType("sprint");
+            plan.setStart(spec.start);
+            plan.setEnd(spec.end);
+            plan.setProject(project);
+            em.persist(plan);
 
-        return plan;
-    }
+            Allocation allocation = new Allocation();
+            allocation.setTeam(project.getTeam());
+            allocation.setDeveloperHours(spec.devHours);
+            allocation.setTesterHours(spec.tstHours);
+            allocation.setSprint(plan);
 
-    @RequestMapping(value="/{planId}/add_wi", method = RequestMethod.POST)
-    @ResponseBody
-    public String addWorkItem(@PathVariable Long planId, @RequestParam("wiid")Long wiid){
-        EntityManager em = HibernateHelper.createEntityManager();
-        Plan plan = em.find(Plan.class, planId);
-        if (plan == null)
-            return "plan not exist";
-
-        WorkItem workItem = em.find(WorkItem.class, wiid);
-        if (workItem == null)
-            return "work item not exist";
-
-        em.getTransaction().begin();
-        workItem.setPlan(plan);
-        em.merge(workItem);
-        em.getTransaction().commit();
-        em.close();
-
-        return "OK";
+            em.persist(allocation);
+            em.getTransaction().commit();
+            return plan;
+        } catch (Exception ex) {
+            em.getTransaction().rollback();
+            return null;
+        } finally {
+            em.close();
+        }
     }
 
     @RequestMapping(value = "/{planId}/move-in", method = RequestMethod.POST, consumes = "application/json")
@@ -112,12 +97,10 @@ public class PlanController {
             }
 
             em.getTransaction().commit();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             em.getTransaction().rollback();
             return "Failed";
-        }
-        finally {
+        } finally {
             em.close();
         }
 
@@ -125,45 +108,11 @@ public class PlanController {
     }
 
     public static class PlanSpec {
-        private Long projectId;
-        private String name;
-        private Date start;
-        private Date end;
-
-        public Long getProjectId() {
-            return projectId;
-        }
-
-        public void setProjectId(Long projectId) {
-            this.projectId = projectId;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public Date getStart() {
-            return start;
-        }
-
-        public void setStart(Date start) {
-            this.start = start;
-        }
-
-        public Date getEnd() {
-            return end;
-        }
-
-        public void setEnd(Date end) {
-            this.end = end;
-        }
-
-        public String toString() {
-            return "[name:" + name + ",start:" + start + ",end:" + end + "]";
-        }
+        public Long projectId;
+        public String name;
+        public Date start;
+        public Date end;
+        public Long devHours;
+        public Long tstHours;
     }
 }
