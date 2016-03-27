@@ -8,8 +8,7 @@
             <ul class="summary">
                 <li>Start: <span>{{date(current.start)}}</span></li>
                 <li>Deadline: <span>{{date(current.end)}}</span></li>
-                <li *ngIf="current.allocation">Developer time: <span>{{current.allocation.developerHours}}</span></li>
-                <li *ngIf="current.allocation">Tester time: <span>{{current.allocation.testerHours}}</span></li>
+                <li *ngIf="current.allocation">Remain time: <span>{{sumHours()}}/{{current.allocation.developerHours + current.allocation.testerHours}}</span></li>
             </ul>
         </div>
         <div class="item-table">

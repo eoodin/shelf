@@ -179,6 +179,14 @@ export class Plans {
         return moment(epoch).format("YYYY-MM-DD");
     }
 
+
+    sumHours() {
+        var total = 0;
+        this.workItems.forEach(i=>{ total += i.estimation; });
+        return total;
+    }
+
+
     private getSelectedWorkItemIds() {
         var selected = [];
         this.workItems.forEach( wi=> {
