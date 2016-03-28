@@ -26,6 +26,11 @@ import {ModalDialog} from '../components/modal-dialog.ts';
     .item-table{position:relative;}
     .checkbox{margin:0; width: 22px; height: 22px;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
+    .type-and-id .glyphicon {margin-right: 8px;}
+    .us.glyphicon{color: #050;}
+    .defect.glyphicon{color: #500;}
+    .task.glyphicon{color: #333;}
+    .type-and-id input { display: inline-block; }
     `],
     styleUrls: ['../../deps/css/css-spinner.css']
 })
