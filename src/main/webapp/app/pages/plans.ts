@@ -1,4 +1,4 @@
-import {Component} from 'angular2/core';
+import {Component, ElementRef} from 'angular2/core';
 import {Http, Response, Request, RequestMethod, RequestOptions} from 'angular2/http';
 import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/common'
 
@@ -9,6 +9,7 @@ import {PlanList} from '../components/plan-list.ts';
 import {ProjectService} from '../services/project-service.ts';
 import {WorkItemDetail} from '../components/work-item-detail.ts';
 import {ModalDialog} from '../components/modal-dialog.ts';
+import Quill from 'quill';
 
 @Component({
     selector: 'plans',
@@ -18,7 +19,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
     .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
     [ngcontrol='title'] { width: 100%; }
-    [ngcontrol='description'] { width: 100%; height: 8em; }
+    .description-editor { width: 100%; border: 1px solid #444; height: 18em; }
     .plan-head h1 {font-size: 18px;}
     .plan-head ul {padding-left: 0;}
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
@@ -31,6 +32,11 @@ import {ModalDialog} from '../components/modal-dialog.ts';
     .defect.glyphicon{color: #500;}
     .task.glyphicon{color: #333;}
     .type-and-id input { display: inline-block; }
+    .work-item-details { padding-left: 0;}
+    .work-item-details li { list-style:none; margin-bottom: 10px;}
+    .work-item-details li:last-child { margin-bottom: 0;}
+    .work-item-details li .title { font-weight: 700; }
+    .work-item-details li .big-section { display: block;}
     `],
     styleUrls: ['../../deps/css/css-spinner.css']
 })
@@ -40,8 +46,10 @@ export class Plans {
     private plans = null;
     private members;
     private ui;
+    private descriptionEditor;
 
-    constructor(private http: Http, private projectService: ProjectService) {
+    constructor(private ele: ElementRef,
+                private http: Http, private projectService: ProjectService) {
         this.ui = {
             "awd": {"show": false},
             "mtd": {"show": false},
@@ -93,6 +101,20 @@ export class Plans {
 
     showAddWorkitemDlg() {
         this.ui.awd.show = true;
+        if (!this.descriptionEditor) {
+            var el = this.ele.nativeElement;
+            var editorEle = el.getElementsByClassName("quill-editor")[0];
+            var toolbarEle = el.getElementsByClassName('quill-toolbar')[0];
+            this.descriptionEditor = new Quill(editorEle, {
+                'modules': {
+                    'authorship': {authorId: 'galadriel', enabled: true},
+                    'multi-cursor': true,
+                    'link-tooltip': true,
+                    'toolbar': {'container': toolbarEle}
+                },
+                'theme': 'snow'
+            });
+        }
     }
 
     addWorkItem(data) {
@@ -101,6 +123,7 @@ export class Plans {
             return;
         }
 
+        data['description'] = this.descriptionEditor.getHTML();
         data['projectId'] = this.projectService.current.id;
         data['planId'] = this.current.id;
         this.http.request(new Request(new RequestOptions(
