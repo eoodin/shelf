@@ -85,31 +85,26 @@ public class WorkItemController {
             Changes changes = new Changes();
             if (spec.status != null) {
                 WorkItem.Status status = WorkItem.Status.valueOf(spec.status);
-                changes.addChange("status", item.getStatus(), status);
-                item.setStatus(status);
+                if (changes.addChange("status", item.getStatus(), status))
+                    item.setStatus(status);
             }
 
-            if (spec.estimation != null) {
-                changes.addChange("estimation", item.getEstimation(), spec.estimation);
-                item.setEstimation(spec.estimation);
-            }
+            if (spec.estimation != null)
+                if (changes.addChange("estimation", item.getEstimation(), spec.estimation))
+                    item.setEstimation(spec.estimation);
 
-            if (spec.title != null) {
-                changes.addChange("title", item.getTitle(), spec.title);
-                item.setTitle(spec.title);
-            }
+            if (spec.title != null)
+                if (changes.addChange("title", item.getTitle(), spec.title))
+                    item.setTitle(spec.title);
 
-            if (spec.description != null) {
-                changes.addChange("description", item.getDescription(), spec.description);
-                item.setDescription(spec.description);
-            }
+            if (spec.description != null)
+                if(changes.addChange("description", item.getDescription(), spec.description))
+                    item.setDescription(spec.description);
 
-            if (spec.ownerId != null) {
-                changes.addChange("owner", item.getOwner().getUserId(), spec.ownerId);
-                item.setOwner(em.find(User.class, spec.ownerId));
-            }
+            if (spec.ownerId != null)
+                if (changes.addChange("owner", item.getOwner().getUserId(), spec.ownerId))
+                    item.setOwner(em.find(User.class, spec.ownerId));
 
-            // TODO: add work log
             User currentUser = UserUtils.findOrCreateUser(request.getRemoteUser());
             em.getTransaction().begin();
             try {
@@ -211,12 +206,16 @@ public class WorkItemController {
         private static final ObjectMapper jsonMapper = new ObjectMapper();
 
 
-        public void addChange(String field, Object oldVal, Object newVal) {
+        public boolean addChange(String field, Object oldVal, Object newVal) {
             if (oldVal.getClass() != newVal.getClass())
                 throw new RuntimeException("It is danger to diff two different class objects");
 
+            if (oldVal.equals(newVal))
+                return false;
+
             oldValues.put(field, oldVal);
             newValues.put(field, newVal);
+            return true;
         }
 
         public String getOldJson() throws JsonProcessingException {

@@ -2,7 +2,7 @@ import {Component, ElementRef} from 'angular2/core';
 import {Http, Response, Request, RequestMethod, RequestOptions} from 'angular2/http';
 import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/common'
 
-import {DROPDOWN_DIRECTIVES} from 'deps/ng2-bs/ng2-bootstrap.ts';
+import {DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES} from 'deps/ng2-bs/ng2-bootstrap.ts';
 import moment from 'moment';
 
 import {PlanList} from '../components/plan-list.ts';
@@ -13,9 +13,12 @@ import Quill from 'quill';
 
 @Component({
     selector: 'plans',
-    directives: [PlanList, WorkItemDetail, ModalDialog, DROPDOWN_DIRECTIVES],
+    directives: [PlanList, WorkItemDetail, ModalDialog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     templateUrl: 'app/templates/plans.html',
-    styles: [`.right{ padding: 0 15px; }
+    styles: [`
+    .work-items-heading > div{float:right;}
+    .work-items-heading { height: 50px; }
+    .right{ padding: 0 15px; }
     .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
     [ngcontrol='title'] { width: 100%; }
@@ -49,6 +52,7 @@ export class Plans {
     private members;
     private ui;
     private descriptionEditor;
+    private hideFinished = false;
 
     constructor(private ele: ElementRef,
                 private http: Http, private projectService: ProjectService) {
@@ -173,6 +177,13 @@ export class Plans {
         ui.rwd.show =false;
     }
 
+    getShowingItems() {
+        if (this.hideFinished)
+            return this.workItems.filter(i=>i.status != 'Finished');
+        else
+            return this.workItems;
+    }
+
     moveItems() {
         console.log("TODO: not implemented.");
         console.log(this.workItems);
@@ -217,11 +228,7 @@ export class Plans {
 
     loadWorkItems() {
         this.http.get('/api/work-items/?planId=' + this.current.id)
-            .subscribe(resp => this.setWorkItems(resp.json()));
-    }
-
-    setWorkItems(items) {
-        this.workItems = items;
+            .subscribe(resp => this.workItems = resp.json());
     }
 
     date(epoch) {
@@ -231,11 +238,9 @@ export class Plans {
         return moment(epoch).format("YYYY-MM-DD");
     }
 
-
     sumHours() {
         var total = 0;
-        // TODO: change to remaining estimation
-        this.workItems.forEach(i=>{ total += i.originalEstimation; });
+        this.workItems.forEach(i=>{ total += i.estimation; });
         return total;
     }
 

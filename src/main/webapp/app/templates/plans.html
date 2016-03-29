@@ -9,7 +9,7 @@
             <ul class="summary">
                 <li>Start: <span>{{date(current.start)}}</span></li>
                 <li>Deadline: <span>{{date(current.end)}}</span></li>
-                <li *ngIf="current.allocation">Remain time: <span>{{sumHours()}}/{{current.allocation.developerHours + current.allocation.testerHours}}</span></li>
+                <li *ngIf="current.allocation">Time: <span>{{sumHours()}}/{{current.allocation.developerHours + current.allocation.testerHours}}</span></li>
             </ul>
         </div>
         <div class="item-table">
@@ -17,8 +17,15 @@
                 <div class="spinner-loader"></div>
             </div>
             <div class="panel panel-default">
-                <div class="panel-heading">{{current.name}}</div>
-                <table class="table">
+                <div class="panel-heading work-items-heading">
+                    <div>
+                        <label  >
+                            <input type="checkbox" [(ngModel)]="hideFinished"  (click)="loadWorkItems();" />
+                            Hide Finished
+                        </label>
+                    </div>
+                </div>
+                <table *ngIf="workItems" class="table">
                     <tr>
                         <th>ID</th>
                         <th>Title</th>
@@ -26,7 +33,7 @@
                         <th>Owner</th>
                         <th>Operations</th>
                     </tr>
-                    <tr *ngFor="#item of workItems">
+                    <tr *ngFor="#item of getShowingItems()">
                         <td class="type-and-id">
                             <label>
                                 <input class="checkbox" [(ngModel)]="item.checked" type="checkbox">
@@ -235,9 +242,7 @@
                                     <span title="Link" class="ql-format-button ql-link"></span>
                                     </span>
                                 </div>
-                                <div class="quill-editor">
-                                    <div [innerHTML]="ui.awd.item.description"></div>
-                                </div>
+                                <div class="quill-editor"></div>
                             </div>
                         </div>
                     </div>
