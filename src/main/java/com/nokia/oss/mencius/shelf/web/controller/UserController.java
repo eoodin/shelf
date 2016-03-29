@@ -2,7 +2,7 @@ package com.nokia.oss.mencius.shelf.web.controller;
 
 import com.nokia.oss.mencius.shelf.model.User;
 import com.nokia.oss.mencius.shelf.utils.UserUtils;
-import com.nokia.oss.mencius.shelf.web.security.ShelfException;
+import com.nokia.oss.mencius.shelf.ShelfException;
 import com.nokia.oss.mencius.shelf.web.security.UnAuthorizedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

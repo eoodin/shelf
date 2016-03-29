@@ -17,7 +17,7 @@ import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/c
                     <div class="modal-body">
                         <ul>
                             <li>Description:{{_item.description}}</li>
-                            <li>Estimation:{{_item.estimation}} hours</li>
+                            <li>Estimation:{{_item.originalEstimation}} hours</li>
                         </ul>
                     </div>
                     <div class="modal-footer">

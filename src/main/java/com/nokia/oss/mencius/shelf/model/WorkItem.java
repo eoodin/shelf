@@ -27,7 +27,10 @@ abstract public class WorkItem {
     @Column
     private String title;
 
-    @Column
+    @Column(nullable = false)
+    private int originalEstimation;
+
+    @Column(nullable = false)
     private int estimation;
 
     @Lob
@@ -62,6 +65,14 @@ abstract public class WorkItem {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public int getOriginalEstimation() {
+        return originalEstimation;
+    }
+
+    public void setOriginalEstimation(int estimation) {
+        this.originalEstimation = estimation;
     }
 
     public int getEstimation() {

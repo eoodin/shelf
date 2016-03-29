@@ -4,7 +4,7 @@ import com.nokia.oss.mencius.shelf.data.HibernateHelper;
 import com.nokia.oss.mencius.shelf.model.Team;
 import com.nokia.oss.mencius.shelf.model.User;
 import com.nokia.oss.mencius.shelf.utils.UserUtils;
-import com.nokia.oss.mencius.shelf.web.security.ShelfException;
+import com.nokia.oss.mencius.shelf.ShelfException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

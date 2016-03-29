@@ -37,6 +37,8 @@ import Quill from 'quill';
     .work-item-details li:last-child { margin-bottom: 0;}
     .work-item-details li .title { font-weight: 700; }
     .work-item-details li .big-section { display: block;}
+    .awd .modal-dialog {width: 720px;}
+    .awd .modal-dialog form input.work-item-title { width: 100%; }
     `],
     styleUrls: ['../../deps/css/css-spinner.css']
 })
@@ -50,12 +52,12 @@ export class Plans {
 
     constructor(private ele: ElementRef,
                 private http: Http, private projectService: ProjectService) {
+        this.descriptionEditor = null;
         this.ui = {
-            "awd": {"show": false},
-            "mtd": {"show": false},
-            "showDetailDlg": {"show": false}, "loading": {"show": false}};
-
-
+            'loading': {'show': false},
+            'awd': {'show': false, 'loading': false, 'item': {}},
+            'mtd': {'show': false}
+        };
     }
 
     public onSelect(plan): void {
@@ -63,8 +65,9 @@ export class Plans {
             this.current = plan;
             this.loadWorkItems();
 
-            if (!this.members) {
-                this.http.get('/api/teams/' + this.projectService.current.team.id + '/members')
+            var current = this.projectService.current;
+            if (!this.members && current && current.team) {
+                this.http.get('/api/teams/' + current.team.id + '/members')
                     .subscribe(resp => this.members = resp.json());
             }
         }
@@ -99,7 +102,12 @@ export class Plans {
         this.loadWorkItems();
     }
 
-    showAddWorkitemDlg() {
+    showAddItem() {
+        this.ui.awd.item = {'description': ''};
+        this.showWorkItemDlg();
+    }
+
+    showWorkItemDlg() {
         this.ui.awd.show = true;
         if (!this.descriptionEditor) {
             var el = this.ele.nativeElement;
@@ -115,29 +123,42 @@ export class Plans {
                 'theme': 'snow'
             });
         }
+
+        var description = this.ui.awd.item.description || '';
+        this.descriptionEditor.setHTML(description);
     }
 
-    addWorkItem(data) {
+    saveWorkItem() {
         if (!this.current.id) {
             alert('No selected plan.');
             return;
         }
 
+        var data = JSON.parse(JSON.stringify(this.ui.awd.item));
         data['description'] = this.descriptionEditor.getHTML();
         data['projectId'] = this.projectService.current.id;
         data['planId'] = this.current.id;
-        this.http.request(new Request(new RequestOptions(
-            {url: '/api/work-items/',
-                method: RequestMethod.Post,
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            }))).subscribe(resp => this.onWorkItemCreated(resp));
+        if (!data['id']) {
+            this.http.request(new Request(new RequestOptions(
+                {url: '/api/work-items/',
+                    method: RequestMethod.Post,
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                }))).subscribe(resp => this.onWorkSaved(resp));
+        }
+        else {
+            this.http.request(new Request(new RequestOptions(
+                {url: '/api/work-items/' + data['id'],
+                    method: RequestMethod.Put,
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                }))).subscribe(resp => this.onWorkSaved(resp));
+        }
     }
 
     showItem(item) {
-        this.ui.showDetailDlg.item = item;
-        this.ui.showDetailDlg.show = true;
-        console.log(this.ui.showDetailDlg);
+        this.ui.awd.item = item;
+        this.showWorkItemDlg();
     }
 
     removeItem(item) {
@@ -177,7 +198,7 @@ export class Plans {
         ))).subscribe(resp => this.onStatusUpdate(resp));
     }
 
-    onWorkItemCreated(resp) {
+    onWorkSaved(resp) {
         this.ui.awd.show = false;
         this.loadWorkItems();
     }
@@ -210,7 +231,8 @@ export class Plans {
 
     sumHours() {
         var total = 0;
-        this.workItems.forEach(i=>{ total += i.estimation; });
+        // TODO: change to remaining estimation
+        this.workItems.forEach(i=>{ total += i.originalEstimation; });
         return total;
     }
 

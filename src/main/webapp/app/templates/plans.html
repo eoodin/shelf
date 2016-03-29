@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="//cdn.quilljs.com/0.20.1/quill.snow.css" />
+
 <div class="row" *ngIf="projectService.current">
     <div class="col-sm-2">
         <plan-list [project]="projectService.current" (select)="onSelect($event)"></plan-list>
@@ -75,7 +75,7 @@
         </div>
         <div class="row">
             <div class="col-sm-2">
-                <button class="btn btn-primary" (click)="showAddWorkitemDlg()">Add Work Item...</button>
+                <button class="btn btn-primary" (click)="showAddItem()">Add Work Item...</button>
             </div>
             <div class="col-sm-6">
                 <button class="btn btn-primary"><span class="glyphicon glyphicon-remove"></span> Remove</button>
@@ -91,27 +91,29 @@
 
 <div class="modal fade in awd" [style.display]="ui.awd.show ? 'block' : 'none'" role="dialog">
     <div class="modal-dialog">
-        <form #f="ngForm" (ngSubmit)="addWorkItem(f.value)">
+        <form (ngSubmit)="saveWorkItem()">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" (click)="ui.awd.show = false"
                             data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Add Work Item to {{current.name}}</h4>
+                    <h4 class="modal-title" *ngIf="!ui.awd.item.id">Add Work Item to {{current.name}}</h4>
+                    <h4 class="modal-title" *ngIf="ui.awd.item.id">Work item detail</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
+                    <div class="row" >
                         <div class="col-sm-3">Type:</div>
                         <div class="col-sm-8">
-                            <select #type ngControl="type">
-                                <option value="US">User Story</option>
-                                <option value="TA">Task</option>
-                                <option value="DE">Defect</option>
+                            <select *ngIf="!ui.awd.item.id" #type [(ngModel)]="ui.awd.item.type">
+                                <option value="UserStory" selected="selected">User Story</option>
+                                <option value="Task">Task</option>
+                                <option value="Defect">Defect</option>
                             </select>
+                            <span *ngIf="ui.awd.item.id">{{ui.awd.item.type}}</span>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-3">Title:</div>
-                        <div class="col-sm-8"><input type="text" class="title" ngControl="title"></div>
+                        <div class="col-sm-8"><input type="text" class="work-item-title" [(ngModel)]="ui.awd.item.title"></div>
                     </div>
                     <div class="row">
                         <div class="col-sm-3">Description:</div>
@@ -233,54 +235,31 @@
                                     <span title="Link" class="ql-format-button ql-link"></span>
                                     </span>
                                 </div>
-                                <div class="quill-editor"></div>
+                                <div class="quill-editor">
+                                    <div [innerHTML]="ui.awd.item.description"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-3">Effort Estimation:</div>
                         <div class="col-sm-8">
-                            <input type="text" ngControl="estimation">
+                            <input type="text" [(ngModel)]="ui.awd.item.estimation">
                         </div>
                     </div>
-
-                    <div class="row" *ngIf="type.value == 'US'">
+                    <div class="row" *ngIf="ui.awd.item.type == 'UserStory'">
                         <div class="col-sm-3">Story Points</div>
                         <div class="col-sm-8">
-                            <input type="text" ngControl="points" value="0">
+                            <input type="text" [(ngModel)]="ui.awd.item.points" value="0">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-default" data-dismiss="modal">Create</button>
+                    <button *ngIf="!ui.awd.item.id" type="submit" class="btn btn-default" data-dismiss="modal">Create</button>
+                    <button *ngIf="ui.awd.item.id" type="submit" class="btn btn-default" data-dismiss="modal">Save</button>
                 </div>
             </div>
         </form>
-    </div>
-</div>
-<div class="modal fade in awd" *ngIf="ui.showDetailDlg.show" [style.display]="ui.showDetailDlg.show ? 'block' : 'block'"
-     role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" (click)="ui.showDetailDlg.show = false"
-                        data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">{{ui.showDetailDlg.item.title}}</h4>
-            </div>
-            <div class="modal-body">
-                <ul class="work-item-details">
-                    <li>
-                        <span class="title big-section">Description:</span>
-                        <div [innerHTML]="ui.showDetailDlg.item.description"></div>
-                    </li>
-                    <li>
-                        <span class="title">Estimation:</span> {{ui.showDetailDlg.item.estimation}} hours</li>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button (click)="ui.showDetailDlg.show=false;" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
     </div>
 </div>
 

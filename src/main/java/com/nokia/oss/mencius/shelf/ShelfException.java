@@ -1,4 +1,4 @@
-package com.nokia.oss.mencius.shelf.web.security;
+package com.nokia.oss.mencius.shelf;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

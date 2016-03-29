@@ -2,7 +2,7 @@ package com.nokia.oss.mencius.shelf.utils;
 
 import com.nokia.oss.mencius.shelf.data.HibernateHelper;
 import com.nokia.oss.mencius.shelf.model.User;
-import com.nokia.oss.mencius.shelf.web.security.ShelfException;
+import com.nokia.oss.mencius.shelf.ShelfException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
