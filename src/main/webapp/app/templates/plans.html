@@ -67,7 +67,7 @@
                             </div>
                         </td>
                         <td>
-                            <a (click)="removeItem(item)"><span class="glyphicon glyphicon-remove"></span></a>
+                            <a (click)="removingItem(item)"><span class="glyphicon glyphicon-remove"></span></a>
                         </td>
                     </tr>
                 </table>
@@ -263,8 +263,7 @@
     </div>
 </div>
 
-<div class="modal fade in awd" *ngIf="ui.mtd.show" [style.display]="ui.mtd.show ? 'block' : 'block'"
-     role="dialog">
+<div class="modal fade in awd" *ngIf="ui.mtd.show" [style.display]="ui.mtd.show ? 'block' : 'block'" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -280,6 +279,25 @@
             <div class="modal-footer">
                 <button (click)="ui.mtd.show=false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <button (click)="moveItemsToPlan(moveTo.value)" class="btn btn-default" data-dismiss="modal">Move</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade in" *ngIf="ui.rwd.show" [style.display]="ui.rwd.show ? 'block' : 'block'" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="ui.rwd.show = false"
+                        data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Confirm to remove work item</h4>
+            </div>
+            <div class="modal-body">
+                You are about to remove work item {{ui.rwd.item.id}}. Are you sure?
+            </div>
+            <div class="modal-footer">
+                <button (click)="ui.rwd.show =false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button (click)="removeItem(ui.rwd.item)" class="btn btn-default" data-dismiss="modal">Remove</button>
             </div>
         </div>
     </div>

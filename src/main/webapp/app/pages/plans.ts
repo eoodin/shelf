@@ -56,7 +56,8 @@ export class Plans {
         this.ui = {
             'loading': {'show': false},
             'awd': {'show': false, 'loading': false, 'item': {}},
-            'mtd': {'show': false}
+            'mtd': {'show': false},
+            'rwd': {'show': false}
         };
     }
 
@@ -161,9 +162,15 @@ export class Plans {
         this.showWorkItemDlg();
     }
 
+    removingItem(item) {
+        this.ui.rwd.item = item;
+        this.ui.rwd.show = true;
+    }
+
     removeItem(item) {
         this.http.delete('/api/work-items/' + item.id)
-            .subscribe(resp => this.onWorkItemRemoved(resp));
+            .subscribe(resp => this.loadWorkItems());
+        ui.rwd.show =false;
     }
 
     moveItems() {
@@ -200,10 +207,6 @@ export class Plans {
 
     onWorkSaved(resp) {
         this.ui.awd.show = false;
-        this.loadWorkItems();
-    }
-
-    onWorkItemRemoved(resp) {
         this.loadWorkItems();
     }
 
