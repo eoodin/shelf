@@ -1,5 +1,7 @@
 package com.nokia.oss.mencius.shelf.web.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nokia.oss.mencius.shelf.data.HibernateHelper;
 import com.nokia.oss.mencius.shelf.model.*;
 import com.nokia.oss.mencius.shelf.utils.UserUtils;
@@ -11,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/work-items")
@@ -73,29 +78,51 @@ public class WorkItemController {
 
         try {
             WorkItem item = em.find(WorkItem.class, id);
+
             if (item == null)
                 throw new NotFoundException();
 
-            if (spec.status != null)
-                item.setStatus(WorkItem.Status.valueOf(spec.status));
+            Changes changes = new Changes();
+            if (spec.status != null) {
+                WorkItem.Status status = WorkItem.Status.valueOf(spec.status);
+                changes.addChange("status", item.getStatus(), status);
+                item.setStatus(status);
+            }
 
-            if (spec.estimation != null)
+            if (spec.estimation != null) {
+                changes.addChange("estimation", item.getEstimation(), spec.estimation);
                 item.setEstimation(spec.estimation);
+            }
 
-            if (spec.title != null)
+            if (spec.title != null) {
+                changes.addChange("title", item.getTitle(), spec.title);
                 item.setTitle(spec.title);
+            }
 
-            if (spec.description != null)
+            if (spec.description != null) {
+                changes.addChange("description", item.getDescription(), spec.description);
                 item.setDescription(spec.description);
+            }
 
-            if (spec.ownerId != null)
+            if (spec.ownerId != null) {
+                changes.addChange("owner", item.getOwner().getUserId(), spec.ownerId);
                 item.setOwner(em.find(User.class, spec.ownerId));
+            }
 
             // TODO: add work log
-            // User currentUser = UserUtils.findOrCreateUser(request.getRemoteUser());
+            User currentUser = UserUtils.findOrCreateUser(request.getRemoteUser());
             em.getTransaction().begin();
             try {
                 em.persist(item);
+
+                ChangeLog changeLog = new ChangeLog();
+                changeLog.setActor(currentUser);
+                changeLog.setOriginalData(changes.getOldJson());
+                changeLog.setChangedData(changes.getNewJson());
+                changeLog.setItem(item);
+                changeLog.setChangeTime(new Date());
+                em.persist(changeLog);
+
                 em.getTransaction().commit();
             } catch (Exception ex) {
                 System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
@@ -158,6 +185,7 @@ public class WorkItemController {
         workItem.setEstimation(estimation);
         workItem.setTitle(spec.title.trim());
         workItem.setDescription(spec.description);
+        workItem.setCreatedAt(new Date());
 
         return workItem;
     }
@@ -174,7 +202,29 @@ public class WorkItemController {
         public String status;
     }
 
-    public static class WorkItemList extends ArrayList<WorkItem> {
+    public static class WorkItemList extends ArrayList<WorkItem> { }
 
+    static class Changes {
+        Map<String, Object> oldValues = new HashMap<>();
+        Map<String, Object> newValues = new HashMap<>();
+
+        private static final ObjectMapper jsonMapper = new ObjectMapper();
+
+
+        public void addChange(String field, Object oldVal, Object newVal) {
+            if (oldVal.getClass() != newVal.getClass())
+                throw new RuntimeException("It is danger to diff two different class objects");
+
+            oldValues.put(field, oldVal);
+            newValues.put(field, newVal);
+        }
+
+        public String getOldJson() throws JsonProcessingException {
+            return jsonMapper.writeValueAsString(oldValues);
+        }
+
+        public String getNewJson() throws JsonProcessingException {
+            return jsonMapper.writeValueAsString(newValues);
+        }
     }
 }
