@@ -1,5 +1,4 @@
-
-<div class="row" *ngIf="projectService.current">
+<div class="row plan-page" *ngIf="projectService.current">
     <div class="col-sm-2">
         <plan-list [project]="projectService.current" (select)="onSelect($event)"></plan-list>
     </div>
@@ -9,7 +8,8 @@
             <ul class="summary">
                 <li>Start: <span>{{date(current.start)}}</span></li>
                 <li>Deadline: <span>{{date(current.end)}}</span></li>
-                <li *ngIf="current.allocation">Time: <span>{{sumHours()}}/{{current.allocation.developerHours + current.allocation.testerHours}}</span></li>
+                <li *ngIf="current.allocation">Time(remain/planned): <span>{{sumHours()}}/{{current.allocation.developerHours + current.allocation.testerHours}}</span></li>
+                <li *ngIf="current.allocation">Progress: <span> x/x </span></li>
             </ul>
         </div>
         <div class="item-table">
@@ -85,7 +85,6 @@
                 <button class="btn btn-primary" (click)="showAddItem()">Add Work Item...</button>
             </div>
             <div class="col-sm-6">
-                <button class="btn btn-primary"><span class="glyphicon glyphicon-remove"></span> Remove</button>
                 <button class="btn btn-primary" (click)="showMoveToDialog();">Move To...</button>
             </div>
         </div>
@@ -108,9 +107,9 @@
                 </div>
                 <div class="modal-body">
                     <div class="row" >
-                        <div class="col-sm-3">Type:</div>
-                        <div class="col-sm-8">
-                            <select *ngIf="!ui.awd.item.id" #type [(ngModel)]="ui.awd.item.type">
+                        <div class="col-sm-12">
+                            Type:
+                            <select *ngIf="!ui.awd.item.id" [(ngModel)]="ui.awd.item.type">
                                 <option value="UserStory" selected="selected">User Story</option>
                                 <option value="Task">Task</option>
                                 <option value="Defect">Defect</option>
@@ -119,14 +118,23 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-3">Title:</div>
-                        <div class="col-sm-8"><input type="text" class="work-item-title" [(ngModel)]="ui.awd.item.title"></div>
+                        <div class="col-sm-12">
+                            Title:
+                            <input type="text" class="work-item-title" [(ngModel)]="ui.awd.item.title">
+                        </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-3">Description:</div>
-                        <div class="col-sm-8">
+                        <div class="col-sm-12">Description:</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
                             <div class="description-editor">
-                                <div id="full-toolbar" class="quill-toolbar toolbar">
+                                <label class="toolbar-toggler" [style.background]="editorToggle?'gray':'white'"
+                                       style="padding-left: 7px;font-size:18px;border: 1px solid #bbb; border-radius: 3px; overflow: hidden;display:inline-block;float:right;width: 28px; height:28px;background: gray;margin: 5px;">
+                                    <input type="checkbox" [(ngModel)]="editorToggle" style="display:none;">
+                                    T
+                                </label>
+                                <div [style.display]="editorToggle?'inherit':'none'" class="quill-toolbar toolbar">
                                     <span class="ql-format-group">
                                     <select title="Font" class="ql-font">
                                         <option value="sans-serif" selected="">Sans Serif</option>
@@ -247,16 +255,10 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-3">Effort Estimation:</div>
-                        <div class="col-sm-8">
-                            <input type="text" [(ngModel)]="ui.awd.item.estimation">
-                        </div>
+                        <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="ui.awd.item.estimation"></div>
                     </div>
                     <div class="row" *ngIf="ui.awd.item.type == 'UserStory'">
-                        <div class="col-sm-3">Story Points</div>
-                        <div class="col-sm-8">
-                            <input type="text" [(ngModel)]="ui.awd.item.points" value="0">
-                        </div>
+                        <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="ui.awd.item.points" value="0"></div>
                     </div>
                 </div>
                 <div class="modal-footer">

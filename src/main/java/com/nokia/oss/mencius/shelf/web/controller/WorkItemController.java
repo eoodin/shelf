@@ -90,8 +90,11 @@ public class WorkItemController {
             }
 
             if (spec.estimation != null)
-                if (changes.addChange("estimation", item.getEstimation(), spec.estimation))
+                if (changes.addChange("estimation", item.getEstimation(), spec.estimation)) {
                     item.setEstimation(spec.estimation);
+                    if (spec.estimation == 0)
+                        item.setStatus(WorkItem.Status.Finished);
+                }
 
             if (spec.title != null)
                 if (changes.addChange("title", item.getTitle(), spec.title))

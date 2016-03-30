@@ -16,13 +16,15 @@ import Quill from 'quill';
     directives: [PlanList, WorkItemDetail, ModalDialog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     templateUrl: 'app/templates/plans.html',
     styles: [`
+    .plan-page {padding-bottom: 15px;}
     .work-items-heading > div{float:right;}
-    .work-items-heading { height: 50px; }
+    .work-items-heading { height: 38px; }
     .right{ padding: 0 15px; }
     .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
     [ngcontrol='title'] { width: 100%; }
-    .description-editor { width: 100%; border: 1px solid #444; height: 18em; }
+    .description-editor { width: 100%; border: 1px solid #ccc; height: 18em; }
+    .quill-toolbar {border-bottom:  1px solid #ccc;}
     .plan-head h1 {font-size: 18px;}
     .plan-head ul {padding-left: 0;}
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
@@ -182,11 +184,6 @@ export class Plans {
             return this.workItems.filter(i=>i.status != 'Finished');
         else
             return this.workItems;
-    }
-
-    moveItems() {
-        console.log("TODO: not implemented.");
-        console.log(this.workItems);
     }
 
     changeStatus(item, status) {
