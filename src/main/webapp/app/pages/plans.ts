@@ -51,6 +51,7 @@ export class Plans {
     private current = {};
     private workItems = [];
     private plans = null;
+    private sort = {};
     private members;
     private ui;
     private descriptionEditor;
@@ -223,8 +224,24 @@ export class Plans {
         this.loadWorkItems();
     }
 
+    sortResult(field) {
+        if (field == this.sort.field)
+            this.sort.order = this.sort.order == 'desc' ? 'asc' : 'desc';
+        else
+            this.sort.order = 'asc';
+
+        this.sort.field = field;
+        this.loadWorkItems();
+    }
+
     loadWorkItems() {
-        this.http.get('/api/work-items/?planId=' + this.current.id)
+        var fetchUrl = '/api/work-items/?planId=' + this.current.id;
+        if (this.sort.field) {
+            fetchUrl += '&sortBy=' + this.sort.field;
+            this.sort.order == 'desc' && (fetchUrl += '&desc=true');
+        }
+
+        this.http.get(fetchUrl)
             .subscribe(resp => this.workItems = resp.json());
     }
 

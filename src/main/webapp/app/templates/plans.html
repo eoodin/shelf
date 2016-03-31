@@ -27,10 +27,33 @@
                 </div>
                 <table *ngIf="workItems" class="table">
                     <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Status</th>
-                        <th>Owner</th>
+                        <th>
+                            <a href="javascript:void(0);" (click)="sortResult('id')">ID
+                                <span *ngIf="sort.field=='id'">
+                                    <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                                </span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="javascript:void(0);" (click)="sortResult('title')">Title
+                                <span *ngIf="sort.field=='title'">
+                                    <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                                </span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="javascript:void(0);" (click)="sortResult('status')">Status
+                                <span *ngIf="sort.field=='status'">
+                                    <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                                </span>
+                            </a>
+                        </th>
+                        <th><a href="javascript:void(0);" (click)="sortResult('owner')">Owner
+                                <span *ngIf="sort.field=='owner'">
+                                    <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                                </span>
+                            </a>
+                        </th>
                         <th>Operations</th>
                     </tr>
                     <tr *ngFor="#item of getShowingItems()">

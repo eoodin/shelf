@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/work-items")
@@ -23,11 +20,24 @@ public class WorkItemController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseBody
-    public WorkItemList getWorkItems(@RequestParam("planId") Long planId) {
+    public WorkItemList getWorkItems(
+            @RequestParam(value = "planId", required = false) Long planId,
+            @RequestParam(value = "sortBy", required = false) String sortBy,
+            @RequestParam(value = "desc", required = false) boolean desc) {
         WorkItemList list = new WorkItemList();
         EntityManager em = HibernateHelper.createEntityManager();
         Plan plan = em.find(Plan.class, planId);
-        list.addAll(plan.getWorkItems());
+
+        String jpql = "SELECT w FROM WorkItem w WHERE w.plan=:plan";
+        if (sortBy != null) {
+            jpql += " ORDER BY w." + sortBy;
+            if (desc) {
+                jpql += " DESC";
+            }
+        }
+
+        List results = em.createQuery(jpql).setParameter("plan", plan).getResultList();
+        list.addAll(results);
         em.close();
         return list;
     }
@@ -210,10 +220,10 @@ public class WorkItemController {
 
 
         public boolean addChange(String field, Object oldVal, Object newVal) {
-            if (oldVal.getClass() != newVal.getClass())
-                throw new RuntimeException("It is danger to diff two different class objects");
+            if (oldVal == null && newVal == null)
+                return false;
 
-            if (oldVal.equals(newVal))
+            if ((oldVal != null && oldVal.equals(newVal)) || (newVal != null && newVal.equals(oldVal)))
                 return false;
 
             oldValues.put(field, oldVal);
