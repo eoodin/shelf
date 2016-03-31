@@ -3,6 +3,11 @@
         <plan-list [project]="projectService.current" (select)="onSelect($event)"></plan-list>
     </div>
     <div class="col-sm-offset-2 col-md-offset-2 right">
+        <div class="project-info">
+            <div class="project-operations">
+                <button class="btn btn-warning" (click)="showAddItem('Defect')">Report A Problem</button>
+            </div>
+        </div>
         <div class="plan-head" *ngIf="current.id">
             <h1>{{current.name}}</h1>
             <ul class="summary">
@@ -120,7 +125,7 @@
 
 <div class="modal fade in awd" [style.display]="ui.awd.show ? 'block' : 'none'" role="dialog">
     <div class="modal-dialog">
-        <form (ngSubmit)="saveWorkItem()">
+        <form (ngSubmit)="saveWorkItem()" action="">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" (click)="ui.awd.show = false"
@@ -132,12 +137,25 @@
                     <div class="row" >
                         <div class="col-sm-12">
                             Type:
-                            <select *ngIf="!ui.awd.item.id" [(ngModel)]="ui.awd.item.type">
+                            <select *ngIf="!ui.awd.item.id" [(ngModel)]="ui.awd.item.type" [disabled]="creatingType">
                                 <option value="UserStory" selected="selected">User Story</option>
                                 <option value="Task">Task</option>
                                 <option value="Defect">Defect</option>
                             </select>
                             <span *ngIf="ui.awd.item.id">{{ui.awd.item.type}}</span>
+                        </div>
+                    </div>
+                    <div *ngIf="ui.awd.item.type == 'Defect'" class="row">
+                        <div class="col-sm-12">Severity:
+                            <label><input #s1 type="radio" [checked]="ui.awd.item.severity==s1.value" (click)="ui.awd.item.severity=s1.value" value="Blocker">Blocker</label>
+                            <label><input #s2 type="radio" [checked]="ui.awd.item.severity==s2.value" (click)="ui.awd.item.severity=s2.value" value="Critical">Critical</label>
+                            <label><input #s3 type="radio" [checked]="ui.awd.item.severity==s3.value" (click)="ui.awd.item.severity=s3.value" value="Major">Major</label>
+                            <label><input #s4 type="radio" [checked]="ui.awd.item.severity==s4.value" (click)="ui.awd.item.severity=s4.value" value="Minor">Minor</label>
+                        </div>
+                    </div>
+                    <div *ngIf="ui.awd.item.type == 'Defect'" class="row">
+                        <div class="col-sm-12">Found in:
+                            <input [(ngModel)]="ui.awd.item.version">
                         </div>
                     </div>
                     <div class="row">
@@ -277,7 +295,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div *ngIf="ui.awd.item.type == 'Task'" class="row">
                         <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="ui.awd.item.estimation"></div>
                     </div>
                     <div class="row" *ngIf="ui.awd.item.type == 'UserStory'">

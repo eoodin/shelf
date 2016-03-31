@@ -178,7 +178,9 @@ public class WorkItemController {
                 workItem = userStory;
                 break;
             case "Defect":
-                workItem = new Defect();
+                Defect defect = new Defect();
+                defect.setSeverity(Defect.Severity.valueOf(spec.severity));
+                workItem = defect;
                 break;
             case "Task":
                 workItem = new Task();
@@ -188,9 +190,11 @@ public class WorkItemController {
         }
 
         workItem.setStatus(WorkItem.Status.New);
-        Integer estimation = Integer.valueOf(spec.estimation);
-        workItem.setOriginalEstimation(estimation);
-        workItem.setEstimation(estimation);
+        if (spec.estimation != null) {
+            Integer estimation = Integer.valueOf(spec.estimation);
+            workItem.setOriginalEstimation(estimation);
+            workItem.setEstimation(estimation);
+        }
         workItem.setTitle(spec.title.trim());
         workItem.setDescription(spec.description);
         workItem.setCreatedAt(new Date());
@@ -208,6 +212,7 @@ public class WorkItemController {
         public Integer estimation;
         public String points;
         public String status;
+        public String severity;
     }
 
     public static class WorkItemList extends ArrayList<WorkItem> { }

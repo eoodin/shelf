@@ -5,11 +5,11 @@ import {NgForm} from 'angular2/common'
 @Component({
     selector: 'plan-list',
     template: `
-    <div class="list-group" *ngIf="backlog">
-      <a class="list-group-item" [class.active]="backlog == selected" (click)="selectBacklog()"> {{backlog.name}} </a>
+    <div class="list-group" *ngIf="_backlog">
+      <a class="list-group-item" [class.active]="_backlog == selected" (click)="selectBacklog()"> {{_backlog.name}} </a>
     </div>
     <div class="list-group">
-      <a class="list-group-item" *ngFor="#plan of plans" [class.active]="plan == selected" (click)="onClick($event, plan)"> {{plan.name}} </a>
+      <a class="list-group-item" *ngFor="#plan of _plans" [class.active]="plan == selected" (click)="selectPlan(plan)"> {{plan.name}} </a>
     </div>
 
     <button class="btn btn-primary" (click)="ui.cpd.show = true;">New Sprint...</button>
@@ -57,8 +57,8 @@ import {NgForm} from 'angular2/common'
 })
 export class PlanList {
     private _project: Object = {};
-    private plans: Array = [];
-    private backlog;
+    private _plans: Array = [];
+    private _backlog;
     private ui: {};
     @Output() public select: EventEmitter<PlanList> = new EventEmitter();
 
@@ -76,15 +76,25 @@ export class PlanList {
     private loadPlans() {
         if (this._project.id) {
             this.http.get('/api/backlogs/' + this._project.backlog.id)
-                .subscribe(resp => this.backlog = resp.json());
+                .subscribe(resp => this._backlog = resp.json());
 
             this.http.get('/api/plans/?project=' + this._project.id)
                 .subscribe(resp => this.setPlans(resp.json()));
         }
     }
 
+    @Output public get plans() {
+        return this._plans;
+    }
+
+    @Output public get backlog() {
+        return this._backlog;
+    }
+
     private setPlans(plans) {
-        this.plans = plans;
+        this._plans = plans;
+        this.selected = null;
+        (plans && plans.length) && this.selectPlan(plans[0]);
     }
 
     createPlan(data) {
@@ -104,13 +114,13 @@ export class PlanList {
         this.loadPlans();
     }
 
-    onClick(e, plan) {
+    selectPlan(plan) {
         this.selected = plan;
         this.select.next(plan);
     }
 
     selectBacklog() {
-        this.selected = this.backlog;
-        this.select.next(this.backlog)
+        this.selected = this._backlog;
+        this.select.next(this._backlog)
     }
 }

@@ -16,6 +16,8 @@ import Quill from 'quill';
     directives: [PlanList, WorkItemDetail, ModalDialog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     templateUrl: 'app/templates/plans.html',
     styles: [`
+    .project-info { height:; 40px; padding: 2px 0;}
+    .project-operations { float: right;}
     .plan-page {padding-bottom: 15px;}
     .work-items-heading > div{float:right;}
     .work-items-heading { height: 38px; }
@@ -56,6 +58,8 @@ export class Plans {
     private ui;
     private descriptionEditor;
     private hideFinished = false;
+    private creatingType;
+    private projectOfPlans;
 
     constructor(private ele: ElementRef,
                 private http: Http, private projectService: ProjectService) {
@@ -84,8 +88,12 @@ export class Plans {
     showMoveToDialog() {
         this.ui.mtd.show = true;
         if (!this.plans) {
-            this.http.get('/api/plans/?project=' + this.projectService.current.id)
-                .subscribe(resp => this.plans = resp.json());
+            var projectId = this.projectService.current.id;
+            this.http.get('/api/plans/?project=' + projectId)
+                .subscribe(resp => {
+                    this.plans = resp.json();
+                    this.projectOfPlans = projectId;
+                });
         }
     }
 
@@ -110,8 +118,14 @@ export class Plans {
         this.loadWorkItems();
     }
 
-    showAddItem() {
+    showAddItem(type) {
         this.ui.awd.item = {'description': ''};
+        this.creatingType = type;
+        if (type) {
+            this.ui.awd.item.type = type;
+            this.ui.awd.item.severity =  'Major';
+        }
+
         this.showWorkItemDlg();
     }
 
