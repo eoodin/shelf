@@ -179,7 +179,7 @@ export class Plans {
     }
 
     showItem(item) {
-        this.ui.awd.item = item;
+        this.ui.awd.item = JSON.parse(JSON.stringify(item));
         this.showWorkItemDlg();
     }
 
