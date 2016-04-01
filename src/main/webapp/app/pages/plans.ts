@@ -190,8 +190,11 @@ export class Plans {
 
     removeItem(item) {
         this.http.delete('/api/work-items/' + item.id)
-            .subscribe(resp => this.loadWorkItems());
-        ui.rwd.show =false;
+            .subscribe(resp =>
+            {
+                this.loadWorkItems();
+                this.ui.rwd.show =false;
+            });
     }
 
     getShowingItems() {
