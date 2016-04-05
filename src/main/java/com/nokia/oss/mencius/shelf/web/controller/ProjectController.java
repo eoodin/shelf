@@ -69,6 +69,7 @@ public class ProjectController {
             backlog.setProject(project);
             em.persist(backlog);
 
+            project.setBacklog(backlog);
             Team team = em.find(Team.class, spec.teamId);
             project.setTeam(team);
 

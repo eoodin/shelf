@@ -86,61 +86,61 @@ public class WorkItemController {
             HttpServletRequest request) throws ShelfException {
         EntityManager em = HibernateHelper.createEntityManager();
 
-        try {
-            WorkItem item = em.find(WorkItem.class, id);
-
-            if (item == null)
-                throw new NotFoundException();
-
-            Changes changes = new Changes();
-            if (spec.status != null) {
-                WorkItem.Status status = WorkItem.Status.valueOf(spec.status);
-                if (changes.addChange("status", item.getStatus(), status))
-                    item.setStatus(status);
-            }
-
-            if (spec.estimation != null)
-                if (changes.addChange("estimation", item.getEstimation(), spec.estimation)) {
-                    item.setEstimation(spec.estimation);
-                    if (spec.estimation == 0)
-                        item.setStatus(WorkItem.Status.Finished);
-                }
-
-            if (spec.title != null)
-                if (changes.addChange("title", item.getTitle(), spec.title))
-                    item.setTitle(spec.title);
-
-            if (spec.description != null)
-                if(changes.addChange("description", item.getDescription(), spec.description))
-                    item.setDescription(spec.description);
-
-            if (spec.ownerId != null)
-                if (changes.addChange("owner", item.getOwner().getUserId(), spec.ownerId))
-                    item.setOwner(em.find(User.class, spec.ownerId));
-
-            User currentUser = UserUtils.findOrCreateUser(request.getRemoteUser());
-            em.getTransaction().begin();
-            try {
-                em.persist(item);
-
-                ChangeLog changeLog = new ChangeLog();
-                changeLog.setActor(currentUser);
-                changeLog.setOriginalData(changes.getOldJson());
-                changeLog.setChangedData(changes.getNewJson());
-                changeLog.setItem(item);
-                changeLog.setChangeTime(new Date());
-                em.persist(changeLog);
-
-                em.getTransaction().commit();
-            } catch (Exception ex) {
-                System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
-                em.getTransaction().rollback();
-                throw new ShelfException(ex.getMessage());
-            }
+        WorkItem item = em.find(WorkItem.class, id);
+        Changes changes = new Changes();
+        if (item == null) {
+            em.close();
+            throw new NotFoundException();
         }
-        finally {
+
+        if (spec.status != null) {
+            WorkItem.Status status = WorkItem.Status.valueOf(spec.status);
+            if (changes.addChange("status", item.getStatus(), status))
+                item.setStatus(status);
+        }
+
+        if (spec.estimation != null)
+            if (changes.addChange("estimation", item.getEstimation(), spec.estimation)) {
+                item.setEstimation(spec.estimation);
+                if (spec.estimation == 0)
+                    item.setStatus(WorkItem.Status.Finished);
+            }
+
+        if (spec.title != null)
+            if (changes.addChange("title", item.getTitle(), spec.title))
+                item.setTitle(spec.title);
+
+        if (spec.description != null)
+            if (changes.addChange("description", item.getDescription(), spec.description))
+                item.setDescription(spec.description);
+
+        if (spec.ownerId != null)
+            if (changes.addChange("owner", item.getOwner().getUserId(), spec.ownerId))
+                item.setOwner(em.find(User.class, spec.ownerId));
+
+        User currentUser = UserUtils.findOrCreateUser(request.getRemoteUser());
+
+        em.getTransaction().begin();
+        try {
+            em.persist(item);
+
+            ChangeLog changeLog = new ChangeLog();
+            changeLog.setActor(currentUser);
+            changeLog.setOriginalData(changes.getOldJson());
+            changeLog.setChangedData(changes.getNewJson());
+            changeLog.setItem(item);
+            changeLog.setChangeTime(new Date());
+            em.persist(changeLog);
+
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
+            em.getTransaction().rollback();
+            throw new ShelfException(ex.getMessage());
+        } finally {
             em.close();
         }
+
     }
 
     @RequestMapping(value = "/{wiid}", method = RequestMethod.DELETE)

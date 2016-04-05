@@ -35,6 +35,7 @@ abstract public class WorkItem {
     private int estimation;
 
     @Lob
+    @Column(length = 524288)
     private String description;
 
     @Column
