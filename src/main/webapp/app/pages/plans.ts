@@ -7,16 +7,15 @@ import moment from 'moment';
 
 import {PlanList} from '../components/plan-list.ts';
 import {ProjectService} from '../services/project-service.ts';
-import {WorkItemDetail} from '../components/work-item-detail.ts';
+import {ItemDetail} from '../components/item-detail.ts';
 import {ModalDialog} from '../components/modal-dialog.ts';
-import Quill from 'quill';
 
 @Component({
     selector: 'plans',
-    directives: [PlanList, WorkItemDetail, ModalDialog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
+    directives: [PlanList, ItemDetail, ModalDialog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     templateUrl: 'app/templates/plans.html',
     styles: [`
-    .project-info { height:; 40px; padding: 2px 0;}
+    .project-info { height:40px; padding: 2px 0;}
     .project-operations { float: right;}
     .plan-page {padding-bottom: 15px;}
     .work-items-heading > div{float:right;}
@@ -25,9 +24,7 @@ import Quill from 'quill';
     .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
     [ngcontrol='title'] { width: 100%; }
-    .description-editor { width: 100%; border: 1px solid #ccc; height: 18em; }
-    .quill-toolbar {border-bottom:  1px solid #ccc;}
-    .plan-head h1 {font-size: 18px;}
+    .plan-head h1 {font-size: 18px; margin: 0;}
     .plan-head ul {padding-left: 0;}
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
     .plan-head ul li span {font-weight: normal}
@@ -39,13 +36,6 @@ import Quill from 'quill';
     .defect.glyphicon{color: #500;}
     .task.glyphicon{color: #333;}
     .type-and-id input { display: inline-block; }
-    .work-item-details { padding-left: 0;}
-    .work-item-details li { list-style:none; margin-bottom: 10px;}
-    .work-item-details li:last-child { margin-bottom: 0;}
-    .work-item-details li .title { font-weight: 700; }
-    .work-item-details li .big-section { display: block;}
-    .awd .modal-dialog {width: 720px;}
-    .awd .modal-dialog form input.work-item-title { width: 100%; }
     `],
     styleUrls: ['../../deps/css/css-spinner.css']
 })
@@ -56,14 +46,11 @@ export class Plans {
     private sort = {};
     private members;
     private ui;
-    private descriptionEditor;
     private hideFinished = false;
-    private creatingType;
     private projectOfPlans;
 
     constructor(private ele: ElementRef,
                 private http: Http, private projectService: ProjectService) {
-        this.descriptionEditor = null;
         this.ui = {
             'loading': {'show': false},
             'awd': {'show': false, 'loading': false, 'item': {}},
@@ -120,34 +107,13 @@ export class Plans {
 
     showAddItem(type) {
         this.ui.awd.item = {'description': ''};
-        this.creatingType = type;
+        this.ui.awd.type = type;
         if (type) {
             this.ui.awd.item.type = type;
             this.ui.awd.item.severity =  'Major';
         }
 
-        this.showWorkItemDlg();
-    }
-
-    showWorkItemDlg() {
         this.ui.awd.show = true;
-        if (!this.descriptionEditor) {
-            var el = this.ele.nativeElement;
-            var editorEle = el.getElementsByClassName("quill-editor")[0];
-            var toolbarEle = el.getElementsByClassName('quill-toolbar')[0];
-            this.descriptionEditor = new Quill(editorEle, {
-                'modules': {
-                    'authorship': {authorId: 'galadriel', enabled: true},
-                    'multi-cursor': true,
-                    'link-tooltip': true,
-                    'toolbar': {'container': toolbarEle}
-                },
-                'theme': 'snow'
-            });
-        }
-
-        var description = this.ui.awd.item.description || '';
-        this.descriptionEditor.setHTML(description);
     }
 
     saveWorkItem() {
@@ -180,7 +146,7 @@ export class Plans {
 
     showItem(item) {
         this.ui.awd.item = JSON.parse(JSON.stringify(item));
-        this.showWorkItemDlg();
+        this.ui.awd.show = true;
     }
 
     removingItem(item) {
@@ -249,6 +215,11 @@ export class Plans {
 
         this.sort.field = field;
         this.loadWorkItems();
+    }
+
+    detailClosed() {
+        this.ui.awd.show = false;
+        console.log("Detail dialog closed.");
     }
 
     loadWorkItems() {

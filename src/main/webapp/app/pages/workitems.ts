@@ -5,7 +5,7 @@ import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/c
 import {DROPDOWN_DIRECTIVES} from 'deps/ng2-bs/ng2-bootstrap.ts';
 
 import {ProjectService} from '../services/project-service.ts';
-import {WorkItemDetail} from '../components/work-item-detail.ts';
+import {WorkItemDetail} from '../components/item-detail.ts';
 import {ModalDialog} from '../components/modal-dialog.ts';
 
 @Component({

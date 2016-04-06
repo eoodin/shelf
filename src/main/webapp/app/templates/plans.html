@@ -2,118 +2,121 @@
     <div class="col-sm-2">
         <plan-list [project]="projectService.current" (select)="onSelect($event)"></plan-list>
     </div>
+
     <div class="col-sm-offset-2 col-md-offset-2 right">
+        <div class="plan-head" *ngIf="current.id">
+            <h1>{{current.name}}</h1>
+            <ul class="summary">
+                <li *ngIf="current.start">Start: <span>{{date(current.start)}}</span></li>
+                <li *ngIf="current.end">Deadline: <span>{{date(current.end)}}</span></li>
+                <li *ngIf="current.allocation">Time(remain/planned): <span>{{sumHours()}}/{{current.allocation.developerHours + current.allocation.testerHours}}</span></li>
+                <li *ngIf="current.allocation">Progress: <span> x/x </span></li>
+            </ul>
+        </div>
         <div class="project-info">
             <div class="project-operations">
                 <button class="btn btn-warning" (click)="showAddItem('Defect')">Report A Problem</button>
             </div>
         </div>
-        <div class="plan-head" *ngIf="current.id">
-            <h1>{{current.name}}</h1>
-            <ul class="summary">
-                <li>Start: <span>{{date(current.start)}}</span></li>
-                <li>Deadline: <span>{{date(current.end)}}</span></li>
-                <li *ngIf="current.allocation">Time(remain/planned): <span>{{sumHours()}}/{{current.allocation.developerHours + current.allocation.testerHours}}</span></li>
-                <li *ngIf="current.allocation">Progress: <span> x/x </span></li>
-            </ul>
-        </div>
-        <div class="item-table">
-            <div class="loading-mask" *ngIf="ui.loading.show">
-                <div class="spinner-loader"></div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading work-items-heading">
-                    <div>
-                        <label  >
-                            <input type="checkbox" [(ngModel)]="hideFinished"  (click)="loadWorkItems();" />
-                            Hide Finished
-                        </label>
-                    </div>
+        <div class="plan-body">
+            <div class="item-table">
+                <div class="loading-mask" *ngIf="ui.loading.show">
+                    <div class="spinner-loader"></div>
                 </div>
-                <table *ngIf="workItems" class="table">
-                    <tr>
-                        <th>
-                            <a href="javascript:void(0);" (click)="sortResult('id')">ID
+                <div class="panel panel-default">
+                    <div class="panel-heading work-items-heading">
+                        <div>
+                            <label  >
+                                <input type="checkbox" [(ngModel)]="hideFinished"  (click)="loadWorkItems();" />
+                                Hide Finished
+                            </label>
+                        </div>
+                    </div>
+                    <table *ngIf="workItems" class="table">
+                        <tr>
+                            <th>
+                                <a href="javascript:void(0);" (click)="sortResult('id')">ID
                                 <span *ngIf="sort.field=='id'">
                                     <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
                                 </span>
-                            </a>
-                        </th>
-                        <th>
-                            <a href="javascript:void(0);" (click)="sortResult('title')">Title
+                                </a>
+                            </th>
+                            <th>
+                                <a href="javascript:void(0);" (click)="sortResult('title')">Title
                                 <span *ngIf="sort.field=='title'">
                                     <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
                                 </span>
-                            </a>
-                        </th>
-                        <th>
-                            <a href="javascript:void(0);" (click)="sortResult('status')">Status
+                                </a>
+                            </th>
+                            <th>
+                                <a href="javascript:void(0);" (click)="sortResult('status')">Status
                                 <span *ngIf="sort.field=='status'">
                                     <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
                                 </span>
-                            </a>
-                        </th>
-                        <th><a href="javascript:void(0);" (click)="sortResult('owner')">Owner
+                                </a>
+                            </th>
+                            <th><a href="javascript:void(0);" (click)="sortResult('owner')">Owner
                                 <span *ngIf="sort.field=='owner'">
                                     <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
                                 </span>
                             </a>
-                        </th>
-                        <th>Operations</th>
-                    </tr>
-                    <tr *ngFor="#item of getShowingItems()">
-                        <td class="type-and-id">
-                            <label>
-                                <input class="checkbox" [(ngModel)]="item.checked" type="checkbox">
-                                <span *ngIf="item.type=='UserStory'" class="us glyphicon glyphicon-edit"></span>
-                                <span *ngIf="item.type=='Defect'" class="defect glyphicon glyphicon-fire"></span>
-                                <span *ngIf="item.type=='Task'" class="task glyphicon glyphicon-check"></span>
-                                {{item.id}}
-                            </label>
-                        </td>
-                        <td><a (click)="showItem(item)">{{item.title}}</a></td>
-                        <td>
-                            <div class="btn-group" dropdown keyboardNav>
-                                <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {{item.status}} <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li role="menuitem"
-                                        *ngFor="#st of ['New','InProgress','','Finished','Pending','Dropped']"
-                                        [class.hidden]="st == item.status">
-                                        <a (click)="changeStatus(item, st)">{{st}}</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="btn-group" dropdown keyboardNav>
-                                <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span *ngIf="item.owner">{{item.owner.userId}}</span> <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li role="menuitem"
-                                        *ngFor="#member of members"
-                                        [class.hidden]="member == item.owner"><a
-                                            (click)="assignTo(item, member)">{{member.userId}}</a></li>
-                                </ul>
-                            </div>
-                        </td>
-                        <td>
-                            <a (click)="removingItem(item)"><span class="glyphicon glyphicon-remove"></span></a>
-                        </td>
-                    </tr>
-                </table>
+                            </th>
+                            <th>Operations</th>
+                        </tr>
+                        <tr *ngFor="#item of getShowingItems()">
+                            <td class="type-and-id">
+                                <label>
+                                    <input class="checkbox" [(ngModel)]="item.checked" type="checkbox">
+                                    <span *ngIf="item.type=='UserStory'" class="us glyphicon glyphicon-edit"></span>
+                                    <span *ngIf="item.type=='Defect'" class="defect glyphicon glyphicon-fire"></span>
+                                    <span *ngIf="item.type=='Task'" class="task glyphicon glyphicon-check"></span>
+                                    {{item.id}}
+                                </label>
+                            </td>
+                            <td><a (click)="showItem(item)">{{item.title}}</a></td>
+                            <td>
+                                <div class="btn-group" dropdown keyboardNav>
+                                    <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        {{item.status}} <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li role="menuitem"
+                                            *ngFor="#st of ['New','InProgress','','Finished','Pending','Dropped']"
+                                            [class.hidden]="st == item.status">
+                                            <a (click)="changeStatus(item, st)">{{st}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="btn-group" dropdown keyboardNav>
+                                    <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span *ngIf="item.owner">{{item.owner.userId}}</span> <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li role="menuitem"
+                                            *ngFor="#member of members"
+                                            [class.hidden]="member == item.owner"><a
+                                                (click)="assignTo(item, member)">{{member.userId}}</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <a (click)="removingItem(item)"><span class="glyphicon glyphicon-remove"></span></a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-2">
-                <button class="btn btn-primary" (click)="showAddItem()">Add Work Item...</button>
-            </div>
-            <div class="col-sm-6">
-                <button class="btn btn-primary" (click)="showMoveToDialog();">Move To...</button>
+            <div>
+                <div class="col-sm-2">
+                    <button class="btn btn-primary" (click)="showAddItem()">Add Work Item...</button>
+                </div>
+                <div class="col-sm-6">
+                    <button class="btn btn-primary" (click)="showMoveToDialog();">Move To...</button>
+                </div>
             </div>
         </div>
     </div>
@@ -123,193 +126,12 @@
     <h1 class="no-content-notice">No project.</h1>
 </div>
 
-<div class="modal fade in awd" [style.display]="ui.awd.show ? 'block' : 'none'" role="dialog">
-    <div class="modal-dialog">
-        <form (ngSubmit)="saveWorkItem()" action="">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" (click)="ui.awd.show = false"
-                            data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title" *ngIf="!ui.awd.item.id">Add Work Item to {{current.name}}</h4>
-                    <h4 class="modal-title" *ngIf="ui.awd.item.id">Work item detail</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="row" >
-                        <div class="col-sm-12">
-                            Type:
-                            <select *ngIf="!ui.awd.item.id" [(ngModel)]="ui.awd.item.type" [disabled]="creatingType">
-                                <option value="UserStory" selected="selected">User Story</option>
-                                <option value="Task">Task</option>
-                                <option value="Defect">Defect</option>
-                            </select>
-                            <span *ngIf="ui.awd.item.id">{{ui.awd.item.type}}</span>
-                        </div>
-                    </div>
-                    <div *ngIf="ui.awd.item.type == 'Defect'" class="row">
-                        <div class="col-sm-12">Severity:
-                            <label><input #s1 type="radio" [checked]="ui.awd.item.severity==s1.value" (click)="ui.awd.item.severity=s1.value" value="Blocker">Blocker</label>
-                            <label><input #s2 type="radio" [checked]="ui.awd.item.severity==s2.value" (click)="ui.awd.item.severity=s2.value" value="Critical">Critical</label>
-                            <label><input #s3 type="radio" [checked]="ui.awd.item.severity==s3.value" (click)="ui.awd.item.severity=s3.value" value="Major">Major</label>
-                            <label><input #s4 type="radio" [checked]="ui.awd.item.severity==s4.value" (click)="ui.awd.item.severity=s4.value" value="Minor">Minor</label>
-                        </div>
-                    </div>
-                    <div *ngIf="ui.awd.item.type == 'Defect'" class="row">
-                        <div class="col-sm-12">Found in:
-                            <input [(ngModel)]="ui.awd.item.version">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            Title:
-                            <input type="text" class="work-item-title" [(ngModel)]="ui.awd.item.title">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">Description:</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="description-editor">
-                                <label class="toolbar-toggler" [style.background]="editorToggle?'gray':'white'"
-                                       style="padding-left: 7px;font-size:18px;border: 1px solid #bbb; border-radius: 3px; overflow: hidden;display:inline-block;float:right;width: 28px; height:28px;background: gray;margin: 5px;">
-                                    <input type="checkbox" [(ngModel)]="editorToggle" style="display:none;">
-                                    T
-                                </label>
-                                <div [style.display]="editorToggle?'inherit':'none'" class="quill-toolbar toolbar">
-                                    <span class="ql-format-group">
-                                    <select title="Font" class="ql-font">
-                                        <option value="sans-serif" selected="">Sans Serif</option>
-                                        <option value="serif">Serif</option>
-                                        <option value="monospace">Monospace</option>
-                                    </select>
-                                    <select title="Size" class="ql-size">
-                                        <option value="10px">Small</option>
-                                        <option value="13px" selected="">Normal</option>
-                                        <option value="18px">Large</option>
-                                        <option value="32px">Huge</option>
-                                    </select>
-                                    </span>
-                                    <span class="ql-format-group">
-                                    <span title="Bold" class="ql-format-button ql-bold"></span>
-                                    <span class="ql-format-separator"></span>
-                                    <span title="Italic" class="ql-format-button ql-italic"></span>
-                                    <span class="ql-format-separator"></span>
-                                    <span title="Underline" class="ql-format-button ql-underline"></span>
-                                    <span class="ql-format-separator"></span>
-                                    <span title="Strikethrough" class="ql-format-button ql-strike"></span>
-                                    </span>
-                                    <span class="ql-format-group">
-                                    <select title="Text Color" class="ql-color">
-                                        <option value="rgb(0, 0, 0)" label="rgb(0, 0, 0)" selected=""></option>
-                                        <option value="rgb(230, 0, 0)" label="rgb(230, 0, 0)"></option>
-                                        <option value="rgb(255, 153, 0)" label="rgb(255, 153, 0)"></option>
-                                        <option value="rgb(255, 255, 0)" label="rgb(255, 255, 0)"></option>
-                                        <option value="rgb(0, 138, 0)" label="rgb(0, 138, 0)"></option>
-                                        <option value="rgb(0, 102, 204)" label="rgb(0, 102, 204)"></option>
-                                        <option value="rgb(153, 51, 255)" label="rgb(153, 51, 255)"></option>
-                                        <option value="rgb(255, 255, 255)" label="rgb(255, 255, 255)"></option>
-                                        <option value="rgb(250, 204, 204)" label="rgb(250, 204, 204)"></option>
-                                        <option value="rgb(255, 235, 204)" label="rgb(255, 235, 204)"></option>
-                                        <option value="rgb(255, 255, 204)" label="rgb(255, 255, 204)"></option>
-                                        <option value="rgb(204, 232, 204)" label="rgb(204, 232, 204)"></option>
-                                        <option value="rgb(204, 224, 245)" label="rgb(204, 224, 245)"></option>
-                                        <option value="rgb(235, 214, 255)" label="rgb(235, 214, 255)"></option>
-                                        <option value="rgb(187, 187, 187)" label="rgb(187, 187, 187)"></option>
-                                        <option value="rgb(240, 102, 102)" label="rgb(240, 102, 102)"></option>
-                                        <option value="rgb(255, 194, 102)" label="rgb(255, 194, 102)"></option>
-                                        <option value="rgb(255, 255, 102)" label="rgb(255, 255, 102)"></option>
-                                        <option value="rgb(102, 185, 102)" label="rgb(102, 185, 102)"></option>
-                                        <option value="rgb(102, 163, 224)" label="rgb(102, 163, 224)"></option>
-                                        <option value="rgb(194, 133, 255)" label="rgb(194, 133, 255)"></option>
-                                        <option value="rgb(136, 136, 136)" label="rgb(136, 136, 136)"></option>
-                                        <option value="rgb(161, 0, 0)" label="rgb(161, 0, 0)"></option>
-                                        <option value="rgb(178, 107, 0)" label="rgb(178, 107, 0)"></option>
-                                        <option value="rgb(178, 178, 0)" label="rgb(178, 178, 0)"></option>
-                                        <option value="rgb(0, 97, 0)" label="rgb(0, 97, 0)"></option>
-                                        <option value="rgb(0, 71, 178)" label="rgb(0, 71, 178)"></option>
-                                        <option value="rgb(107, 36, 178)" label="rgb(107, 36, 178)"></option>
-                                        <option value="rgb(68, 68, 68)" label="rgb(68, 68, 68)"></option>
-                                        <option value="rgb(92, 0, 0)" label="rgb(92, 0, 0)"></option>
-                                        <option value="rgb(102, 61, 0)" label="rgb(102, 61, 0)"></option>
-                                        <option value="rgb(102, 102, 0)" label="rgb(102, 102, 0)"></option>
-                                        <option value="rgb(0, 55, 0)" label="rgb(0, 55, 0)"></option>
-                                        <option value="rgb(0, 41, 102)" label="rgb(0, 41, 102)"></option>
-                                        <option value="rgb(61, 20, 102)" label="rgb(61, 20, 102)"></option>
-                                    </select>
-                                    <span class="ql-format-separator"></span>
-                                    <select title="Background Color" class="ql-background">
-                                        <option value="rgb(0, 0, 0)" label="rgb(0, 0, 0)"></option>
-                                        <option value="rgb(230, 0, 0)" label="rgb(230, 0, 0)"></option>
-                                        <option value="rgb(255, 153, 0)" label="rgb(255, 153, 0)"></option>
-                                        <option value="rgb(255, 255, 0)" label="rgb(255, 255, 0)"></option>
-                                        <option value="rgb(0, 138, 0)" label="rgb(0, 138, 0)"></option>
-                                        <option value="rgb(0, 102, 204)" label="rgb(0, 102, 204)"></option>
-                                        <option value="rgb(153, 51, 255)" label="rgb(153, 51, 255)"></option>
-                                        <option value="rgb(255, 255, 255)" label="rgb(255, 255, 255)" selected=""></option>
-                                        <option value="rgb(250, 204, 204)" label="rgb(250, 204, 204)"></option>
-                                        <option value="rgb(255, 235, 204)" label="rgb(255, 235, 204)"></option>
-                                        <option value="rgb(255, 255, 204)" label="rgb(255, 255, 204)"></option>
-                                        <option value="rgb(204, 232, 204)" label="rgb(204, 232, 204)"></option>
-                                        <option value="rgb(204, 224, 245)" label="rgb(204, 224, 245)"></option>
-                                        <option value="rgb(235, 214, 255)" label="rgb(235, 214, 255)"></option>
-                                        <option value="rgb(187, 187, 187)" label="rgb(187, 187, 187)"></option>
-                                        <option value="rgb(240, 102, 102)" label="rgb(240, 102, 102)"></option>
-                                        <option value="rgb(255, 194, 102)" label="rgb(255, 194, 102)"></option>
-                                        <option value="rgb(255, 255, 102)" label="rgb(255, 255, 102)"></option>
-                                        <option value="rgb(102, 185, 102)" label="rgb(102, 185, 102)"></option>
-                                        <option value="rgb(102, 163, 224)" label="rgb(102, 163, 224)"></option>
-                                        <option value="rgb(194, 133, 255)" label="rgb(194, 133, 255)"></option>
-                                        <option value="rgb(136, 136, 136)" label="rgb(136, 136, 136)"></option>
-                                        <option value="rgb(161, 0, 0)" label="rgb(161, 0, 0)"></option>
-                                        <option value="rgb(178, 107, 0)" label="rgb(178, 107, 0)"></option>
-                                        <option value="rgb(178, 178, 0)" label="rgb(178, 178, 0)"></option>
-                                        <option value="rgb(0, 97, 0)" label="rgb(0, 97, 0)"></option>
-                                        <option value="rgb(0, 71, 178)" label="rgb(0, 71, 178)"></option>
-                                        <option value="rgb(107, 36, 178)" label="rgb(107, 36, 178)"></option>
-                                        <option value="rgb(68, 68, 68)" label="rgb(68, 68, 68)"></option>
-                                        <option value="rgb(92, 0, 0)" label="rgb(92, 0, 0)"></option>
-                                        <option value="rgb(102, 61, 0)" label="rgb(102, 61, 0)"></option>
-                                        <option value="rgb(102, 102, 0)" label="rgb(102, 102, 0)"></option>
-                                        <option value="rgb(0, 55, 0)" label="rgb(0, 55, 0)"></option>
-                                        <option value="rgb(0, 41, 102)" label="rgb(0, 41, 102)"></option>
-                                        <option value="rgb(61, 20, 102)" label="rgb(61, 20, 102)"></option>
-                                    </select>
-                                    </span>
-                                    <span class="ql-format-group">
-                                    <span title="List" class="ql-format-button ql-list"></span>
-                                    <span class="ql-format-separator"></span>
-                                    <span title="Bullet" class="ql-format-button ql-bullet"></span>
-                                    <span class="ql-format-separator"></span>
-                                    <select title="Text Alignment" class="ql-align">
-                                        <option value="left" label="Left" selected=""></option>
-                                        <option value="center" label="Center"></option>
-                                        <option value="right" label="Right"></option>
-                                        <option value="justify" label="Justify"></option>
-                                    </select>
-                                    </span>
-                                    <span class="ql-format-group">
-                                    <span title="Link" class="ql-format-button ql-link"></span>
-                                    </span>
-                                </div>
-                                <div class="quill-editor"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div *ngIf="ui.awd.item.type == 'Task'" class="row">
-                        <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="ui.awd.item.estimation"></div>
-                    </div>
-                    <div class="row" *ngIf="ui.awd.item.type == 'UserStory'">
-                        <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="ui.awd.item.points" value="0"></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button *ngIf="!ui.awd.item.id" type="submit" class="btn btn-default" data-dismiss="modal">Create</button>
-                    <button *ngIf="ui.awd.item.id" type="submit" class="btn btn-default" data-dismiss="modal">Save</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
+<item-detail [item]="ui.awd.item"
+             [show]="ui.awd.show"
+             [type]="ui.awd.type"
+             (closed)="ui.awd.show = false"
+             (saved)="onWorkSaved();"
+        ></item-detail>
 
 <div class="modal fade in awd" *ngIf="ui.mtd.show" [style.display]="ui.mtd.show ? 'block' : 'block'" role="dialog">
     <div class="modal-dialog">
