@@ -18,7 +18,7 @@
                 <button class="btn btn-warning" (click)="showAddItem('Defect')">Report A Problem</button>
             </div>
         </div>
-        <div class="plan-body">
+        <div *ngIf="current.type != 'backlog'" class="plan-body">
             <div class="item-table">
                 <div class="loading-mask" *ngIf="ui.loading.show">
                     <div class="spinner-loader"></div>
@@ -118,6 +118,9 @@
                     <button class="btn btn-primary" (click)="showMoveToDialog();">Move To...</button>
                 </div>
             </div>
+        </div>
+        <div *ngIf="current && current.type == 'backlog'" class="plan-body">
+            <backlog [data]="current"></backlog>
         </div>
     </div>
 </div>

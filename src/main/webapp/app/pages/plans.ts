@@ -6,13 +6,14 @@ import {DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES} from 'deps/ng2-bs/ng2-bootstrap.
 import moment from 'moment';
 
 import {PlanList} from '../components/plan-list.ts';
+import {Backlog} from '../components/backlog.ts';
 import {ProjectService} from '../services/project-service.ts';
 import {ItemDetail} from '../components/item-detail.ts';
 import {ModalDialog} from '../components/modal-dialog.ts';
 
 @Component({
     selector: 'plans',
-    directives: [PlanList, ItemDetail, ModalDialog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
+    directives: [PlanList, ItemDetail, ModalDialog, Backlog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     templateUrl: 'app/templates/plans.html',
     styles: [`
     .project-info { height:40px; padding: 2px 0;}
@@ -47,7 +48,6 @@ export class Plans {
     private members;
     private ui;
     private hideFinished = false;
-    private projectOfPlans;
 
     constructor(private ele: ElementRef,
                 private http: Http, private projectService: ProjectService) {
@@ -74,12 +74,11 @@ export class Plans {
 
     showMoveToDialog() {
         this.ui.mtd.show = true;
-        if (!this.plans) {
+        if (!this.plans) { // TODO: use plan service to manager plan list.
             var projectId = this.projectService.current.id;
             this.http.get('/api/plans/?project=' + projectId)
                 .subscribe(resp => {
                     this.plans = resp.json();
-                    this.projectOfPlans = projectId;
                 });
         }
     }
