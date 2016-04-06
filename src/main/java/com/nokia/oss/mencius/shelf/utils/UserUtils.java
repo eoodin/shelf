@@ -5,14 +5,11 @@ import com.nokia.oss.mencius.shelf.model.User;
 import com.nokia.oss.mencius.shelf.ShelfException;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UserUtils {
     public static User findOrCreateUser(String userId) throws ShelfException {
@@ -23,12 +20,10 @@ public class UserUtils {
     public static Collection<User> findOrCreateUsers(String ... userIds) throws ShelfException {
         EntityManager em = HibernateHelper.createEntityManager();
 
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<User> cq = cb.createQuery(User.class);
-        Root<User> user = cq.from(User.class);
+        String sql = "SELECT u FROM User u WHERE u.userId IN :ids";
+        TypedQuery<User> query = em.createQuery(sql, User.class).setParameter("ids", Arrays.asList(userIds));
 
-        cq.select(user);
-        List<User> list = em.createQuery(cq).getResultList();
+        List<User> list = query.getResultList();
 
         Map<String, User> id2Users = new HashMap<>();
         for (User u : list) {

@@ -15,6 +15,7 @@ import {ROUTER_DIRECTIVES,
     Router} from 'angular2/router';
 
 import {ProjectService} from './services/project-service.ts';
+import {PreferenceService} from './services/preference-service.ts';
 import {TeamService} from './services/team-service.ts';
 import {Projects} from './pages/projects.ts';
 import {Plans} from './pages/plans.ts';
@@ -85,7 +86,7 @@ import {WorkItems} from './pages/workitems.ts';
     .nav-logo {width: 32px; height:32px;}
     `],
     directives: [Alert, ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
-    providers: [ProjectService, TeamService]
+    providers: [ProjectService, PreferenceService, TeamService]
 })
 @RouteConfig([
     {path: '/projects', component: Projects, name: 'Projects'},
@@ -96,13 +97,17 @@ export class ShelfApp {
     router:Router;
     location:Location;
     private projectService : ProjectService;
+    private prefService : PreferenceService;
     private ui;
 
-    constructor(router:Router, location:Location, projectService: ProjectService) {
+    constructor(router:Router, location:Location, projectService: ProjectService, pfs: PreferenceService) {
         this.router = router;
         this.location = location;
+        this.prefService = pfs;
+        this.prefService.load(); // TODO: make projects loading depends on preferences loading.
         this.projectService = projectService;
         this.ui = {"nav" : {"projectList" : {"show": false}}};
+
         this.projectService.load();
     }
 

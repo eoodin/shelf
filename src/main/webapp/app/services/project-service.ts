@@ -1,12 +1,14 @@
 import {Injectable} from 'angular2/core';
 import {Http, Response} from 'angular2/http';
 
+import {PreferenceService} from './preference-service.ts';
+
 @Injectable()
 export class ProjectService {
     private _current = null;
     private _projects = [];
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private prefService:PreferenceService) {
     }
 
     get current():Object {
@@ -15,6 +17,7 @@ export class ProjectService {
 
     set current(project:Object) {
         this._current = project;
+        this.prefService.setPreference('lastProjectId', this._current.id);
     }
 
     get projects():Object[] {
@@ -23,6 +26,16 @@ export class ProjectService {
 
     set projects(projects:Object[]) {
         this._projects = projects;
+        var lastProjectId = this.prefService.preferences['lastProjectId'];
+        if (lastProjectId) {
+            for (var p of this._projects) {
+                if (p.id==lastProjectId) {
+                    this._current = p;
+                    return;
+                }
+            }
+        }
+
         if (!this._projects.length) {
             this._current = null;
         }

@@ -1,8 +1,12 @@
 package com.nokia.oss.mencius.shelf.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.Collection;
 import java.util.Date;
 
 @Entity
@@ -19,6 +23,10 @@ public class User {
 
     @Column(nullable = false)
     private Date createdAt;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    private Collection<UserPreference> preferences;
 
     public String getUserId() {
         return userId;
@@ -50,5 +58,13 @@ public class User {
 
     public Date getCreatedAt() {
         return createdAt;
+    }
+
+    public Collection<UserPreference> getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(Collection<UserPreference> preferences) {
+        this.preferences = preferences;
     }
 }
