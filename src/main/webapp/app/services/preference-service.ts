@@ -1,5 +1,6 @@
 import {Injectable} from 'angular2/core';
 import {Http, Response} from 'angular2/http';
+import {Observable} from 'rxjs/Observable';
 
 @Injectable()
 export class PreferenceService {
@@ -28,14 +29,21 @@ export class PreferenceService {
         this._preferences = p;
     }
 
-    public load() {
+    public load() : Promise {
         var that = this;
-        this.http.get('/api/users/me')
-            .subscribe(resp => {
-                that.currentUser = resp.json();
-                that.http.get('/api/users/' + that._currentUser.userId + '/preferences')
-                    .subscribe(resp => that.preferences = resp.json());
-            });
+        return new Observable(observer => {
+            that.http.get('/api/users/me')
+                .subscribe(resp => {
+                    that.currentUser = resp.json();
+                    that.http.get('/api/users/' + that._currentUser.userId + '/preferences')
+                        .subscribe(resp => {
+                            that.preferences = resp.json();
+                            console.log('user preference loaded');
+                            observer.next();
+                            observer.complete();
+                        });
+                });
+        });
     }
 
     public setPreference(name, value) {

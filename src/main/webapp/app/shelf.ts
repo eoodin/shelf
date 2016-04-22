@@ -104,11 +104,10 @@ export class ShelfApp {
         this.router = router;
         this.location = location;
         this.prefService = pfs;
-        this.prefService.load(); // TODO: make projects loading depends on preferences loading.
         this.projectService = projectService;
-        this.ui = {"nav" : {"projectList" : {"show": false}}};
+        this.prefService.load().subscribe( () => this.projectService.load() );
 
-        this.projectService.load();
+        this.ui = {"nav" : {"projectList" : {"show": false}}};
     }
 
     getLinkStyle(path) {
