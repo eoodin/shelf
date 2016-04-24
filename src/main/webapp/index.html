@@ -3,6 +3,21 @@
 <head>
     <title>Shelf -- SCRUM tool for Mencius</title>
 
+    <link href="deps/bootstrap/bootstrap-3.3.5.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="deps/quill.snow.css" />
+    <style type="text/css">
+        html, body {height: 100%;}
+    </style>
+    <base href="/">
+</head>
+
+<body>
+    <div style="height:100%;"shelf-app>
+        <div style="position: relative;top: 50%;left: 50%;margin-left: -36px;margin-top: -36px;">
+            <img src="spin.gif"/>
+        </div>
+    </div>
+
     <script src="deps/es6-shim-0.35.0.min.js"></script>
     <script src="deps/system-polyfills-0.19.20.min.js"></script>
     <script src="deps/shims_for_IE.js"></script>
@@ -31,38 +46,24 @@
         System.normalize = function (dep, parent) {
             var System = this;
             return systemNormalize.call(this, dep, parent)
-                .then(function (normalized) {
-                    if ((parent && (parent.slice(-3) == '.ts')) && (dep[0] == ".")) {
-                        var depname = dep.slice(dep.lastIndexOf("/"));
-                        if (depname.indexOf('.') < 0 ||
-                                depname.indexOf('.component') > 0 ||
-                                depname.indexOf('.directive') > 0 ||
-                                depname.indexOf('.service') > 0 ||
-                                depname.indexOf('.class') > 0)
-                            normalized = normalized + '.ts';
-                    }
+                    .then(function (normalized) {
+                        if ((parent && (parent.slice(-3) == '.ts')) && (dep[0] == ".")) {
+                            var depname = dep.slice(dep.lastIndexOf("/"));
+                            if (depname.indexOf('.') < 0 ||
+                                    depname.indexOf('.component') > 0 ||
+                                    depname.indexOf('.directive') > 0 ||
+                                    depname.indexOf('.service') > 0 ||
+                                    depname.indexOf('.class') > 0)
+                                normalized = normalized + '.ts';
+                        }
 
-                    if ((normalized.slice(-6) == '.ts.js') || (normalized.slice(-6) == '.js.ts'))
-                        normalized = normalized.slice(0, normalized.length - 6) + ".ts";
+                        if ((normalized.slice(-6) == '.ts.js') || (normalized.slice(-6) == '.js.ts'))
+                            normalized = normalized.slice(0, normalized.length - 6) + ".ts";
 
-                    return normalized;
-                });
-        }
-
+                        return normalized;
+                    });
+        };
+        System.import('app/shelf.ts').then(null, console.error.bind(console));
     </script>
-    <link href="deps/bootstrap/bootstrap-3.3.5.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="deps/quill.snow.css" />
-    <style type="text/css">
-        html, body {height: 100%;}
-    </style>
-    <base href="/">
-</head>
-<body>
-
-<div shelf-app>loading...</div>
-
-<script>
-    System.import('app/shelf.ts').then(null, console.error.bind(console));
-</script>
-</body>
+    </body>
 </html>
