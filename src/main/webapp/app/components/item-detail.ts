@@ -265,7 +265,6 @@ export class ItemDetail {
         var data = JSON.parse(JSON.stringify(this._item));
         data['description'] = this.descriptionEditor.getHTML();
         data['projectId'] = this.pService.current.id;
-        // data['planId'] = this.current.id;
         if (!data['id']) {
             this.http.request(new Request(new RequestOptions(
                 {url: '/api/work-items/',

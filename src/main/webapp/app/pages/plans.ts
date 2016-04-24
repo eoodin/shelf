@@ -105,7 +105,7 @@ export class Plans {
     }
 
     showAddItem(type) {
-        this.ui.awd.item = {'description': ''};
+        this.ui.awd.item = {'planId': this.current.id};
         this.ui.awd.type = type;
         if (type) {
             this.ui.awd.item.type = type;

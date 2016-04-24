@@ -47,7 +47,6 @@ export class PreferenceService {
     }
 
     public setPreference(name, value) {
-        this.http.put('/api/users/' + this._currentUser.userId + '/preferences?name=' + name + "&value=" + value)
-            .subscribe(resp => console.log(resp.json()));
+        this.http.put('/api/users/' + this._currentUser.userId + '/preferences?name=' + name + "&value=" + value);
     }
 }
