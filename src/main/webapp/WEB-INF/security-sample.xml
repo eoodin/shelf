@@ -14,7 +14,8 @@
     <http use-expressions="true">
         <csrf disabled="true"/>
         <intercept-url pattern="/**" access="isAuthenticated()"/>
-        <form-login default-target-url="/#/projects"
+        <form-login default-target-url="/#/plans"
+                    always-use-default-target="true"
                     login-page="/login.html"
                     username-parameter="j_username"
                     password-parameter="j_password"

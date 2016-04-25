@@ -5,6 +5,7 @@ import com.nokia.oss.mencius.shelf.model.User;
 import com.nokia.oss.mencius.shelf.model.UserPreference;
 import com.nokia.oss.mencius.shelf.utils.UserUtils;
 import com.nokia.oss.mencius.shelf.ShelfException;
+import com.nokia.oss.mencius.shelf.web.NotFoundException;
 import com.nokia.oss.mencius.shelf.web.security.UnAuthorizedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -66,37 +67,47 @@ public class UserController {
                                              HttpServletRequest request,
                                              @RequestParam String name,
                                              @RequestParam(required = false) String value)
-            throws UnAuthorizedException {
+            throws UnAuthorizedException, NotFoundException {
         String remoteUser = request.getRemoteUser();
         if (remoteUser == null || !remoteUser.equals(userId))
             throw new UnAuthorizedException();
 
         EntityManager em = HibernateHelper.createEntityManager();
+        User user = em.find(User.class, userId);
+        String sql = "SELECT p FROM UserPreference p WHERE p.user=:user AND p.name=:name";
+        TypedQuery<UserPreference> query = em.createQuery(sql, UserPreference.class);
+        query.setParameter("user", user);
+        query.setParameter("name", name);
+        List<UserPreference> results = query.getResultList();
+
         try {
             em.getTransaction().begin();
-            User user = em.find(User.class, userId);
-            String sql = "SELECT p FROM UserPreference p WHERE p.user=:user AND p.name=:name";
-            TypedQuery<UserPreference> query = em.createQuery(sql, UserPreference.class);
-            query.setParameter("user", user);
-            query.setParameter("name", name);
+            UserPreference preference = results.isEmpty() ? createPreference(user, name) : results.get(0);
 
-            List<UserPreference> results = query.getResultList();
-            UserPreference preference = results.isEmpty() ? null : results.get(0);
-            if(preference == null) {
-                preference = new UserPreference();
-                preference.setUser(user);
-                preference.setName(name);
-                preference.setCreatedAt(new Date());
+            if (results.isEmpty() || preference.getValue() == null || !preference.getValue().equals(value)) {
+                preference.setValue(value);
+                preference.setChangedAt(new Date());
+                em.merge(preference);
+                em.getTransaction().commit();
             }
-
-            preference.setValue(value); // TODO: validation?
-            em.merge(preference);
-
-            em.getTransaction().commit();
-        } finally {
+        }
+        catch (Exception ex) {
+            em.getTransaction().rollback();
+            throw new NotFoundException();
+        }
+        finally {
             em.close();
         }
     }
+
+    private UserPreference createPreference(User user, String name) {
+        UserPreference preference = new UserPreference();
+        preference.setUser(user);
+        preference.setName(name);
+        preference.setCreatedAt(new Date());
+        return preference;
+    }
+
 
     public static class UserInfo {
         private String userId;

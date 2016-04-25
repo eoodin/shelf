@@ -27,7 +27,7 @@
                     <div class="panel-heading work-items-heading">
                         <div>
                             <label  >
-                                <input type="checkbox" [(ngModel)]="hideFinished"  (click)="loadWorkItems();" />
+                                <input type="checkbox" [(ngModel)]="hideFinished"  (click)="loadWorkItems();" (click)="onHideFinishedCheck()"/>
                                 Hide Finished
                             </label>
                         </div>

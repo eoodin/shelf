@@ -1,6 +1,7 @@
 import {Component, Input, Output, EventEmitter} from 'angular2/core';
 import {Http, Request, Response, RequestMethod, RequestOptions} from 'angular2/http';
-import {NgForm} from 'angular2/common'
+import {NgForm} from 'angular2/common';
+import {PreferenceService} from '../services/preference-service.ts';
 
 @Component({
     selector: 'plan-list',
@@ -64,7 +65,7 @@ export class PlanList {
 
     private selected: any;
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private pref : PreferenceService) {
         this.ui = {cpd: {show: false}};
     }
 
@@ -94,7 +95,20 @@ export class PlanList {
     private setPlans(plans) {
         this._plans = plans;
         this.selected = null;
-        (plans && plans.length) && this.selectPlan(plans[0]);
+        if (plans && plans.length) {
+            var lastSelectedPlan = this.pref.preferences['lastSelectedPlan'];
+            if (lastSelectedPlan) {
+                for (var p of plans) {
+                    if (p.id == lastSelectedPlan) {
+                        this.selectPlan(p);
+                        return;
+                    }
+                }
+            }
+            else {
+                this.selectPlan(plans[0]);
+            }
+        }
     }
 
     createPlan(data) {
@@ -115,6 +129,11 @@ export class PlanList {
     }
 
     selectPlan(plan) {
+        var lastSelectedPlan = this.pref.preferences['lastSelectedPlan'];
+        if (plan.id != lastSelectedPlan) {
+            this.pref.setPreference('lastSelectedPlan', plan.id);
+        }
+
         this.selected = plan;
         this.select.next(plan);
     }

@@ -8,7 +8,7 @@ export class PreferenceService {
     private _preferences = [];
 
     constructor(private http: Http) {
-
+        console.log('PreferenceService instance created.');
     }
 
     get currentUser():Object {
@@ -47,6 +47,10 @@ export class PreferenceService {
     }
 
     public setPreference(name, value) {
-        this.http.put('/api/users/' + this._currentUser.userId + '/preferences?name=' + name + "&value=" + value);
+        if (!this._currentUser.userId)
+            console && console.log('userId not loaded.');
+
+        this.http.put('/api/users/' + this.currentUser.userId + '/preferences?name=' + name + "&value=" + value)
+            .subscribe(_ => {});
     }
 }

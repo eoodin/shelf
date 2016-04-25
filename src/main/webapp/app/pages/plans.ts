@@ -8,6 +8,7 @@ import moment from 'moment';
 import {PlanList} from '../components/plan-list.ts';
 import {Backlog} from '../components/backlog.ts';
 import {ProjectService} from '../services/project-service.ts';
+import {PreferenceService} from '../services/preference-service.ts';
 import {ItemDetail} from '../components/item-detail.ts';
 import {ModalDialog} from '../components/modal-dialog.ts';
 
@@ -50,13 +51,17 @@ export class Plans {
     private hideFinished = false;
 
     constructor(private ele: ElementRef,
-                private http: Http, private projectService: ProjectService) {
+                private http: Http,
+                private projectService: ProjectService,
+                private pref : PreferenceService) {
         this.ui = {
             'loading': {'show': false},
             'awd': {'show': false, 'loading': false, 'item': {}},
             'mtd': {'show': false},
             'rwd': {'show': false}
         };
+
+        this.hideFinished  = eval(pref.preferences['hideFinished']);
     }
 
     public onSelect(plan): void {
@@ -81,6 +86,10 @@ export class Plans {
                     this.plans = resp.json();
                 });
         }
+    }
+
+    onHideFinishedCheck() {
+        this.pref.setPreference('hideFinished',  !this.hideFinished);
     }
 
     moveItemsToPlan(planId) {

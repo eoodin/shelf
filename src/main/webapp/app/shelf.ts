@@ -109,7 +109,7 @@ export class ShelfApp {
 
         this.ui = {"nav" : {"projectList" : {"show": false}}};
     }
-
+    
     getLinkStyle(path) {
         if (path === this.location.path()) {
             return true;
