@@ -240,7 +240,7 @@ export class Plans {
             'rwd': {'show': false}
         };
 
-        this.hideFinished  = eval(pref.preferences['hideFinished']);
+        pref.load().subscribe(_ => this.hideFinished = eval(pref.preferences['hideFinished']));
     }
 
     public onSelect(plan): void {

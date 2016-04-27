@@ -4,8 +4,8 @@ import {Observable} from 'rxjs/Observable';
 
 @Injectable()
 export class PreferenceService {
-    private _currentUser = {};
-    private _preferences = [];
+    private _currentUser = null;
+    private _preferences = null;
 
     constructor(private http: Http) {
         console.log('PreferenceService instance created.');
@@ -16,7 +16,7 @@ export class PreferenceService {
     }
 
     set currentUser(user:Object) {
-        var reloadNeeded = user.userId != this._currentUser.userId;
+        var reloadNeeded = (!this._currentUser || user.userId != this._currentUser.userId);
         this._currentUser = user;
         reloadNeeded && this.load();
     }
@@ -25,32 +25,54 @@ export class PreferenceService {
         return this._preferences;
     }
 
-    set preferences(p:Object) {
-        this._preferences = p;
-    }
-
-    public load() : Promise {
+    public load() : Observable {
         var that = this;
         return new Observable(observer => {
-            that.http.get('/api/users/me')
+            if (!that._preferences) {
+                that.http.get('/api/users/me')
+                    .subscribe(resp => {
+                        that.currentUser = resp.json();
+                        that.http.get('/api/users/' + that._currentUser.userId + '/preferences')
+                            .subscribe(resp => {
+                                that._preferences = resp.json();
+                                console.log('user preference loaded');
+                                observer.next();
+                                observer.complete();
+                            });
+                    });
+            }
+            else {
+                observer.next();
+                observer.complete();
+            }
+        });
+    }
+
+    public fetchUserInfo() : Observable {
+        return new Observable(observer => {
+            if (this._currentUser) {
+                observer.next(this._currentUser);
+                observer.complete();
+                return;
+            }
+
+            this.http.get('/api/users/me')
                 .subscribe(resp => {
-                    that.currentUser = resp.json();
-                    that.http.get('/api/users/' + that._currentUser.userId + '/preferences')
-                        .subscribe(resp => {
-                            that.preferences = resp.json();
-                            console.log('user preference loaded');
-                            observer.next();
-                            observer.complete();
-                        });
+                    this._currentUser = resp.json();
+                    observer.next(this._currentUser);
+                    observer.complete();
                 });
         });
     }
 
     public setPreference(name, value) {
-        if (!this._currentUser.userId)
-            console && console.log('userId not loaded.');
 
-        this.http.put('/api/users/' + this.currentUser.userId + '/preferences?name=' + name + "&value=" + value)
-            .subscribe(_ => {});
+        this.fetchUserInfo().subscribe(u => {
+            if (!u.userId)
+                console && console.log('userId not loaded.');
+
+            this.http.put('/api/users/' + u.userId + '/preferences?name=' + name + "&value=" + value)
+                .subscribe(_ => {});
+        });
     }
 }

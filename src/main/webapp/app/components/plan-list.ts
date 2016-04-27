@@ -87,18 +87,20 @@ export class PlanList {
         this._plans = plans;
         this.selected = null;
         if (plans && plans.length) {
-            var lastSelectedPlan = this.pref.preferences['lastSelectedPlan'];
-            if (lastSelectedPlan) {
-                for (var p of plans) {
-                    if (p.id == lastSelectedPlan) {
-                        this.selectPlan(p);
-                        return;
+            this.pref.load().subscribe(_ => {
+                var lastSelectedPlan = this.pref.preferences['lastSelectedPlan'];
+                if (lastSelectedPlan) {
+                    for (var p of plans) {
+                        if (p.id == lastSelectedPlan) {
+                            this.selectPlan(p);
+                            return;
+                        }
                     }
                 }
-            }
-            else {
-                this.selectPlan(plans[0]);
-            }
+                else {
+                    this.selectPlan(plans[0]);
+                }
+            });
         }
     }
 
@@ -119,12 +121,16 @@ export class PlanList {
         this.loadPlans();
     }
 
-    selectPlan(plan) {
+    clickedPlan(plan) {
         var lastSelectedPlan = this.pref.preferences['lastSelectedPlan'];
         if (plan.id != lastSelectedPlan) {
             this.pref.setPreference('lastSelectedPlan', plan.id);
         }
 
+        this.selectPlan(plan);
+    }
+
+    selectPlan(plan) {
         this.selected = plan;
         this.select.next(plan);
     }

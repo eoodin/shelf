@@ -49,6 +49,7 @@ export class ProjectService {
                         break;
                     }
                 }
+                this._current = np ? np : this._projects[0];
             }
             select = np ? np : this._projects[0];
         }
