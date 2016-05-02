@@ -43,6 +43,10 @@ abstract public class WorkItem {
 
     @ManyToOne
     @JsonIgnore
+    private Project project;
+
+    @ManyToOne
+    @JsonIgnore
     private Plan plan;
 
     @OneToOne
@@ -53,8 +57,6 @@ abstract public class WorkItem {
 
     @Column
     private Date createdAt;
-
-    public WorkItem() {}
 
     public Long getId() {
         return id;

@@ -1,18 +1,10 @@
-import {Component, View, provide} from 'angular2/core';
+import {Component, provide} from 'angular2/core';
 import {bootstrap} from 'angular2/platform/browser';
-
 import {HTTP_PROVIDERS} from 'angular2/http';
+import {Location, LocationStrategy, HashLocationStrategy} from 'angular2/platform/common';
+import {ROUTER_DIRECTIVES, ROUTER_PROVIDERS, RouteConfig, Route, Router} from 'angular2/router';
 
 import {Alert, DROPDOWN_DIRECTIVES} from 'deps/ng2-bs/ng2-bootstrap.ts';
-
-import {ROUTER_DIRECTIVES,
-    ROUTER_PROVIDERS,
-    RouteConfig,
-    Location,
-    LocationStrategy,
-    HashLocationStrategy,
-    Route,
-    Router} from 'angular2/router';
 
 import {ProjectService} from './services/project-service.ts';
 import {PreferenceService} from './services/preference-service.ts';
@@ -51,7 +43,7 @@ import {WorkItems} from './pages/workitems.ts';
                         <span *ngIf="!projectService.current">No Project </span><span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
-                      <li *ngFor="#p of projectService.projects" role="menuitem">
+                      <li *ngFor="let p of projectService.projects" role="menuitem">
                         <a (click)="projectService.current=p;">{{p.name}}</a>
                       </li>
                     </ul>

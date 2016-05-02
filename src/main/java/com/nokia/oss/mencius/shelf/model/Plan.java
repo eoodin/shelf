@@ -29,7 +29,6 @@ public class Plan {
     private Date end;
 
     @OneToMany(mappedBy = "plan", cascade = CascadeType.REMOVE)
-    // @OrderBy("id ASC")
     @JsonIgnore
     private List<WorkItem> workItems;
 

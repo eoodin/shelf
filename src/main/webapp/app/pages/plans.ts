@@ -15,7 +15,189 @@ import {ModalDialog} from '../components/modal-dialog.ts';
 @Component({
     selector: 'plans',
     directives: [PlanList, ItemDetail, ModalDialog, Backlog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
-    templateUrl: 'app/templates/plans.html',
+    template: `
+    <div class="row plan-page" *ngIf="projectService.current">
+        <div class="col-sm-2">
+            <plan-list [project]="projectService.current" (select)="onSelect($event)"></plan-list>
+        </div>
+    
+        <div class="col-sm-offset-2 col-md-offset-2 right">
+            <div class="plan-head" *ngIf="current.id">
+                <h1>{{current.name}}</h1>
+                <ul class="summary">
+                    <li *ngIf="current.start">Start: <span>{{date(current.start)}}</span></li>
+                    <li *ngIf="current.end">Deadline: <span>{{date(current.end)}}</span></li>
+                    <li *ngIf="current.allocation">Time(remain/planned): <span>{{sumHours()}}/{{current.allocation.developerHours + current.allocation.testerHours}}</span></li>
+                    <li *ngIf="current.allocation">Progress: <span> x/x </span></li>
+                </ul>
+            </div>
+            <div class="project-info">
+                <div class="project-operations">
+                    <button class="btn btn-warning" (click)="showAddItem('Defect')">Report A Problem</button>
+                </div>
+            </div>
+            <div *ngIf="current.type != 'backlog'" class="plan-body">
+                <div class="item-table">
+                    <div class="loading-mask" *ngIf="ui.loading.show">
+                        <div class="spinner-loader"></div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading work-items-heading">
+                            <div>
+                                <label  >
+                                    <input type="checkbox" [(ngModel)]="hideFinished"  (click)="loadWorkItems();" (click)="onHideFinishedCheck()"/>
+                                    Hide Finished
+                                </label>
+                            </div>
+                        </div>
+                        <table *ngIf="workItems" class="table">
+                            <tr>
+                                <th>
+                                    <a href="javascript:void(0);" (click)="sortResult('id')">ID
+                                    <span *ngIf="sort.field=='id'">
+                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                                    </span>
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="javascript:void(0);" (click)="sortResult('title')">Title
+                                    <span *ngIf="sort.field=='title'">
+                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                                    </span>
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="javascript:void(0);" (click)="sortResult('status')">Status
+                                    <span *ngIf="sort.field=='status'">
+                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                                    </span>
+                                    </a>
+                                </th>
+                                <th><a href="javascript:void(0);" (click)="sortResult('owner')">Owner
+                                    <span *ngIf="sort.field=='owner'">
+                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                                    </span>
+                                </a>
+                                </th>
+                                <th>Remaining</th>
+                                <th>Operations</th>
+                            </tr>
+                            <tr *ngFor="let item of getShowingItems()">
+                                <td class="type-and-id">
+                                    <label>
+                                        <input class="checkbox" [(ngModel)]="item.checked" type="checkbox">
+                                        <span *ngIf="item.type=='UserStory'" class="us glyphicon glyphicon-edit"></span>
+                                        <span *ngIf="item.type=='Defect'" class="defect glyphicon glyphicon-fire"></span>
+                                        <span *ngIf="item.type=='Task'" class="task glyphicon glyphicon-check"></span>
+                                        {{item.id}}
+                                    </label>
+                                </td>
+                                <td><a (click)="showItem(item)">{{item.title}}</a></td>
+                                <td>
+                                    <div class="btn-group" dropdown keyboardNav>
+                                        <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            {{item.status}} <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li role="menuitem"
+                                                *ngFor="let st of ['New','InProgress','','Finished','Pending','Dropped']"
+                                                [class.hidden]="st == item.status">
+                                                <a (click)="changeStatus(item, st)">{{st}}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group" dropdown keyboardNav>
+                                        <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span *ngIf="item.owner">{{item.owner.userId}}</span> <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li role="menuitem"
+                                                *ngFor="let member of members"
+                                                [class.hidden]="member == item.owner"><a
+                                                    (click)="assignTo(item, member)">{{member.userId}}</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td>{{item.estimation}}</td>
+                                <td>
+                                    <a (click)="removingItem(item)"><span class="glyphicon glyphicon-remove"></span></a>
+                                    <a (click)="putToBacklog(item)"><span class="glyphicon glyphicon-copy"></span></a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <div class="col-sm-2">
+                        <button class="btn btn-primary" (click)="showAddItem()">Add Work Item...</button>
+                    </div>
+                    <div class="col-sm-6">
+                        <button class="btn btn-primary" (click)="showMoveToDialog();">Move To...</button>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="current && current.type == 'backlog'" class="plan-body">
+                <backlog [data]="current"></backlog>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row" *ngIf="projectService.current == null">
+        <h1 class="no-content-notice">No project.</h1>
+    </div>
+    
+    <item-detail [item]="ui.awd.item"
+                 [show]="ui.awd.show"
+                 [type]="ui.awd.type"
+                 (closed)="ui.awd.show = false"
+                 (saved)="onWorkSaved();"
+            ></item-detail>
+    
+    <div class="modal fade in awd" *ngIf="ui.mtd.show" [style.display]="ui.mtd.show ? 'block' : 'block'" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" (click)="ui.mtd.show = false"
+                            data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Move selected items to plan</h4>
+                </div>
+                <div class="modal-body">
+                    <select #moveTo class="form-control" required>
+                        <option *ngFor="let p of plans" [value]="p.id">{{p.name}}</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button (click)="ui.mtd.show=false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button (click)="moveItemsToPlan(moveTo.value)" class="btn btn-default" data-dismiss="modal">Move</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade in" *ngIf="ui.rwd.show" [style.display]="ui.rwd.show ? 'block' : 'block'" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" (click)="ui.rwd.show = false"
+                            data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirm to remove work item</h4>
+                </div>
+                <div class="modal-body">
+                    You are about to remove work item {{ui.rwd.item.id}}. Are you sure?
+                </div>
+                <div class="modal-footer">
+                    <button (click)="ui.rwd.show =false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button (click)="removeItem(ui.rwd.item)" class="btn btn-default" data-dismiss="modal">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    `,
     styles: [`
     .project-info { height:40px; padding: 2px 0;}
     .project-operations { float: right;}
@@ -160,6 +342,10 @@ export class Plans {
     removingItem(item) {
         this.ui.rwd.item = item;
         this.ui.rwd.show = true;
+    }
+
+    putToBacklog(item) {
+        // TODO.
     }
 
     removeItem(item) {

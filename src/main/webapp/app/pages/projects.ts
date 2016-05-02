@@ -21,7 +21,7 @@ class Project {
        </div>
        <div class="panel-body">
         <ul class="sidebar-item-list">
-            <li *ngFor="#project of projectService.projects" >
+            <li *ngFor="let project of projectService.projects" >
                 <a href="#/plans?pid={{project.id}}"><span class="main-title">{{project.name}}</span></a>
                 <button class="btn btn-danger btn-sm" (click)="deleteProject(project)">Delete</button>
             </li>
@@ -45,7 +45,7 @@ class Project {
                                 <div class="col-sm-3">Team:</div>
                                 <div class="col-sm-5">
                                    <select class="form-control" required ngControl="teamId">
-                                      <option *ngFor="#t of teamService.teams" [value]="t.id">{{t.name}}</option>
+                                      <option *ngFor="let t of teamService.teams" [value]="t.id">{{t.name}}</option>
                                    </select>
                                 </div>
                             </div>
@@ -67,7 +67,7 @@ class Project {
        </div>
        <div class="panel-body">
         <ul class="sidebar-item-list">
-            <li *ngFor="#team of teamService.teams" >
+            <li *ngFor="let team of teamService.teams" >
                 <span class="main-title">{{team.name}}</span>
                 <button class="btn btn-danger btn-sm" (click)="deleteTeam(team)">Delete</button>
             </li>
@@ -111,7 +111,7 @@ class Project {
        </div>
        <div class="panel-body">
         <ul class="project-list">
-            <li *ngFor="#ref of [1,2,3,4]" > Reference #{{ref}}</li>
+            <li *ngFor="let ref of [1,2,3,4]" > Reference #{{ref}}</li>
         </ul>
        </div>
       </div>
@@ -133,7 +133,7 @@ class Project {
        </div>
        <div class="panel-body project-plans">
         <ul class="project-list">
-            <li *ngFor="#plan of ['Product backlog', 'Sprint 1', 'Sprint 2', 'Sprint 3']" > &gt;&gt; {{plan}}</li>
+            <li *ngFor="let plan of ['Product backlog', 'Sprint 1', 'Sprint 2', 'Sprint 3']" > &gt;&gt; {{plan}}</li>
         </ul>
        </div>
       </div>

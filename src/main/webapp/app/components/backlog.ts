@@ -60,7 +60,7 @@ import Quill from 'quill';
                         </th>
                         <th>Operations</th>
                     </tr>
-                    <tr *ngFor="#item of getShowingItems()">
+                    <tr *ngFor="let item of getShowingItems()">
                         <td class="type-and-id">
                             <label>
                                 <input class="checkbox" [(ngModel)]="item.checked" type="checkbox">
@@ -79,7 +79,7 @@ import Quill from 'quill';
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li role="menuitem"
-                                        *ngFor="#st of ['New','InProgress','','Finished','Pending','Dropped']"
+                                        *ngFor="let st of ['New','InProgress','','Finished','Pending','Dropped']"
                                         [class.hidden]="st == item.status">
                                         <a (click)="changeStatus(item, st)">{{st}}</a>
                                     </li>
@@ -94,7 +94,7 @@ import Quill from 'quill';
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li role="menuitem"
-                                        *ngFor="#member of members"
+                                        *ngFor="let member of members"
                                         [class.hidden]="member == item.owner"><a
                                             (click)="assignTo(item, member)">{{member.userId}}</a></li>
                                 </ul>

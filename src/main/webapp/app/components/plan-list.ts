@@ -10,7 +10,7 @@ import {PreferenceService} from '../services/preference-service.ts';
       <a class="list-group-item" [class.active]="_backlog == selected" (click)="selectBacklog()"> {{_backlog.name}} </a>
     </div>
     <div class="list-group">
-      <a class="list-group-item" *ngFor="#plan of _plans" [class.active]="plan == selected" (click)="selectPlan(plan)"> {{plan.name}} </a>
+      <a class="list-group-item" *ngFor="let plan of _plans" [class.active]="plan == selected" (click)="selectPlan(plan)"> {{plan.name}} </a>
     </div>
 
     <button class="btn btn-primary" (click)="ui.cpd.show = true;">New Sprint...</button>
