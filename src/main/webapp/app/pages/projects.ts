@@ -21,7 +21,7 @@ class Project {
        </div>
        <div class="panel-body">
         <ul class="sidebar-item-list">
-            <li *ngFor="let project of projectService.projects" >
+            <li *ngFor="let project of projects" >
                 <a href="#/plans?pid={{project.id}}"><span class="main-title">{{project.name}}</span></a>
                 <button class="btn btn-danger btn-sm" (click)="deleteProject(project)">Delete</button>
             </li>
@@ -154,6 +154,7 @@ class Project {
 export class Projects {
     private ui;
     private user;
+    private projects: any[];
 
     constructor(private http:Http,
                 private projectService: ProjectService,
@@ -170,7 +171,9 @@ export class Projects {
 
     deleteProject(p:Project) {
         this.http.delete('/api/projects/' + p.id)
-            .subscribe(response => this.projectService.reload());
+            .subscribe(response => {
+                this.projectService.reload().subscribe(ps => this.projects = ps);
+            });
     }
 
     onCreateProjectSubmit(data) {
@@ -180,7 +183,7 @@ export class Projects {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             })))
-            .subscribe(resp => this.projectService.reload());
+            .subscribe(resp => this.projectService.reload().subscribe(ps => this.projects = ps));
 
         this.ui.createProjectDialog.show = false;
     }

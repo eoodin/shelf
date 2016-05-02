@@ -14,7 +14,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
 
 @Component({
     selector: 'plans',
-    directives: [PlanList, ItemDetail, ModalDialog, Backlog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
+    directives: [PlanList, ItemDetail, ModalDialog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     template: `
     <div class="row plan-page" *ngIf="projectService.current">
         <div class="col-sm-2">
@@ -36,7 +36,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
                     <button class="btn btn-warning" (click)="showAddItem('Defect')">Report A Problem</button>
                 </div>
             </div>
-            <div *ngIf="current.type != 'backlog'" class="plan-body">
+            <div class="plan-body">
                 <div class="item-table">
                     <div class="loading-mask" *ngIf="ui.loading.show">
                         <div class="spinner-loader"></div>
@@ -140,9 +140,6 @@ import {ModalDialog} from '../components/modal-dialog.ts';
                     </div>
                 </div>
             </div>
-            <div *ngIf="current && current.type == 'backlog'" class="plan-body">
-                <backlog [data]="current"></backlog>
-            </div>
         </div>
     </div>
     
@@ -154,8 +151,8 @@ import {ModalDialog} from '../components/modal-dialog.ts';
                  [show]="ui.awd.show"
                  [type]="ui.awd.type"
                  (closed)="ui.awd.show = false"
-                 (saved)="onWorkSaved();"
-            ></item-detail>
+                 (saved)="onWorkSaved();">
+    </item-detail>
     
     <div class="modal fade in awd" *ngIf="ui.mtd.show" [style.display]="ui.mtd.show ? 'block' : 'block'" role="dialog">
         <div class="modal-dialog">

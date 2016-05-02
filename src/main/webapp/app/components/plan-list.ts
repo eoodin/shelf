@@ -6,9 +6,6 @@ import {PreferenceService} from '../services/preference-service.ts';
 @Component({
     selector: 'plan-list',
     template: `
-    <div class="list-group" *ngIf="_backlog">
-      <a class="list-group-item" [class.active]="_backlog == selected" (click)="selectBacklog()"> {{_backlog.name}} </a>
-    </div>
     <div class="list-group">
       <a class="list-group-item" *ngFor="let plan of _plans" [class.active]="plan == selected" (click)="selectPlan(plan)"> {{plan.name}} </a>
     </div>
@@ -59,8 +56,9 @@ import {PreferenceService} from '../services/preference-service.ts';
 export class PlanList {
     private _project: Object = {};
     private _plans: Array = [];
-    private _backlog;
     private ui: {};
+    private showingBacklog;
+    
     @Output() public select: EventEmitter<PlanList> = new EventEmitter();
 
     private selected: any;
@@ -76,9 +74,6 @@ export class PlanList {
 
     private loadPlans() {
         if (this._project.id) {
-            this.http.get('/api/backlogs/' + this._project.backlog.id)
-                .subscribe(resp => this._backlog = resp.json());
-
             this.http.get('/api/plans/?project=' + this._project.id)
                 .subscribe(resp => this.setPlans(resp.json()));
         }
@@ -86,10 +81,6 @@ export class PlanList {
 
     @Output public get plans() {
         return this._plans;
-    }
-
-    @Output public get backlog() {
-        return this._backlog;
     }
 
     private setPlans(plans) {
@@ -136,10 +127,5 @@ export class PlanList {
 
         this.selected = plan;
         this.select.next(plan);
-    }
-
-    selectBacklog() {
-        this.selected = this._backlog;
-        this.select.next(this._backlog)
     }
 }

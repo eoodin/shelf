@@ -4,11 +4,14 @@ import com.nokia.oss.mencius.shelf.data.HibernateHelper;
 import com.nokia.oss.mencius.shelf.model.Plan;
 import com.nokia.oss.mencius.shelf.model.Project;
 import com.nokia.oss.mencius.shelf.model.Team;
+import com.nokia.oss.mencius.shelf.model.WorkItem;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,7 +26,7 @@ public class ProjectController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseBody
-    private List<Project> listProjects() {
+    public List<Project> listProjects() {
         EntityManager em = HibernateHelper.createEntityManager();
         List<Project> projects = new ArrayList<Project>();
 
@@ -36,7 +39,7 @@ public class ProjectController {
 
     @RequestMapping(value = "/{projectId}", method = RequestMethod.DELETE)
     @ResponseBody
-    private String deleteProject(@PathVariable String projectId) {
+    public String deleteProject(@PathVariable String projectId) {
         Long id = Long.valueOf(projectId);
         EntityManager em = HibernateHelper.createEntityManager();
         em.getTransaction().begin();
@@ -55,9 +58,21 @@ public class ProjectController {
         return "deleted";
     }
 
+    @RequestMapping(value="/{projectId}/backlog", method = RequestMethod.GET)
+    @ResponseBody
+    public List<WorkItem> getBacklogItems(@PathVariable Long projectId) {
+        List<WorkItem> items = new ArrayList<>();
+
+        EntityManager em = HibernateHelper.createEntityManager();
+        Query query = em.createQuery("SELECT w FROM WorkItem w WHERE w.project=:proj");
+        query.setParameter("proj", em.find(Project.class, projectId));
+        items.addAll(query.getResultList());
+        return items;
+    }
+
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ResponseBody
-    private String createProject(@RequestBody ProjectSpec spec) {
+    public String createProject(@RequestBody ProjectSpec spec) {
         EntityManager em = HibernateHelper.createEntityManager();
         em.getTransaction().begin();
         try {

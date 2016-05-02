@@ -10,6 +10,7 @@ import {ProjectService} from './services/project-service.ts';
 import {PreferenceService} from './services/preference-service.ts';
 import {TeamService} from './services/team-service.ts';
 import {Projects} from './pages/projects.ts';
+import {Backlog} from './pages/backlog.ts';
 import {Plans} from './pages/plans.ts';
 import {WorkItems} from './pages/workitems.ts';
 
@@ -31,6 +32,7 @@ import {WorkItems} from './pages/workitems.ts';
             <div class="collapse navbar-collapse">
               <ul class="nav navbar-nav">
                 <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/Projects']" class="link">Dashboard</a></li>
+                <li [class.active]="getLinkStyle('/backlog')"><a [routerLink]="['/Backlog']" class="link">Backlog</a></li>
                 <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/Plans']" class="link">Plans</a></li>
                 <li [class.active]="getLinkStyle('/workitems')"><a [routerLink]="['/WorkItems']" class="link">Work Items</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">CI Status</a></li>
@@ -43,7 +45,7 @@ import {WorkItems} from './pages/workitems.ts';
                         <span *ngIf="!projectService.current">No Project </span><span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
-                      <li *ngFor="let p of projectService.projects" role="menuitem">
+                      <li *ngFor="let p of projects" role="menuitem">
                         <a (click)="projectService.current=p;">{{p.name}}</a>
                       </li>
                     </ul>
@@ -82,6 +84,7 @@ import {WorkItems} from './pages/workitems.ts';
 })
 @RouteConfig([
     {path: '/projects', component: Projects, name: 'Projects'},
+    {path: '/backlog', component: Backlog, name: 'Backlog'},
     {path: '/plans', component: Plans, name: 'Plans'},
     {path: '/workitems', component: WorkItems, name: 'WorkItems'}
 ])
@@ -90,6 +93,7 @@ export class ShelfApp {
     location:Location;
     private projectService : ProjectService;
     private prefService : PreferenceService;
+    private projects: any[];
     private ui;
 
     constructor(router:Router, location:Location, projectService: ProjectService, pfs: PreferenceService) {
@@ -97,7 +101,9 @@ export class ShelfApp {
         this.location = location;
         this.prefService = pfs;
         this.projectService = projectService;
-        this.prefService.load().subscribe( () => this.projectService.load() );
+        this.prefService.load().subscribe( () => {
+            this.projectService.load().subscribe(ps => this.projects = ps);
+        });
 
         this.ui = {"nav" : {"projectList" : {"show": false}}};
     }

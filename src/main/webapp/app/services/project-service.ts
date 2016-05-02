@@ -1,5 +1,6 @@
-import {Injectable} from 'angular2/core';
+import {Injectable, EventEmitter} from 'angular2/core';
 import {Http, Response} from 'angular2/http';
+import {Observable} from 'rxjs/Observable';
 
 import {PreferenceService} from './preference-service.ts';
 
@@ -8,7 +9,9 @@ export class ProjectService {
     private _current = null;
     private _projects = [];
 
-    constructor(private http: Http, private prefService:PreferenceService) {
+    public currentChanges = new EventEmitter();
+
+    constructor(private http: Http, private prf:PreferenceService) {
     }
 
     get current():Object {
@@ -17,7 +20,8 @@ export class ProjectService {
 
     set current(project:Object) {
         this._current = project;
-        this.prefService.setPreference('lastProjectId', this._current.id);
+        this.currentChanges.next(project);
+        this.prf.setPreference('lastProjectId', this._current.id);
     }
 
     get projects():Object[] {
@@ -26,20 +30,17 @@ export class ProjectService {
 
     set projects(projects:Object[]) {
         this._projects = projects;
-        var lastProjectId = this.prefService.preferences['lastProjectId'];
+
+        var select = null;
+        var lastProjectId = this.prf.preferences['lastProjectId'];
         if (lastProjectId) {
             for (var p of this._projects) {
-                if (p.id==lastProjectId) {
-                    this._current = p;
-                    return;
+                if (p.id == lastProjectId) {
+                    select = p;
                 }
             }
         }
-
-        if (!this._projects.length) {
-            this._current = null;
-        }
-        else {
+        else if (this._projects.length) {
             var np = null;
             if (this._current) {
                 for(var p of this._projects) {
@@ -49,18 +50,25 @@ export class ProjectService {
                     }
                 }
             }
-            this._current = np ? np : this._projects[0];
+            select = np ? np : this._projects[0];
         }
+
+        this.current = select;
     }
 
     public load() {
-        this.http.get('/api/projects/')
-            .subscribe(resp => this.projects = resp.json());
+        return new Observable(observer => {
+            var projects = this.http.get('/api/projects/');
+            projects.subscribe(resp => {
+                this.projects = resp.json();
+                observer.next(this.projects);
+            });
+        });
     }
-
+    
     public reload() {
         //TODO: update only changed/added/removed.
-        this.load();
+        return this.load();
     }
 
 }

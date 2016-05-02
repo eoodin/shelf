@@ -13,6 +13,14 @@ import java.util.Date;
         include = JsonTypeInfo.As.PROPERTY,
         property = "type")
 abstract public class WorkItem {
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
     public enum Status {
         New,
         InProgress,
