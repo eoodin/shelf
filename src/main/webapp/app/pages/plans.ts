@@ -410,7 +410,6 @@ export class Plans {
 
     detailClosed() {
         this.ui.awd.show = false;
-        console.log("Detail dialog closed.");
     }
 
     loadWorkItems() {

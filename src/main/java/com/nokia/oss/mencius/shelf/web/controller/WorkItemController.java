@@ -2,32 +2,34 @@ package com.nokia.oss.mencius.shelf.web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nokia.oss.mencius.shelf.data.HibernateHelper;
+import com.nokia.oss.mencius.shelf.ShelfException;
 import com.nokia.oss.mencius.shelf.model.*;
 import com.nokia.oss.mencius.shelf.utils.UserUtils;
-import com.nokia.oss.mencius.shelf.ShelfException;
 import com.nokia.oss.mencius.shelf.web.NotFoundException;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Controller
 @RequestMapping("/work-items")
 public class WorkItemController {
+    @PersistenceContext
+    private EntityManager em;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseBody
+    @Transactional
     public WorkItemList getWorkItems(
             @RequestParam(value = "planId", required = false) Long planId,
             @RequestParam(value = "sortBy", required = false) String sortBy,
             @RequestParam(value = "desc", required = false) boolean desc) {
         WorkItemList list = new WorkItemList();
-        EntityManager em = HibernateHelper.createEntityManager();
         Plan plan = em.find(Plan.class, planId);
-
         String jpql = "SELECT w FROM WorkItem w WHERE w.plan=:plan";
         if (sortBy != null) {
             jpql += " ORDER BY w." + sortBy;
@@ -38,61 +40,40 @@ public class WorkItemController {
 
         List results = em.createQuery(jpql).setParameter("plan", plan).getResultList();
         list.addAll(results);
-        em.close();
         return list;
     }
 
     @RequestMapping(value="/", method = RequestMethod.POST)
     @ResponseBody
+    @Transactional
     public Long addWorkItem(@RequestBody ItemSpec spec, HttpServletRequest request) throws ShelfException {
-        EntityManager em = HibernateHelper.createEntityManager();
+        Plan plan = em.find(Plan.class, spec.planId);
+        WorkItem wi = createItem(spec);
+        if (wi == null)
+            throw new ShelfException("Cannot create work item.");
 
-        try {
-            Plan plan = em.find(Plan.class, spec.planId);
-            if (plan == null) {
-                Project project = em.find(Project.class, spec.projectId);
-                plan = project.getBacklog();
-            }
+        User currentUser = UserUtils.findOrCreateUser(em, request.getRemoteUser());
+        wi.setCreatedBy(currentUser);
+        wi.setOwner(currentUser);
+        wi.setPlan(plan);
+        em.persist(wi);
 
-            WorkItem wi = createItem(spec);
-            if (wi == null)
-                throw new ShelfException("Cannot create work item.");
-
-            User currentUser = UserUtils.findOrCreateUser(request.getRemoteUser());
-            em.getTransaction().begin();
-            try {
-                wi.setCreatedBy(currentUser);
-                wi.setOwner(currentUser);
-                wi.setPlan(plan);
-                em.persist(wi);
-                em.getTransaction().commit();
-                return wi.getId();
-            } catch (Exception ex) {
-                System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
-                em.getTransaction().rollback();
-                throw new ShelfException(ex.getMessage());
-            }
-        }
-        finally {
-            em.close();
-        }
+        return wi.getId();
     }
 
     @RequestMapping(value="/{id}", method = RequestMethod.PUT)
     @ResponseBody
+    @Transactional
     public void updateItem(
             @PathVariable("id") Long id,
             @RequestBody ItemSpec spec,
-            HttpServletRequest request) throws ShelfException {
-        EntityManager em = HibernateHelper.createEntityManager();
-
+            HttpServletRequest request) throws ShelfException, JsonProcessingException {
         WorkItem item = em.find(WorkItem.class, id);
-        Changes changes = new Changes();
         if (item == null) {
-            em.close();
             throw new NotFoundException();
         }
 
+        Changes changes = new Changes();
         if (spec.status != null) {
             WorkItem.Status status = WorkItem.Status.valueOf(spec.status);
             if (changes.addChange("status", item.getStatus(), status))
@@ -118,55 +99,30 @@ public class WorkItemController {
             if (changes.addChange("owner", item.getOwner().getUserId(), spec.ownerId))
                 item.setOwner(em.find(User.class, spec.ownerId));
 
-        User currentUser = UserUtils.findOrCreateUser(request.getRemoteUser());
+        User currentUser = UserUtils.findOrCreateUser(em, request.getRemoteUser());
 
-        em.getTransaction().begin();
-        try {
-            em.persist(item);
 
-            ChangeLog changeLog = new ChangeLog();
-            changeLog.setActor(currentUser);
-            changeLog.setOriginalData(changes.getOldJson());
-            changeLog.setChangedData(changes.getNewJson());
-            changeLog.setItem(item);
-            changeLog.setChangeTime(new Date());
-            em.persist(changeLog);
+        em.persist(item);
 
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
-            em.getTransaction().rollback();
-            throw new ShelfException(ex.getMessage());
-        } finally {
-            em.close();
-        }
+        ChangeLog changeLog = new ChangeLog();
+        changeLog.setActor(currentUser);
+        changeLog.setOriginalData(changes.getOldJson());
+        changeLog.setChangedData(changes.getNewJson());
+        changeLog.setItem(item);
+        changeLog.setChangeTime(new Date());
 
+        em.persist(changeLog);
     }
 
     @RequestMapping(value = "/{wiid}", method = RequestMethod.DELETE)
     @ResponseBody
     public boolean removeWorkItem(@PathVariable("wiid") Long wiid) {
-        EntityManager em = HibernateHelper.createEntityManager();
-        try {
-            WorkItem wi = em.find(WorkItem.class, wiid);
-            if (wi == null)
-                return false;
+        WorkItem wi = em.find(WorkItem.class, wiid);
+        if (wi == null)
+            return false;
 
-            em.getTransaction().begin();
-            try {
-                em.remove(wi);
-                em.getTransaction().commit();
-                return true;
-            } catch (Exception ex) {
-                System.err.println("Save status failed, persistence exception caught: " + ex.getMessage());
-                em.getTransaction().rollback();
-            }
-        }
-        finally {
-            em.close();
-        }
-
-        return false;
+        em.remove(wi);
+        return true;
     }
 
     private WorkItem createItem(ItemSpec spec){

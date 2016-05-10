@@ -1,18 +1,15 @@
 package com.nokia.oss.mencius.shelf.web.controller;
 
-import com.nokia.oss.mencius.shelf.data.HibernateHelper;
+import com.nokia.oss.mencius.shelf.ShelfException;
 import com.nokia.oss.mencius.shelf.model.Team;
 import com.nokia.oss.mencius.shelf.model.User;
 import com.nokia.oss.mencius.shelf.utils.UserUtils;
-import com.nokia.oss.mencius.shelf.ShelfException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -25,11 +22,13 @@ import java.util.List;
 @Controller
 @RequestMapping("/teams")
 public class TeamController {
+    @PersistenceContext
+    private EntityManager em;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseBody
+    @Transactional
     public List<Team> getTeams() {
-        EntityManager em = HibernateHelper.createEntityManager();
         List<Team> teams = new ArrayList<>();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Team> cq = cb.createQuery(Team.class);
@@ -44,76 +43,43 @@ public class TeamController {
 
         teams.addAll(list);
 
-        em.close();
         return teams;
     }
 
     @RequestMapping(value = "/{teamId}/members", method = RequestMethod.GET)
     @ResponseBody
+    @Transactional
     public List<User> getMembers(@PathVariable("teamId") Long teamId) {
-        EntityManager em = HibernateHelper.createEntityManager();
-        try {
-            Team team = em.find(Team.class, teamId);
-            List<User> members = new ArrayList<>();
-            members.addAll(team.getMembers());
-            return members;
-        }
-        finally {
-            em.close();
-        }
+        Team team = em.find(Team.class, teamId);
+        return new ArrayList<>(team.getMembers());
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST, headers = {"Content-type=application/json"})
     @ResponseBody
+    @Transactional
     public Team createTeam(@RequestBody TeamSpec spec, HttpServletRequest request) throws ShelfException {
-        Collection<User> users = UserUtils.findOrCreateUsers(spec.getUsers());
-        User scrumMaster = UserUtils.findOrCreateUser(spec.getScrumMaster());
-        User currentUser = UserUtils.findOrCreateUser(request.getRemoteUser());
+        Collection<User> users = UserUtils.findOrCreateUsers(em, spec.getUsers());
+        User scrumMaster = UserUtils.findOrCreateUser(em, spec.getScrumMaster());
+        User currentUser = UserUtils.findOrCreateUser(em, request.getRemoteUser());
 
-        EntityManager em = HibernateHelper.createEntityManager();
-        em.getTransaction().begin();
-        try {
-            Team team = new Team();
-            team.setName(spec.getName());
-            team.setCreatedAt(new Date());
-            team.setMembers(users);
-            team.setScrumMaster(scrumMaster);
-            team.setCreatedBy(currentUser);
-            em.persist(team);
+        Team team = new Team();
+        team.setName(spec.getName());
+        team.setCreatedAt(new Date());
+        team.setMembers(users);
+        team.setScrumMaster(scrumMaster);
+        team.setCreatedBy(currentUser);
+        em.persist(team);
 
-            em.getTransaction().commit();
-            return team;
-        }
-        catch (Exception ex) {
-            em.getTransaction().rollback();
-        }
-        finally {
-            em.close();
-        }
-
-        throw new ShelfException("Unable to create team.");
+        return team;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseBody
+    @Transactional
     public String deleteTeam(@PathVariable("id") Long teamId) {
-        EntityManager em = HibernateHelper.createEntityManager();
-
-        em.getTransaction().begin();
-        try {
-            Team team = em.find(Team.class, teamId);
-            em.remove(team);
-            em.getTransaction().commit();
-            return "deleted";
-        }
-        catch (Exception ex) {
-            em.getTransaction().rollback();
-        }
-        finally {
-            em.close();
-        }
-
-        return "failed";
+        Team team = em.find(Team.class, teamId);
+        em.remove(team);
+        return "ok";
     }
 
 

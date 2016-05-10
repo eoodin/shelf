@@ -337,7 +337,6 @@ export class Backlog {
 
     detailClosed() {
         this.ui.awd.show = false;
-        console.log("Detail dialog closed.");
     }
 
     loadItems() {

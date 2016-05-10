@@ -17,9 +17,6 @@ public class Project {
     @OneToOne
     private Team team;
 
-    @OneToOne
-    private Plan backlog;
-
     @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
     // @OrderBy("id ASC")
     @JsonIgnore
@@ -48,15 +45,7 @@ public class Project {
     public void setTeam(Team team) {
         this.team = team;
     }
-
-    public Plan getBacklog() {
-        return backlog;
-    }
-
-    public void setBacklog(Plan backlog) {
-        this.backlog = backlog;
-    }
-
+    
     public List<Plan> getPlans() {
         return plans;
     }
