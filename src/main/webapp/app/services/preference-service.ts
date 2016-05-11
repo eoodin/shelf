@@ -33,8 +33,7 @@ export class PreferenceService {
                         that.currentUser = resp.json();
                         that.http.get('/api/users/' + that._currentUser.userId + '/preferences')
                             .subscribe(resp => {
-                                that._preferences = resp.json();
-                                console.log('user preference loaded');
+                                that._preferences = resp.json()
                                 observer.next();
                                 observer.complete();
                             });
