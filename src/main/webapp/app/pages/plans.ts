@@ -118,7 +118,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
                                             <li role="menuitem"
                                                 *ngFor="let member of members"
                                                 [class.hidden]="member == item.owner"><a
-                                                    (click)="assignTo(item, member)">{{member.userId}}</a></li>
+                                                    (click)="assignTo(item, member)">{{member.name}}</a></li>
                                         </ul>
                                     </div>
                                 </td>
