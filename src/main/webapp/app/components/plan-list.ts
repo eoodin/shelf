@@ -7,7 +7,7 @@ import {PreferenceService} from '../services/preference-service.ts';
     selector: 'plan-list',
     template: `
     <div class="list-group">
-      <a class="list-group-item" *ngFor="let plan of _plans" [class.active]="plan == selected" (click)="selectPlan(plan)"> {{plan.name}} </a>
+      <a class="list-group-item" *ngFor="let plan of _plans" [class.active]="plan == selected" (click)="clickedPlan(plan)"> {{plan.name}} </a>
     </div>
 
     <button class="btn btn-primary" (click)="ui.cpd.show = true;">New Sprint...</button>
@@ -87,19 +87,19 @@ export class PlanList {
         this._plans = plans;
         this.selected = null;
         if (plans && plans.length) {
+            var list = this;
             this.pref.load().subscribe(_ => {
-                var lastSelectedPlan = this.pref.preferences['lastSelectedPlan'];
-                if (lastSelectedPlan) {
+                var selectPlan = plans[0];
+                if (_['lastSelectedPlan']) {
                     for (var p of plans) {
-                        if (p.id == lastSelectedPlan) {
-                            this.selectPlan(p);
-                            return;
+                        if (p.id == _['lastSelectedPlan']) {
+                            list.selectPlan(p);
+                            break;
                         }
                     }
                 }
-                else {
-                    this.selectPlan(plans[0]);
-                }
+
+                list.selectPlan(selectPlan);
             });
         }
     }

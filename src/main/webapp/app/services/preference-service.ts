@@ -34,13 +34,13 @@ export class PreferenceService {
                         that.http.get('/api/users/' + that._currentUser.userId + '/preferences')
                             .subscribe(resp => {
                                 that._preferences = resp.json()
-                                observer.next();
+                                observer.next(that._preferences);
                                 observer.complete();
                             });
                     });
             }
             else {
-                observer.next();
+                observer.next(that._preferences);
                 observer.complete();
             }
         });

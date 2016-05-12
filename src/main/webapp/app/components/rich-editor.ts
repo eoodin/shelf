@@ -4,7 +4,7 @@ import Quill from 'quill';
 @Component({
     selector: 'rich-editor',
     template: `
-    <div>
+    <div class="rich-editor">
         <label class="toolbar-toggle" [style.background]="showToolbar?'gray':'white'">
             <input type="checkbox" [(ngModel)]="showToolbar" style="display:none;">
             T
@@ -129,6 +129,7 @@ import Quill from 'quill';
     </div>
     `,
     styles: [`
+    .rich-editor {border: 1px solid #aaa;}
     .toolbar-toggle {padding-left: 7px;font-size:18px;border: 1px solid #bbb; border-radius: 3px; overflow: hidden;
         display:inline-block;float:right;width: 28px; height:28px;background: gray;margin: 5px;}
     .description-editor { width: 100%; border: 1px solid #ccc; height: 18em; }
@@ -169,15 +170,11 @@ export class RichEditor {
     }
 
     @Input() set content(html) {
-        if (typeof html != 'string') return;
+        html = html || '';
 
-        if (this._content != html) {
+        if (typeof html == 'string' && this._content != html) {
             this._content = html;
             this.getEditor().setHTML(html);
         }
     }
-    //
-    // @Output() get content() {
-    //     return this._content;
-    // }
 }

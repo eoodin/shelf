@@ -72,13 +72,15 @@ import {ProjectService} from '../services/project-service.ts';
     </div>
     `,
     directives: [RichEditor],
-    styles: [`.work-item-details { padding-left: 0;}
+    styles: [`
+    .awd .modal-dialog form input.work-item-title { width: 100%; }
+    .awd .modal-dialog {width: 720px;}
+    .work-item-details { padding-left: 0;}
     .work-item-details li { list-style:none; margin-bottom: 10px;}
     .work-item-details li:last-child { margin-bottom: 0;}
     .work-item-details li .title { font-weight: 700; }
     .work-item-details li .big-section { display: block;}
-    .awd .modal-dialog {width: 720px;}
-    .awd .modal-dialog form input.work-item-title { width: 100%; }
+    .modal-body .row {margin: 8px 0;}
      `]
 
 })
