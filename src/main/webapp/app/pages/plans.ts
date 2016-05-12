@@ -112,7 +112,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
                                     <div class="btn-group" dropdown keyboardNav>
                                         <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <span *ngIf="item.owner">{{item.owner.userId}}</span> <span class="caret"></span>
+                                            <span *ngIf="item.owner">{{item.owner.name}}</span> <span class="caret"></span>
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li role="menuitem"
