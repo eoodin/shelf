@@ -112,9 +112,11 @@ import {ModalDialog} from '../components/modal-dialog.ts';
                                     <div class="btn-group" dropdown keyboardNav>
                                         <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <span *ngIf="item.owner">{{item.owner.name}}</span> <span class="caret"></span>
+                                            <span *ngIf="item.owner">{{item.owner.name}}</span> 
+                                            <span *ngIf="!item.owner">Unassigned</span> <span class="caret"></span>
                                         </button>
                                         <ul class="dropdown-menu">
+                                            <li role="menuitem"><a (click)="assignTo(item, null)">Unassigned</a></li>
                                             <li role="menuitem"
                                                 *ngFor="let member of members"
                                                 [class.hidden]="member == item.owner"><a
@@ -377,6 +379,7 @@ export class Plans {
 
     assignTo(item, member) {
         this.ui.loading.show = true;
+        member = member || {userId: -1};
         var change = {'ownerId': member.userId};
         this.http.request(new Request(new RequestOptions(
             {
