@@ -93,7 +93,7 @@ export class PlanList {
                 if (_['lastSelectedPlan']) {
                     for (var p of plans) {
                         if (p.id == _['lastSelectedPlan']) {
-                            list.selectPlan(p);
+                            selectPlan = p;
                             break;
                         }
                     }
