@@ -1,5 +1,8 @@
 import {Component, Input, Output, EventEmitter, ElementRef} from 'angular2/core';
+import {Subject} from 'rxjs/Subject';
 import Quill from 'quill';
+import {Rx} from 'rxjs/Rx';
+import 'rxjs/Rx';
 
 @Component({
     selector: 'rich-editor',
@@ -138,14 +141,30 @@ import Quill from 'quill';
 })
 export class RichEditor {
     private editor = null;
-    private _content: string;
+    private contentCache: string;
     private showToolbar = false;
+    private textChange;
 
-    @Output() update: EventEmitter = new EventEmitter();
+    @Output() update = new EventEmitter();
 
-    constructor(private ele: ElementRef) { }
+    constructor(private ele: ElementRef) {
+        this.textChange = new Subject();
+        this.textChange
+            .debounceTime(250)
+            .do(()=>this.contentCache = this.getEditor().getHTML())
+            .subscribe(() => this.update.next(this.getEditor().getHTML()));
+    }
 
-    getEditor() {
+    @Input() set content(html) {
+        html = html || '';
+
+        if (typeof html == 'string' && this.contentCache != html) {
+            this.contentCache = html;
+            this.getEditor().setHTML(html);
+        }
+    }
+
+    private getEditor() {
         if (!this.editor) {
             var el = this.ele.nativeElement;
             var editorEle = el.getElementsByClassName("quill-editor")[0];
@@ -161,20 +180,10 @@ export class RichEditor {
             });
             var that = this;
             this.editor.on('text-change', function(delta, source) {
-                that._content = that.editor.getHTML();
-                that.update.next(that._content);
+                that.textChange.next(delta);
             });
         }
-        
+
         return this.editor;
-    }
-
-    @Input() set content(html) {
-        html = html || '';
-
-        if (typeof html == 'string' && this._content != html) {
-            this._content = html;
-            this.getEditor().setHTML(html);
-        }
     }
 }
