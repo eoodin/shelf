@@ -41,17 +41,17 @@ import {WorkItems} from './pages/workitems.ts';
 
                 <li class="dropdown" dropdown keyboard-nav>
                     <a href="javascript:void(0);" class="dropdown-toggle" dropdownToggle>
-                        <span *ngIf="projectService.current">{{projectService.current.name}}</span>
-                        <span *ngIf="!projectService.current">No Project </span><span class="caret"></span>
+                        <span *ngIf="project">{{project.name}}</span>
+                        <span *ngIf="!project">No Project </span><span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
                       <li *ngFor="let p of projects" role="menuitem">
-                        <a (click)="projectService.current=p;">{{p.name}}</a>
+                        <a (click)="switchProject(p)">{{p.name}}</a>
                       </li>
                     </ul>
                  </li>
               </ul>
-<!-- TODO: show user name/user settings entry here
+            <!-- TODO: show user name/user settings entry here
               <form class="navbar-form navbar-right">
                 <div class="form-group">
                   <input type="text" placeholder="Email" class="form-control">
@@ -68,7 +68,7 @@ import {WorkItems} from './pages/workitems.ts';
 
         <div class="container-fluid">
             <alert [type]="'warning'" dismissible="true">
-                <p>Notice: This tool is under development.</p>
+                <p>Notice: This tool is under development. Help us by submitting idea to "Shelf" project.</p>
             </alert>
             <router-outlet></router-outlet>
         </div>
@@ -89,22 +89,19 @@ import {WorkItems} from './pages/workitems.ts';
     {path: '/workitems', component: WorkItems, name: 'WorkItems'}
 ])
 export class ShelfApp {
-    router:Router;
-    location:Location;
-    private projectService : ProjectService;
-    private prefService : PreferenceService;
     private projects: any[];
+    private project = null;
     private ui;
 
-    constructor(router:Router, location:Location, projectService: ProjectService, pfs: PreferenceService) {
-        this.router = router;
-        this.location = location;
-        this.prefService = pfs;
-        this.projectService = projectService;
-        this.prefService.load().subscribe( () => {
-            this.projectService.load().subscribe(ps => this.projects = ps);
+    constructor(private router:Router, 
+                private location:Location, 
+                private prjs: ProjectService, 
+                private pfs: PreferenceService) {
+        pfs.load().subscribe( () => {
+            prjs.load().subscribe(ps => this.projects = ps);
         });
 
+        prjs.current.subscribe(p => this.project = p);
         this.ui = {"nav" : {"projectList" : {"show": false}}};
     }
     
@@ -115,6 +112,10 @@ export class ShelfApp {
         else if (path.length > 0) {
             return this.location.path().indexOf(path) > -1;
         }
+    }
+
+    switchProject(p) {
+        this.prjs.setCurrent(p);
     }
 }
 

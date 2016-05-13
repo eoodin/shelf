@@ -1,27 +1,28 @@
 import {Injectable, EventEmitter} from 'angular2/core';
 import {Http, Response} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
-
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {PreferenceService} from './preference-service.ts';
 
 @Injectable()
 export class ProjectService {
-    private _current = null;
+    private _current :BehaviorSubject<any> = new BehaviorSubject<any>(null);
+
     private _projects = [];
 
-    public currentChanges = new EventEmitter();
-
     constructor(private http: Http, private prf:PreferenceService) {
+        this._current
+            .filter(p => p != null)
+            .map(p => p.id)
+            .subscribe(id => this.prf.setPreference("lastProjectId", id))
     }
 
-    get current():Object {
+    setCurrent(p) {
+        this._current.next(p);
+    }
+
+    get current(): Observable {
         return this._current;
-    }
-
-    set current(project:Object) {
-        this._current = project;
-        this.currentChanges.next(project);
-        this.prf.setPreference('lastProjectId', this._current.id);
     }
 
     get projects():Object[] {
@@ -42,19 +43,19 @@ export class ProjectService {
         }
         else if (this._projects.length) {
             var np = null;
-            if (this._current) {
+            var currentProject = this._current.getValue();
+            if (currentProject) {
                 for(var p of this._projects) {
-                    if (p.id == this._current.id) {
+                    if (p.id == currentProject.id) {
                         np = p;
                         break;
                     }
                 }
-                this._current = np ? np : this._projects[0];
             }
             select = np ? np : this._projects[0];
         }
 
-        this.current = select;
+        this.setCurrent(select);
     }
 
     public load() {

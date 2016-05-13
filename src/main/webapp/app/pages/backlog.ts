@@ -15,7 +15,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
     selector: 'plans',
     directives: [PlanList, ItemDetail, ModalDialog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     template: `
-    <div class="plan-page" *ngIf="prs.current">
+    <div class="plan-page" *ngIf="project">
         <div class="project-info">
             <div class="project-operations">
                 <button class="btn btn-primary" (click)="ui.awd.show = true">Add Item...</button>
@@ -110,7 +110,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
     styleUrls: ['../../deps/css/css-spinner.css']
 })
 export class Backlog {
-    private project;
+    private project = null;
     private items = [];
     private ui;
 
@@ -125,16 +125,10 @@ export class Backlog {
             'rwd': {'show': false}
         };
 
-        prs.currentChanges.subscribe(p => this.switchProject(p));
-    }
-
-    switchProject(p) {
-        if (p == this.project)
-            return;
-
-        this.project = p;
-        this.loadItems();
-        
+        prs.current
+            .filter(p => p != this.project)
+            .do(p => this.project = p)
+            .subscribe(p => this.loadItems());
     }
 
     loadItems() {

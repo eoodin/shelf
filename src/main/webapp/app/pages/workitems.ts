@@ -10,11 +10,13 @@ import {ModalDialog} from '../components/modal-dialog.ts';
 
 @Component({
     selector: 'work-items',
-    directives: [WorkItemDetail, ModalDialog, DROPDOWN_DIRECTIVES],
-    template: `<div>work items</div>`,
+    //directives: [WorkItemDetail, ModalDialog, DROPDOWN_DIRECTIVES],
+    template: `
+    <h2> Under development... </h2>
+    `,
     styles: [``]
 })
 export class WorkItems {
-    constructor(private http: Http, private projectService: ProjectService) {
+    constructor(private http: Http, private prjs: ProjectService) {
     }
 }

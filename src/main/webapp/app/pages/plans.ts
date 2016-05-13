@@ -16,9 +16,9 @@ import {ModalDialog} from '../components/modal-dialog.ts';
     selector: 'plans',
     directives: [PlanList, ItemDetail, ModalDialog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     template: `
-    <div class="row plan-page" *ngIf="projectService.current">
+    <div class="row plan-page" *ngIf="project">
         <div class="col-sm-2">
-            <plan-list [project]="projectService.current" (select)="onSelect($event)"></plan-list>
+            <plan-list [project]="project" (select)="onSelect($event)"></plan-list>
         </div>
     
         <div class="col-sm-offset-2 col-md-offset-2 right">
@@ -145,7 +145,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
         </div>
     </div>
     
-    <div class="row" *ngIf="projectService.current == null">
+    <div class="row" *ngIf="project == null">
         <h1 class="no-content-notice">No project.</h1>
     </div>
     
@@ -230,10 +230,11 @@ export class Plans {
     private members;
     private ui;
     private hideFinished = false;
+    private project = null;
 
     constructor(private ele: ElementRef,
                 private http: Http,
-                private projectService: ProjectService,
+                private prjs: ProjectService,
                 private pref : PreferenceService) {
         this.ui = {
             'loading': {'show': false},
@@ -242,6 +243,7 @@ export class Plans {
             'rwd': {'show': false}
         };
 
+        prjs.current.subscribe(p => this.project = p);
         pref.load().subscribe(_ => this.hideFinished = eval(pref.preferences['hideFinished']));
     }
 
@@ -250,7 +252,7 @@ export class Plans {
             this.current = plan;
             this.loadWorkItems();
 
-            var current = this.projectService.current;
+            var current = this.project;
             if (!this.members && current && current.team) {
                 this.http.get('/api/teams/' + current.team.id + '/members')
                     .subscribe(resp => this.members = resp.json());
@@ -261,8 +263,7 @@ export class Plans {
     showMoveToDialog() {
         this.ui.mtd.show = true;
         if (!this.plans) { // TODO: use plan service to manager plan list.
-            var projectId = this.projectService.current.id;
-            this.http.get('/api/plans/?project=' + projectId)
+            this.http.get('/api/plans/?project=' + this.project.id)
                 .subscribe(resp => {
                     this.plans = resp.json();
                 });
@@ -313,7 +314,7 @@ export class Plans {
 
         var data = JSON.parse(JSON.stringify(this.ui.awd.item));
         data['description'] = this.descriptionEditor.getHTML();
-        data['projectId'] = this.projectService.current.id;
+        data['projectId'] = this.project.id;
         data['planId'] = this.current.id;
         if (!data['id']) {
             this.http.request(new Request(new RequestOptions(

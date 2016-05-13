@@ -2,8 +2,6 @@ import {Component, Input, Output, EventEmitter, ElementRef} from 'angular2/core'
 import {Http, Request, Response, RequestMethod, RequestOptions} from 'angular2/http';
 import {RichEditor} from './rich-editor.ts';
 
-import {ProjectService} from '../services/project-service.ts';
-
 @Component({
     selector: 'item-detail',
     template: `
@@ -96,8 +94,7 @@ export class ItemDetail {
     public saved: EventEmitter<Object> = new EventEmitter();
 
     constructor(private http: Http,
-                private ele: ElementRef,
-                private pService: ProjectService) {
+                private ele: ElementRef) {
     }
 
     @Input() set show(p: boolean){
@@ -121,7 +118,6 @@ export class ItemDetail {
 
     saveWorkItem() {
         var data = JSON.parse(JSON.stringify(this._item));
-        data['projectId'] = this.pService.current.id;
         if (!data['id']) {
             this.http.request(new Request(new RequestOptions(
                 {url: '/api/work-items/',

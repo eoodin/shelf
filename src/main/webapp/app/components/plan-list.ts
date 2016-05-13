@@ -2,6 +2,10 @@ import {Component, Input, Output, EventEmitter} from 'angular2/core';
 import {Http, Request, Response, RequestMethod, RequestOptions} from 'angular2/http';
 import {NgForm} from 'angular2/common';
 import {PreferenceService} from '../services/preference-service.ts';
+import {ProjectService} from '../services/project-service.ts';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/filter';
 
 @Component({
     selector: 'plan-list',
@@ -21,7 +25,7 @@ import {PreferenceService} from '../services/preference-service.ts';
                     </div>
                     <div class="modal-body">
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Project:</div><div class="col-sm-5"><span>{{_project.name}}</span></div>
+                            <div class="col-sm-3">Project:</div><div class="col-sm-5"><span>{{project.name}}</span></div>
                         </div>
                         <div class="row plan-field-row">
                             <div class="col-sm-3">Sprint name:</div><div class="col-sm-5"> <input type="text" ngControl="name"></div>
@@ -54,29 +58,28 @@ import {PreferenceService} from '../services/preference-service.ts';
     `]
 })
 export class PlanList {
-    private _project: Object = {};
+    private project: Object = {};
     private _plans: Array = [];
     private ui: {};
-    private showingBacklog;
-    
+
     @Output() public select: EventEmitter<PlanList> = new EventEmitter();
 
     private selected: any;
 
-    constructor(private http: Http, private pref : PreferenceService) {
+    constructor(private http: Http,
+                private pref : PreferenceService,
+                private prjs: ProjectService) {
         this.ui = {cpd: {show: false}};
+        prjs.current
+            .filter((id) => id)
+            .do((p) => this.project = p)
+            .map((p) => p.id)
+            .subscribe((id) => {this.loadPlans(id)});
     }
 
-    @Input() set project(p: Object){
-        this._project = p || this._project;
-        this.loadPlans();
-    }
-
-    private loadPlans() {
-        if (this._project.id) {
-            this.http.get('/api/plans/?project=' + this._project.id)
-                .subscribe(resp => this.setPlans(resp.json()));
-        }
+    private loadPlans(pid) {
+        this.http.get('/api/plans/?project=' + pid)
+            .subscribe(resp => this.setPlans(resp.json()));
     }
 
     @Output public get plans() {
@@ -105,7 +108,7 @@ export class PlanList {
     }
 
     createPlan(data) {
-        data['projectId'] = this._project.id;
+        data['projectId'] = this.project.id;
         this.http.request(new Request(new RequestOptions(
             {url: '/api/plans/',
                 method: RequestMethod.Post,
