@@ -50,6 +50,9 @@ abstract public class WorkItem {
     private Status status;
 
     @ManyToOne
+    private WorkItem parent;
+
+    @ManyToOne
     @JsonIgnore
     private Project project;
 
@@ -144,5 +147,13 @@ abstract public class WorkItem {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public WorkItem getParent() {
+        return parent;
+    }
+
+    public void setParent(WorkItem parent) {
+        this.parent = parent;
     }
 }

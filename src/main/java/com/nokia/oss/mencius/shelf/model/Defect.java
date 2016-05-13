@@ -10,10 +10,20 @@ import java.util.Date;
 @DiscriminatorValue("DE")
 public class Defect extends WorkItem {
     public enum Severity {
-        Minor,
-        Major,
+        Blocker,
         Critical,
-        Blocker
+        Major,
+        Minor
+    }
+
+    public enum State {
+        Created,
+        Analyzed,
+        Fixing,
+        Fixed,
+        Testing,
+        Tested,
+        Failed
     }
 
     @Column
@@ -31,11 +41,18 @@ public class Defect extends WorkItem {
     @OneToOne
     private User fixedBy;
 
+    @Column
+    private State state;
+
     public Severity getSeverity() {
         return severity;
     }
 
     public void setSeverity(Severity severity) {
         this.severity = severity;
+    }
+
+    public State getState() {
+        return state;
     }
 }

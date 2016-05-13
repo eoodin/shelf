@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -31,6 +33,7 @@ public class ProjectController {
 
     @RequestMapping(value = "/{projectId}", method = RequestMethod.DELETE)
     @ResponseBody
+    @Transactional
     public String deleteProject(@PathVariable String projectId) {
         Long id = Long.valueOf(projectId);
         Project project = em.find(Project.class, id);
@@ -38,12 +41,14 @@ public class ProjectController {
         return "deleted";
     }
 
+    class ItemList extends ArrayList<WorkItem> { public ItemList(Collection<? extends WorkItem> c) {super(c);}}
     @RequestMapping(value = "/{projectId}/backlog", method = RequestMethod.GET)
     @ResponseBody
-    public List<WorkItem> getBacklogItems(@PathVariable Long projectId) {
+    public ItemList getBacklogItems(@PathVariable Long projectId) {
         Query query = em.createQuery("SELECT w FROM WorkItem w WHERE w.project=:proj");
         query.setParameter("proj", em.find(Project.class, projectId));
-        return query.getResultList();
+
+        return new ItemList(query.getResultList());
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)

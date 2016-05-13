@@ -42,7 +42,8 @@ import {ModalDialog} from '../components/modal-dialog.ts';
                             <td> {{item.type}} </td>
                             <td> {{item.status}} </td>
                             <td><a (click)="showItem(item)"> {{item.title}} </a></td>
-                            <td> {{item.owner.name}} </td>
+                            <td *ngIf="item.owner"> {{item.owner.name}} </td>
+                            <td *ngIf="!item.owner"> Unassigned </td>
                             <td> </td>
                         </tr>
                     </table>

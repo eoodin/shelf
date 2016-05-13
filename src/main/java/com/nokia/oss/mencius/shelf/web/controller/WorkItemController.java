@@ -116,6 +116,7 @@ public class WorkItemController {
 
     @RequestMapping(value = "/{wiid}", method = RequestMethod.DELETE)
     @ResponseBody
+    @Transactional
     public boolean removeWorkItem(@PathVariable("wiid") Long wiid) {
         WorkItem wi = em.find(WorkItem.class, wiid);
         if (wi == null)
