@@ -101,7 +101,6 @@ export class PlanList {
                         }
                     }
                 }
-
                 list.selectPlan(selectPlan);
             });
         }
@@ -115,13 +114,9 @@ export class PlanList {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             })))
-            .subscribe(resp => this.planCreated(resp));
+            .subscribe(resp => this.loadPlans(this.project.id));
 
         this.ui.cpd.show = false;
-    }
-
-    planCreated(resp) {
-        this.loadPlans();
     }
 
     clickedPlan(plan) {

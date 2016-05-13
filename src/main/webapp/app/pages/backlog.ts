@@ -3,22 +3,20 @@ import {Http, Response, Request, RequestMethod, RequestOptions} from 'angular2/h
 import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/common'
 
 import {DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES} from 'deps/ng2-bs/ng2-bootstrap.ts';
-import moment from 'moment';
 
 import {PlanList} from '../components/plan-list.ts';
 import {ProjectService} from '../services/project-service.ts';
 import {PreferenceService} from '../services/preference-service.ts';
 import {ItemDetail} from '../components/item-detail.ts';
-import {ModalDialog} from '../components/modal-dialog.ts';
 
 @Component({
     selector: 'plans',
-    directives: [PlanList, ItemDetail, ModalDialog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
+    directives: [PlanList, ItemDetail, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     template: `
     <div class="plan-page" *ngIf="project">
         <div class="project-info">
             <div class="project-operations">
-                <button class="btn btn-primary" (click)="ui.awd.show = true">Add Item...</button>
+                <button class="btn btn-primary" (click)="showAddItem('UserStory')">Write User Story...</button>
                 <button class="btn btn-warning" (click)="showAddItem('Defect')">Report Problem...</button>
             </div>
         </div>
@@ -63,7 +61,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
                  (closed)="ui.awd.show = false"
                  (saved)="loadItems();">
     </item-detail>
-    
+
     <div class="modal fade in awd" *ngIf="ui.mtd.show" [style.display]="ui.mtd.show ? 'block' : 'block'" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -153,6 +151,17 @@ export class Backlog {
         this.ui.mtd.show = false;
     }
 
+    showAddItem(type) {
+        this.ui.awd.type = type;
+        this.ui.awd.item.type = type;
+        if (this.project)
+            this.ui.awd.item.projectId = this.project.id;
+        
+        if (type == 'Defect')
+            this.ui.awd.item.severity = 'Major';
+
+        this.ui.awd.show = true;
+    }
 
     showItem(item) {
         this.ui.awd.item = JSON.parse(JSON.stringify(item));

@@ -47,7 +47,9 @@ public class WorkItemController {
     @ResponseBody
     @Transactional
     public Long addWorkItem(@RequestBody ItemSpec spec, HttpServletRequest request) throws ShelfException {
-        Plan plan = em.find(Plan.class, spec.planId);
+        if (spec.planId == 0 && spec.projectId == 0)
+            throw new ShelfException("Unable to determine realm for work item.");
+
         WorkItem wi = createItem(spec);
         if (wi == null)
             throw new ShelfException("Cannot create work item.");
@@ -55,7 +57,10 @@ public class WorkItemController {
         User currentUser = UserUtils.findOrCreateUser(em, request.getRemoteUser());
         wi.setCreatedBy(currentUser);
         wi.setOwner(currentUser);
+        Plan plan = em.find(Plan.class, spec.planId);
         wi.setPlan(plan);
+        Project project = plan != null ? plan.getProject() : em.find(Project.class, spec.projectId);
+        wi.setProject(project);
         em.persist(wi);
 
         return wi.getId();
@@ -160,8 +165,8 @@ public class WorkItemController {
     }
 
     static class ItemSpec {
-        public Long projectId;
-        public Long planId;
+        public long projectId;
+        public long planId;
         public String ownerId;
         public String type;
         public String title;
