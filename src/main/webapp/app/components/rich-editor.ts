@@ -4,14 +4,24 @@ import Quill from 'quill';
 import {Rx} from 'rxjs/Rx';
 import 'rxjs/Rx';
 
+import {FileUploader} from './file-upload/file-uploader.ts';
+import {FileSelectDirective} from './file-upload/file-select.ts';
+
+
 @Component({
     selector: 'rich-editor',
+    directives: [FileSelectDirective],
     template: `
     <div class="rich-editor">
+        <label class="toolbar-toggle" [style.background]="showToolbar?'gray':'white'">
+            <input type="file" ng2FileSelect [uploader]="uploader" style="display:none;"/>
+            P
+        </label>
         <label class="toolbar-toggle" [style.background]="showToolbar?'gray':'white'">
             <input type="checkbox" [(ngModel)]="showToolbar" style="display:none;">
             T
         </label>
+        
         <div [style.display]="showToolbar?'inherit':'none'" class="quill-toolbar toolbar">
             <span class="ql-format-group">
             <select title="Font" class="ql-font">
@@ -144,6 +154,7 @@ export class RichEditor {
     private contentCache: string;
     private showToolbar = false;
     private textChange;
+    public uploader = new FileUploader({url: '/api/file/', autoUpload: true});
 
     @Output() update = new EventEmitter();
 
@@ -153,6 +164,11 @@ export class RichEditor {
             .debounceTime(250)
             .do(()=>this.contentCache = this.getEditor().getHTML())
             .subscribe(() => this.update.next(this.getEditor().getHTML()));
+        var editor = this;
+        this.uploader.onCompleteItem = (item, id) => {
+            var last = this.getEditor().getLength() - 1;
+            editor.getEditor().insertEmbed(last, 'image', '/api/file/' + id);
+        }
     }
 
     @Input() set content(html) {

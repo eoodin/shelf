@@ -47,8 +47,8 @@ public class FileController {
         response.setHeader("Content-Type", file.getMime());
         response.setDateHeader("Last-Modified", file.getModifiedAt().getTime());
         // TODO: support ranges.
+        response.setHeader("Accept-Ranges", "none"); // to 'bytes'
         response.setHeader("Content-Length", String.valueOf(file.getSize()));
-        response.setHeader("Accept-Ranges", "bytes");
         response.getOutputStream().write(file.getData());
     }
 
