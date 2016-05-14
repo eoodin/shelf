@@ -157,7 +157,7 @@ export class Projects {
     private projects: any[];
 
     constructor(private http:Http,
-                private projectService: ProjectService,
+                private prjs: ProjectService,
                 private teamService: TeamService) {
         this.ui = {
             createProjectDialog: {show: false, projectName: ''},
@@ -165,15 +165,16 @@ export class Projects {
         };
 
         this.teamService.reload();
-        this.http.get('/api/users/me')
-            .subscribe(response => this.user = response.json());
+        this.prjs.projects.subscribe((ps) => {
+            this.projects = ps;
+        });
+        this.http.get('/api/users/me').subscribe(response => this.user = response.json());
+        
     }
 
     deleteProject(p:Project) {
         this.http.delete('/api/projects/' + p.id)
-            .subscribe(response => {
-                this.projectService.reload().subscribe(ps => this.projects = ps);
-            });
+            .subscribe(() => this.prjs.reload());
     }
 
     onCreateProjectSubmit(data) {
@@ -183,12 +184,11 @@ export class Projects {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             })))
-            .subscribe(resp => this.projectService.reload().subscribe(ps => this.projects = ps));
+            .subscribe(() => this.prjs.reload());
 
         this.ui.createProjectDialog.show = false;
     }
-
-
+    
     onCreateTeamSubmit(data) {
         data.users = data.users.split(',');
 

@@ -28,11 +28,11 @@ public class Plan {
     @Column
     private Date end;
 
-    @OneToMany(mappedBy = "plan", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "plan")
     @JsonIgnore
     private List<WorkItem> workItems;
 
-    @OneToOne(mappedBy = "sprint")
+    @OneToOne(mappedBy = "sprint", cascade = CascadeType.REMOVE)
     private Allocation allocation;
 
     public Long getId() {

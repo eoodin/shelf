@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -69,6 +70,11 @@ abstract public class WorkItem {
 
     @Column
     private Date createdAt;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
+    @OrderBy("changeTime")
+    @JsonIgnore
+    private List<ChangeLog> changes;
 
     public Long getId() {
         return id;
@@ -156,5 +162,13 @@ abstract public class WorkItem {
 
     public void setParent(WorkItem parent) {
         this.parent = parent;
+    }
+
+    public List<ChangeLog> getChanges() {
+        return changes;
+    }
+
+    public void setChanges(List<ChangeLog> changes) {
+        this.changes = changes;
     }
 }

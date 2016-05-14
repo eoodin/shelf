@@ -1,11 +1,14 @@
 import {Injectable} from 'angular2/core';
 import {Http, Response} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class PreferenceService {
     private _currentUser = null;
     private _preferences = null;
+
+    private _values :BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
     constructor(private http: Http) {
     }
@@ -24,6 +27,10 @@ export class PreferenceService {
         return this._preferences;
     }
 
+    get values(): Observable {
+        return this._values;
+    }
+    
     public load() : Observable {
         var that = this;
         return new Observable(observer => {
@@ -32,8 +39,10 @@ export class PreferenceService {
                     .subscribe(resp => {
                         that.currentUser = resp.json();
                         that.http.get('/api/users/' + that._currentUser.userId + '/preferences')
-                            .subscribe(resp => {
-                                that._preferences = resp.json()
+                            .map(resp => resp.json())
+                            .subscribe(prefs => {
+                                that._preferences = prefs;
+                                that._values.next(prefs);
                                 observer.next(that._preferences);
                                 observer.complete();
                             });

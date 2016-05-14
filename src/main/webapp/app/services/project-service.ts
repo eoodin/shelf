@@ -6,15 +6,30 @@ import {PreferenceService} from './preference-service.ts';
 
 @Injectable()
 export class ProjectService {
+    private loading: boolean = false;
     private _current :BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-    private _projects = [];
+    private _projects = new BehaviorSubject<any>([]);
 
     constructor(private http: Http, private prf:PreferenceService) {
         this._current
             .filter(p => p != null)
             .map(p => p.id)
-            .subscribe(id => this.prf.setPreference("lastProjectId", id))
+            .subscribe(id => this.prf.setPreference("lastProjectId", id));
+        this._projects
+            .filter(ps => ps.length > 0) // TODO: check this reasonable?
+            .subscribe((projects) => {
+                if (this.loading) {
+                    this.prf.values
+                        .filter(p => p.lastProjectId)
+                        .map(pref => {
+                            let found = projects.filter(p => p.id == pref.lastProjectId)[0];
+                            found = found || projects[0];
+                            return found;
+                        }).filter(p => p != this._current.getValue())
+                        .subscribe(p => this.setCurrent(p));
+                }
+            });
     }
 
     setCurrent(p) {
@@ -25,52 +40,25 @@ export class ProjectService {
         return this._current;
     }
 
-    get projects():Object[] {
+    get projects(): Observable {
         return this._projects;
     }
 
-    set projects(projects:Object[]) {
-        this._projects = projects;
-
-        var select = null;
-        var lastProjectId = this.prf.preferences['lastProjectId'];
-        if (lastProjectId) {
-            for (var p of this._projects) {
-                if (p.id == lastProjectId) {
-                    select = p;
-                }
-            }
-        }
-        else if (this._projects.length) {
-            var np = null;
-            var currentProject = this._current.getValue();
-            if (currentProject) {
-                for(var p of this._projects) {
-                    if (p.id == currentProject.id) {
-                        np = p;
-                        break;
-                    }
-                }
-            }
-            select = np ? np : this._projects[0];
-        }
-
-        this.setCurrent(select);
-    }
-
     public load() {
-        return new Observable(observer => {
-            var projects = this.http.get('/api/projects/');
-            projects.subscribe(resp => {
-                this.projects = resp.json();
-                observer.next(this.projects);
-            });
-        });
+        this.loading = true;
+        this.http.get('/api/projects/')
+            .map(resp => resp.json())
+            .subscribe(
+                (projects) => {
+                    console.log("Projects: ", projects);
+                    this._projects.next(projects);
+                    this.loading = false;
+                },
+                () => this.loading = false,
+                () => this.loading = false);
     }
     
     public reload() {
-        //TODO: update only changed/added/removed.
         return this.load();
     }
-
 }

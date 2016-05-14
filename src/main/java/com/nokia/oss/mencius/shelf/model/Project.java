@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Project {
@@ -21,6 +22,10 @@ public class Project {
     // @OrderBy("id ASC")
     @JsonIgnore
     private List<Plan> plans;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private Set<WorkItem> items;
 
     public Long getId() {
         return id;
@@ -52,5 +57,13 @@ public class Project {
 
     public void setPlans(List<Plan> plans) {
         this.plans = plans;
+    }
+
+    public Set<WorkItem> getItems() {
+        return items;
+    }
+
+    public void setItems(Set<WorkItem> items) {
+        this.items = items;
     }
 }

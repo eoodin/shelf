@@ -47,6 +47,7 @@ public class WorkItemController {
                 .setParameter("status", WorkItem.Status.Removed)
                 .getResultList();
         list.addAll(results);
+
         return list;
     }
 

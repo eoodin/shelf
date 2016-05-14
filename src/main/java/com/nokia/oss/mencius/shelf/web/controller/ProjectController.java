@@ -38,10 +38,11 @@ public class ProjectController {
         Long id = Long.valueOf(projectId);
         Project project = em.find(Project.class, id);
         em.remove(project);
+        LOG.info("project id=" + id + " is removed, its plans and items are also removed");
         return "deleted";
     }
 
-    class ItemList extends ArrayList<WorkItem> { public ItemList(Collection<? extends WorkItem> c) {super(c);}}
+    class ItemList extends ArrayList<WorkItem> { ItemList(Collection<? extends WorkItem> c) {super(c);}}
     @RequestMapping(value = "/{projectId}/backlog", method = RequestMethod.GET)
     @ResponseBody
     public ItemList getBacklogItems(@PathVariable Long projectId) {
