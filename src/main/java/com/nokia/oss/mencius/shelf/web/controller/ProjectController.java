@@ -45,9 +45,10 @@ public class ProjectController {
     @RequestMapping(value = "/{projectId}/backlog", method = RequestMethod.GET)
     @ResponseBody
     public ItemList getBacklogItems(@PathVariable Long projectId) {
-        Query query = em.createQuery(
-                "SELECT w FROM WorkItem w WHERE w.project=:proj AND (TYPE(w) = UserStory OR TYPE(w) = Defect)");
-        query.setParameter("proj", em.find(Project.class, projectId));
+        Query query = em.createQuery("SELECT w FROM WorkItem w " +
+                "WHERE w.project=:proj AND (TYPE(w) = UserStory OR TYPE(w) = Defect) AND w.status <> :status");
+        query.setParameter("proj", em.find(Project.class, projectId))
+                .setParameter("status", WorkItem.Status.Removed);
 
         return new ItemList(query.getResultList());
     }

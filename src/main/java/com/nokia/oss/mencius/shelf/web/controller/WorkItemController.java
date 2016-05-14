@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -30,7 +34,7 @@ public class WorkItemController {
             @RequestParam(value = "desc", required = false) boolean desc) {
         WorkItemList list = new WorkItemList();
         Plan plan = em.find(Plan.class, planId);
-        String jpql = "SELECT w FROM WorkItem w WHERE w.plan=:plan";
+        String jpql = "SELECT w FROM WorkItem w WHERE w.plan=:plan AND w.status <> :status";
         if (sortBy != null) {
             jpql += " ORDER BY w." + sortBy;
             if (desc) {
@@ -38,7 +42,10 @@ public class WorkItemController {
             }
         }
 
-        List results = em.createQuery(jpql).setParameter("plan", plan).getResultList();
+        List results = em.createQuery(jpql)
+                .setParameter("plan", plan)
+                .setParameter("status", WorkItem.Status.Removed)
+                .getResultList();
         list.addAll(results);
         return list;
     }
@@ -127,7 +134,8 @@ public class WorkItemController {
         if (wi == null)
             return false;
 
-        em.remove(wi);
+        wi.setStatus(WorkItem.Status.Removed);
+        em.merge(wi);
         return true;
     }
 

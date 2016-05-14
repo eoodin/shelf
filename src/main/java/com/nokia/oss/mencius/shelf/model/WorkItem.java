@@ -26,7 +26,8 @@ abstract public class WorkItem {
         InProgress,
         Finished,
         Pending,
-        Dropped
+        Dropped,
+        Removed
     }
 
     @Id
