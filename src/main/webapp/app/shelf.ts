@@ -98,9 +98,10 @@ export class ShelfApp {
                 private prjs: ProjectService, 
                 private pfs: PreferenceService) {
         prjs.projects.subscribe(ps => this.projects = ps);
+        prjs.current.subscribe(p => this.project = p);
+        
         pfs.load().subscribe(prjs.load());
 
-        prjs.current.subscribe(p => this.project = p);
         this.ui = {"nav" : {"projectList" : {"show": false}}};
     }
     

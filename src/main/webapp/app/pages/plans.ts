@@ -244,7 +244,7 @@ export class Plans {
         };
 
         prjs.current.subscribe(p => this.project = p);
-        pref.load().subscribe(_ => this.hideFinished = eval(pref.preferences['hideFinished']));
+        pref.values.subscribe(ps => this.hideFinished = ps.hideFinished);
     }
 
     public onSelect(plan): void {
