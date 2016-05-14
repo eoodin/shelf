@@ -30,6 +30,7 @@
     </bean>
     <tx:annotation-driven transaction-manager="transactionManager" />
 
+    <bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver"/>
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="messageConverters">
             <list>
