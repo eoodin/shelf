@@ -7,4 +7,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class NotFoundException extends ShelfException {
     public NotFoundException() { super("Resource associated with given URI not found"); }
+
+    public NotFoundException(String message) {
+        super(message);
+    }
 }

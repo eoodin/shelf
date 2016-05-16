@@ -21,12 +21,9 @@ import 'rxjs/add/operator/filter';
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" (click)="ui.cpd.show = false" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Add New Sprint</h4>
+                        <h4 class="modal-title">New Sprint</h4>
                     </div>
                     <div class="modal-body">
-                        <div class="row plan-field-row">
-                            <div class="col-sm-3">Project:</div><div class="col-sm-5"><span>{{project.name}}</span></div>
-                        </div>
                         <div class="row plan-field-row">
                             <div class="col-sm-3">Sprint name:</div><div class="col-sm-5"> <input type="text" ngControl="name"></div>
                         </div>

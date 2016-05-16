@@ -15,9 +15,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Controller
+@Controller("planController")
 @RequestMapping("/plans")
 public class PlanController {
+
     @PersistenceContext
     private EntityManager em;
 
@@ -82,6 +83,21 @@ public class PlanController {
         }
 
         return "OK";
+    }
+
+    public Plan getCurrentSprint(Project project) {
+        Date now = new Date();
+
+        List plans =
+                em.createQuery("SELECT p FROM Plan p WHERE p.project = :project AND :time BETWEEN p.start AND p.end")
+                .setParameter("project", project)
+                .setParameter("time", now)
+                .getResultList();
+
+        if (plans.size() > 1)
+            throw new IllegalStateException("Multiple sprints for same period, project id=" + project.getId());
+
+        return plans.isEmpty() ? null : (Plan) plans.get(0);
     }
 
     public static class PlanSpec {

@@ -17,9 +17,11 @@ export class ProjectService {
             .map(p => p.id)
             .subscribe(id => this.prf.setPreference("lastProjectId", id));
         this._projects
-            .filter(ps => ps.length > 0) // TODO: check this reasonable?
             .subscribe((projects) => {
-                if (this.loading) {
+                if (projects.length == 0) {
+                    this._current.next(null);
+                }
+                if (this.loading && projects.length) {
                     this.prf.values
                         .filter(p => p.lastProjectId)
                         .map(pref => {
@@ -50,7 +52,6 @@ export class ProjectService {
             .map(resp => resp.json())
             .subscribe(
                 (projects) => {
-                    console.log("Projects: ", projects);
                     this._projects.next(projects);
                     this.loading = false;
                 },

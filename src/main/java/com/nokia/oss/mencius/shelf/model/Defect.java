@@ -18,6 +18,7 @@ public class Defect extends WorkItem {
 
     public enum State {
         Created,
+        Analyzing,
         Analyzed,
         Fixing,
         Fixed,
@@ -41,8 +42,8 @@ public class Defect extends WorkItem {
     @OneToOne
     private User fixedBy;
 
-    @Column
-    private State state;
+    @Column()
+    private State state = State.Created;
 
     public Severity getSeverity() {
         return severity;
@@ -54,5 +55,9 @@ public class Defect extends WorkItem {
 
     public State getState() {
         return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 }

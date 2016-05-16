@@ -39,10 +39,10 @@ import {WorkItems} from './pages/workitems.ts';
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Promotion Status</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Reports</a></li>
 
-                <li class="dropdown" dropdown keyboard-nav>
+                <li *ngIf="!projects.length"><a href="javascript:void(0);">No Project</a></li>
+                <li *ngIf="projects.length" class="dropdown" dropdown keyboard-nav>
                     <a href="javascript:void(0);" class="dropdown-toggle" dropdownToggle>
-                        <span *ngIf="project">{{project.name}}</span>
-                        <span *ngIf="!project">No Project </span><span class="caret"></span>
+                        <span >{{project.name}}</span><span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
                       <li *ngFor="let p of projects" role="menuitem">

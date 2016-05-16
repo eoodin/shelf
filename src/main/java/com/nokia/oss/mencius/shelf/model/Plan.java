@@ -28,7 +28,7 @@ public class Plan {
     @Column
     private Date end;
 
-    @OneToMany(mappedBy = "plan")
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<WorkItem> workItems;
 

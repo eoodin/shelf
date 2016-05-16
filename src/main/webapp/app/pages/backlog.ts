@@ -30,7 +30,7 @@ import {ItemDetail} from '../components/item-detail.ts';
                         <tr>
                             <th> ID </th>
                             <th> Type </th>
-                            <th> Status </th>
+                            <th> State </th>
                             <th> Title </th>
                             <th> Owner </th>
                             <th> Operations </th>
@@ -38,11 +38,35 @@ import {ItemDetail} from '../components/item-detail.ts';
                         <tr *ngFor="let item of items">
                             <td> {{item.id}} </td>
                             <td> {{item.type}} </td>
-                            <td> {{item.status}} </td>
+                            <td *ngIf="item.type != 'Defect'"> {{item.status}} </td>
+                            <td *ngIf="item.type == 'Defect'"> {{item.state}} </td>
                             <td><a (click)="showItem(item)"> {{item.title}} </a></td>
                             <td *ngIf="item.owner"> {{item.owner.name}} </td>
                             <td *ngIf="!item.owner"> Unassigned </td>
-                            <td> </td>
+                            <td>
+                                <button 
+                                    *ngIf="item.type == 'Defect' && item.state == 'Created'"
+                                    [disabled]="requesting"
+                                    (click)="startFix(item)"
+                                     class="btn btn-default btn-sm">Start Fix</button>
+                                <button 
+                                    *ngIf="item.type == 'Defect' && item.state == 'Fixed'"
+                                    [disabled]="requesting"
+                                    (click)="startTest(item)"
+                                    class="btn btn-default btn-sm">Start Test</button>
+                                <!--
+                                <button 
+                                    *ngIf="item.type == 'Defect' && item.state == 'Testing'"
+                                    [disabled]="requesting"
+                                    (click)="markTestResult(true)"
+                                    class="btn btn-default btn-sm">Pass</button>
+                                <button 
+                                    *ngIf="item.type == 'Defect' && item.state == 'Testing'"
+                                    [disabled]="requesting"
+                                    (click)="markTestResult(false)"
+                                    class="btn btn-default btn-sm">Fail</button>
+                                -->
+                            </td>
                         </tr>
                     </table>
                 </div>
@@ -133,24 +157,7 @@ export class Backlog {
         this.http.get('/api/projects/' + this.project.id + '/backlog')
             .subscribe(b => this.items = b.json());
     }
-
-    moveItemsToPlan(planId) {
-        var ids = this.getSelectedWorkItemIds();
-        if ( ! ids.length) {
-            alert("No selected work item.");
-            return;
-        }
-
-        this.http.request(new Request(new RequestOptions(
-            {
-                url: '/api/plans/' + planId + '/move-in',
-                method: RequestMethod.Post,
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(ids)
-            }))).subscribe(resp => this.loadItems());
-        this.ui.mtd.show = false;
-    }
-
+    
     showAddItem(type) {
         this.ui.awd.type = type;
         this.ui.awd.item.type = type;
@@ -161,6 +168,26 @@ export class Backlog {
             this.ui.awd.item.severity = 'Major';
 
         this.ui.awd.show = true;
+    }
+    
+    startFix(item) {
+        this.requesting = true;
+        this.http.post('/api/defects/' + item.id + '/fix')
+            .subscribe(
+                () => this.loadItems(),
+                () => window.alert('Error occurred.'),
+                () => this.requesting = false
+            );
+    }
+
+    startTest(item) {
+        this.requesting = true;
+        this.http.post('/api/defects/' + item.id + '/test')
+            .subscribe(
+                () => this.loadItems(),
+                () => window.alert('Error occurred.'),
+                () => this.requesting = false
+            );
     }
 
     showItem(item) {
