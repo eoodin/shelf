@@ -2,10 +2,6 @@ package com.nokia.oss.mencius.shelf.web.controller;
 
 import com.nokia.oss.mencius.shelf.ShelfException;
 import com.nokia.oss.mencius.shelf.model.GenericFile;
-import com.nokia.oss.mencius.shelf.model.Team;
-import com.nokia.oss.mencius.shelf.model.User;
-import com.nokia.oss.mencius.shelf.utils.UserUtils;
-import com.oracle.tools.packager.IOUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -13,21 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.activation.FileTypeMap;
 import javax.activation.MimetypesFileTypeMap;
-import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 @Controller
 public class FileController {
