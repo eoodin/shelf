@@ -108,9 +108,11 @@ public class WorkItemController {
             if (changes.addChange("description", item.getDescription(), spec.description))
                 item.setDescription(spec.description);
 
-        if (spec.ownerId != null)
-            if (changes.addChange("owner", item.getOwner().getUserId(), spec.ownerId))
+        if (spec.ownerId != null) {
+            User owner = item.getOwner();
+            if (changes.addChange("owner", owner == null ? 0L : owner.getUserId(), spec.ownerId))
                 item.setOwner(em.find(User.class, spec.ownerId));
+        }
 
         User currentUser = UserUtils.findOrCreateUser(em, request.getRemoteUser());
 
