@@ -42,7 +42,7 @@ import {WorkItems} from './pages/workitems.ts';
                 <li *ngIf="!projects.length"><a href="javascript:void(0);">No Project</a></li>
                 <li *ngIf="projects.length" class="dropdown" dropdown keyboard-nav>
                     <a href="javascript:void(0);" class="dropdown-toggle" dropdownToggle>
-                        <span >{{project.name}}</span><span class="caret"></span>
+                        <span *ngIf="project">{{project.name}}</span><span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
                       <li *ngFor="let p of projects" role="menuitem">
