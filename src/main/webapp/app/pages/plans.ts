@@ -23,7 +23,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
     
         <div class="col-sm-offset-2 col-md-offset-2 right">
             <div class="plan-head" *ngIf="current.id">
-                <h1>{{current.name}}</h1>
+                <h1>{{current.name}} <a href="javascript: void(0);" (click)="ui.calendar.show = true;"><span class="glyphicon glyphicon-calendar"></span></a></h1>
                 <ul class="summary">
                     <li *ngIf="current.start">Start: <span>{{date(current.start)}}</span></li>
                     <li *ngIf="current.end">Deadline: <span>{{date(current.end)}}</span></li>
@@ -240,7 +240,8 @@ export class Plans {
             'loading': {'show': false},
             'awd': {'show': false, 'loading': false, 'item': {}},
             'mtd': {'show': false},
-            'rwd': {'show': false}
+            'rwd': {'show': false},
+            'calendar': {'show': false}
         };
 
         prjs.current.subscribe(p => this.project = p);

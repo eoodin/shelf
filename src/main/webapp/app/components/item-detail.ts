@@ -1,84 +1,72 @@
 import {Component, Input, Output, EventEmitter, ElementRef} from 'angular2/core';
 import {Http, Request, Response, RequestMethod, RequestOptions} from 'angular2/http';
 import {RichEditor} from './rich-editor.ts';
+import {ModalDialog} from './modal-dialog.ts';
 
 @Component({
     selector: 'item-detail',
     template: `
-    <div class="modal fade in awd" [style.display]="_show ? 'block' : 'none'" role="dialog">
-        <div class="modal-dialog">
+    <modal-dialog [(show)]="show" [title]="(_item.id ? 'Item Details' : 'Add Item')">
+        <div dialog-body class="item-details">
             <form (ngSubmit)="saveWorkItem()">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" (click)="show = false"
-                                data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title" *ngIf="!_item.id">Add Work Item</h4>
-                        <h4 class="modal-title" *ngIf="_item.id">Work Item Detail</h4>
+                <div class="row" >
+                    <div class="col-sm-12">
+                        Type:
+                        <select *ngIf="!_item.id" [(ngModel)]="_item.type" [disabled]="_type">
+                            <option value="UserStory" selected="selected">User Story</option>
+                            <option value="Task">Task</option>
+                            <option value="Defect">Defect</option>
+                        </select>
+                        <span *ngIf="_item.id">{{_item.type}}</span>
                     </div>
-                    <div class="modal-body">
-                        <div class="row" >
-                            <div class="col-sm-12">
-                                Type:
-                                <select *ngIf="!_item.id" [(ngModel)]="_item.type" [disabled]="_type">
-                                    <option value="UserStory" selected="selected">User Story</option>
-                                    <option value="Task">Task</option>
-                                    <option value="Defect">Defect</option>
-                                </select>
-                                <span *ngIf="_item.id">{{_item.type}}</span>
-                            </div>
-                        </div>
-                        <div *ngIf="_item.type == 'Defect'" class="row">
-                            <div class="col-sm-12">Severity:
-                                <label><input #s1 type="radio" [checked]="_item.severity==s1.value" (click)="_item.severity=s1.value" value="Blocker">Blocker</label>
-                                <label><input #s2 type="radio" [checked]="_item.severity==s2.value" (click)="_item.severity=s2.value" value="Critical">Critical</label>
-                                <label><input #s3 type="radio" [checked]="_item.severity==s3.value" (click)="_item.severity=s3.value" value="Major">Major</label>
-                                <label><input #s4 type="radio" [checked]="_item.severity==s4.value" (click)="_item.severity=s4.value" value="Minor">Minor</label>
-                            </div>
-                        </div>
-                        <div *ngIf="_item.type == 'Defect'" class="row">
-                            <div class="col-sm-12">Found in:
-                                <input [(ngModel)]="_item.version">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                Title: <input type="text" class="work-item-title" [(ngModel)]="_item.title">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">Description:</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <rich-editor [content]="_item.description" (update)="_item.description = $event"></rich-editor>
-                            </div>
-                        </div>
-                        <div *ngIf="_item.type == 'Task'" class="row">
-                            <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="_item.estimation"></div>
-                        </div>
-                        <div class="row" *ngIf="_item.type == 'UserStory'">
-                            <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="_item.points" value="0"></div>
-                        </div>
+                </div>
+                <div *ngIf="_item.type == 'Defect'" class="row">
+                    <div class="col-sm-12">Severity:
+                        <label><input #s1 type="radio" [checked]="_item.severity==s1.value" (click)="_item.severity=s1.value" value="Blocker">Blocker</label>
+                        <label><input #s2 type="radio" [checked]="_item.severity==s2.value" (click)="_item.severity=s2.value" value="Critical">Critical</label>
+                        <label><input #s3 type="radio" [checked]="_item.severity==s3.value" (click)="_item.severity=s3.value" value="Major">Major</label>
+                        <label><input #s4 type="radio" [checked]="_item.severity==s4.value" (click)="_item.severity=s4.value" value="Minor">Minor</label>
                     </div>
-                    <div class="modal-footer">
-                        <button *ngIf="!_item.id" type="submit" class="btn btn-default" data-dismiss="modal">Create</button>
-                        <button *ngIf="_item.id" type="submit" class="btn btn-default" data-dismiss="modal">Save</button>
+                </div>
+                <div *ngIf="_item.type == 'Defect'" class="row">
+                    <div class="col-sm-12">Found in:
+                        <input [(ngModel)]="_item.version">
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        Title: <input type="text" class="work-item-title" [(ngModel)]="_item.title">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">Description:</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <rich-editor [content]="_item.description" (update)="_item.description = $event"></rich-editor>
+                    </div>
+                </div>
+                <div *ngIf="_item.type == 'Task'" class="row">
+                    <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="_item.estimation"></div>
+                </div>
+                <div class="row" *ngIf="_item.type == 'UserStory'">
+                    <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="_item.points" value="0"></div>
                 </div>
             </form>
         </div>
-    </div>
+        <div dialog-footer>
+            <button (click)="saveWorkItem()" class="btn btn-default">{{(_item.id ? 'Save' : 'Add')}}</button>
+        </div>
+    </modal-dialog>
     `,
-    directives: [RichEditor],
+    directives: [RichEditor, ModalDialog],
     styles: [`
-    .awd .modal-dialog form input.work-item-title { width: 100%; }
-    .awd .modal-dialog {width: 720px;}
-    .work-item-details { padding-left: 0;}
-    .work-item-details li { list-style:none; margin-bottom: 10px;}
-    .work-item-details li:last-child { margin-bottom: 0;}
-    .work-item-details li .title { font-weight: 700; }
-    .work-item-details li .big-section { display: block;}
-    .modal-body .row {margin: 8px 0;}
+    .item-details { padding-left: 0;}
+    .item-details li { list-style:none; margin-bottom: 10px;}
+    .item-details li:last-child { margin-bottom: 0;}
+    .item-details li .title { font-weight: 700; }
+    .item-details li .big-section { display: block;}
+    .item-details .row {margin: 8px 0;}
      `]
 
 })

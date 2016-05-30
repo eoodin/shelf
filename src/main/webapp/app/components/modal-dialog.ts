@@ -1,46 +1,71 @@
 import {
   Component,
-  OnInit, Input, Output,
-  ElementRef, ViewContainerRef, EventEmitter
+  OnInit, OnDestroy, Input, Output,
+  ElementRef, ViewContainerRef, ViewChild, EventEmitter
 } from 'angular2/core';
 import { NgIf, NgClass } from 'angular2/common';
+import {Observable} from 'rxjs/Observable';
 
 @Component({
   selector: 'modal-dialog',
   directives: [NgIf, NgClass],
   template: `
-  <div class="modal fade in awd" *ngIf="!closed" [style.display]="closed ? 'block' : 'block'"
+  <div class="modal fade in awd" [style.display]="_show ? 'block' : 'none'"
      role="dialog">
-    <div class="modal-dialog">
+    <div class="modal-dialog" [style.width]="'720px'">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" (click)="onClose($event)"
-                        data-dismiss="modal">&times;</button>
+                <button #closeBtn type="button" class="close" (click)="_close($event)">&times;</button>
                 <h4 class="modal-title">{{title}}</h4>
             </div>
             <div class="modal-body">
-                <ng-content></ng-content>
+                <ng-content select="[dialog-body]"></ng-content>
             </div>
             <div class="modal-footer">
-                <button (click)="onClose($event)" class="btn btn-default" data-dismiss="modal">Close</button>
+                <ng-content select="[dialog-footer]"></ng-content>
             </div>
         </div>
     </div>
-  </div>`
+  </div>`,
+  styles: ['']
 })
-export class ModalDialog implements OnInit {
-  @Output() public close:EventEmitter<ModalDialog> = new EventEmitter();
-  @Input public closed:boolean;
-  private title:string;
+export class ModalDialog implements OnInit, OnDestroy {
+  private _show: boolean = false;
 
-  constructor(public el:ElementRef) {
+  @Output()
+  public showChange: EventEmitter<boolean> = new EventEmitter();
+
+  @Input()
+  public title: string;
+
+  @ViewChild("closeBtn") closeBtn;
+
+  constructor(private el:ElementRef) {
+
+  }
+
+  @Input()
+  public set show(isShow: boolean) {
+    this._show = isShow;
+    if (isShow) {
+      // TODO: remove ungly focus?
+      setTimeout(() => this.closeBtn.nativeElement.focus(), 0);
+    }
   }
 
   ngOnInit() {
+    this.keySubscription = Observable.fromEvent(this.el.nativeElement, 'keyup')
+        .filter(k => k.keyCode == 27)
+        .subscribe(esc => this._close(esc));
+
   }
 
-  onClose() {
-    this.close.next(this);
-    this.closed = true;
+  ngOnDestroy() {
+    this.keySubscription.unsbscribe();
+  }
+
+  _close(event) {
+    this._show  = false;
+    this.showChange.next(this._show);
   }
 }
