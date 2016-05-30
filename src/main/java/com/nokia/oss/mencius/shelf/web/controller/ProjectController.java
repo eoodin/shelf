@@ -1,8 +1,11 @@
 package com.nokia.oss.mencius.shelf.web.controller;
 
+import com.nokia.oss.mencius.shelf.ShelfException;
 import com.nokia.oss.mencius.shelf.model.Project;
 import com.nokia.oss.mencius.shelf.model.Team;
+import com.nokia.oss.mencius.shelf.model.User;
 import com.nokia.oss.mencius.shelf.model.WorkItem;
+import com.nokia.oss.mencius.shelf.utils.UserUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

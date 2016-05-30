@@ -13,6 +13,7 @@ import {Projects} from './pages/projects.ts';
 import {Backlog} from './pages/backlog.ts';
 import {Plans} from './pages/plans.ts';
 import {WorkItems} from './pages/workitems.ts';
+import {AppService} from "./services/app-service";
 
 @Component({
     selector: '[shelf-app]',
@@ -51,8 +52,9 @@ import {WorkItems} from './pages/workitems.ts';
                     </ul>
                  </li>
               </ul>
-            <!-- TODO: show user name/user settings entry here
               <form class="navbar-form navbar-right">
+                <div ><a href="javascript:void(0);" title="{{app.commit}} at {{app.update}}">{{app.version}}</a></div>
+                <!-- TODO: show user name/user settings entry here
                 <div class="form-group">
                   <input type="text" placeholder="Email" class="form-control">
                 </div>
@@ -60,8 +62,8 @@ import {WorkItems} from './pages/workitems.ts';
                   <input type="password" placeholder="Password" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-success">Sign in</button>
+                -->
               </form>
-              -->
             </div><!--/.nav-collapse -->
           </div>
         </nav>
@@ -80,7 +82,7 @@ import {WorkItems} from './pages/workitems.ts';
     .nav-logo {width: 32px; height:32px;}
     `],
     directives: [Alert, ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
-    providers: [ProjectService, PreferenceService, TeamService]
+    providers: [ProjectService, PreferenceService, TeamService, AppService]
 })
 @RouteConfig([
     {path: '/projects', component: Projects, name: 'Projects'},
@@ -91,16 +93,19 @@ import {WorkItems} from './pages/workitems.ts';
 export class ShelfApp {
     private projects: any[];
     private project = null;
+    private app = {};
     private ui;
 
     constructor(private router:Router, 
                 private location:Location, 
                 private prjs: ProjectService, 
-                private pfs: PreferenceService) {
+                private pfs: PreferenceService,
+                private apps: AppService) {
         prjs.projects.subscribe(ps => this.projects = ps);
         prjs.current.subscribe(p => this.project = p);
         
         pfs.load().subscribe(prjs.load());
+        apps.info.subscribe(app => this.app = app);
 
         this.ui = {"nav" : {"projectList" : {"show": false}}};
     }
