@@ -1,11 +1,9 @@
 package com.nokia.oss.mencius.shelf.web.controller;
 
 import com.nokia.oss.mencius.shelf.ShelfException;
-import com.nokia.oss.mencius.shelf.model.Project;
-import com.nokia.oss.mencius.shelf.model.Team;
-import com.nokia.oss.mencius.shelf.model.User;
-import com.nokia.oss.mencius.shelf.model.WorkItem;
+import com.nokia.oss.mencius.shelf.model.*;
 import com.nokia.oss.mencius.shelf.utils.UserUtils;
+import com.nokia.oss.mencius.shelf.web.security.UnAuthorizedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +36,10 @@ public class ProjectController {
     @RequestMapping(value = "/{projectId}", method = RequestMethod.DELETE)
     @ResponseBody
     @Transactional
-    public String deleteProject(@PathVariable String projectId) {
+    public String deleteProject(@PathVariable String projectId, HttpServletRequest request)
+            throws UnAuthorizedException {
+        ensureAdminRole(request);
+
         Long id = Long.valueOf(projectId);
         Project project = em.find(Project.class, id);
         em.remove(project);
@@ -61,7 +62,10 @@ public class ProjectController {
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ResponseBody
     @Transactional
-    public String createProject(@RequestBody ProjectSpec spec) {
+    public String createProject(@RequestBody ProjectSpec spec, HttpServletRequest request)
+            throws UnAuthorizedException {
+        ensureAdminRole(request);
+
         Project project = new Project();
         project.setName(spec.projectName);
 
@@ -70,6 +74,13 @@ public class ProjectController {
         em.persist(project);
 
         return "created";
+    }
+
+    private void ensureAdminRole(HttpServletRequest request) throws UnAuthorizedException {
+        User u = em.find(User.class, request.getRemoteUser());
+        Role adminRole = em.find(Role.class, 1L);
+        if (u == null || !u.getRoles().contains(adminRole))
+            throw new UnAuthorizedException();
     }
 
     public static class ProjectSpec {

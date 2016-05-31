@@ -28,12 +28,12 @@ public class UserController {
     @RequestMapping(value = "/me", method = RequestMethod.GET)
     @ResponseBody
     @Transactional
-    public UserInfo getPlans(HttpServletRequest request) throws ShelfException {
+    public User getPlans(HttpServletRequest request) throws ShelfException {
         String remoteUser = request.getRemoteUser();
         if (null == remoteUser || remoteUser.isEmpty())
             throw new UnAuthorizedException();
 
-        return new UserInfo(UserUtils.findOrCreateUser(em, remoteUser));
+        return UserUtils.findOrCreateUser(em, remoteUser);
     }
 
 

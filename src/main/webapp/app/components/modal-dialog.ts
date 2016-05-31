@@ -31,6 +31,7 @@ import {Observable} from 'rxjs/Observable';
 })
 export class ModalDialog implements OnInit, OnDestroy {
   private _show: boolean = false;
+  private keySubscription;
 
   @Output()
   public showChange: EventEmitter<boolean> = new EventEmitter();
@@ -57,11 +58,10 @@ export class ModalDialog implements OnInit, OnDestroy {
     this.keySubscription = Observable.fromEvent(this.el.nativeElement, 'keyup')
         .filter(k => k.keyCode == 27)
         .subscribe(esc => this._close(esc));
-
   }
 
   ngOnDestroy() {
-    this.keySubscription.unsbscribe();
+    this.keySubscription && this.keySubscription.unsubscribe();
   }
 
   _close(event) {

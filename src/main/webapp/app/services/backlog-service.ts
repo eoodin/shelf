@@ -18,6 +18,5 @@ export class BacklogService {
                 observer.next(this.projects);
             });
         });
-
     }
 }

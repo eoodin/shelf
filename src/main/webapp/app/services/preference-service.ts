@@ -3,82 +3,40 @@ import {Http, Response} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
+import {UserService} from './user-service.ts';
+
 @Injectable()
 export class PreferenceService {
     private _currentUser = null;
-    private _preferences = null;
 
     private _values :BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
-    constructor(private http: Http) {
-    }
-
-    get currentUser():Object {
-        return this._currentUser;
-    }
-
-    set currentUser(user:Object) {
-        var reloadNeeded = (!this._currentUser || user.userId != this._currentUser.userId);
-        this._currentUser = user;
-        reloadNeeded && this.load();
-    }
-
-    get preferences(): Object {
-        return this._preferences;
+    constructor(private http: Http, private us: UserService) {
+        us.currentUser
+            .do(u => this._currentUser = u)
+            .subscribe(u => this.load(u));
     }
 
     get values(): Observable {
         return this._values;
     }
     
-    public load() : Observable {
-        var that = this;
-        return new Observable(observer => {
-            if (!that._preferences) {
-                that.http.get('/api/users/me')
-                    .subscribe(resp => {
-                        that.currentUser = resp.json();
-                        that.http.get('/api/users/' + that._currentUser.userId + '/preferences')
-                            .map(resp => resp.json())
-                            .subscribe(prefs => {
-                                that._preferences = prefs;
-                                that._values.next(prefs);
-                                observer.next(that._preferences);
-                                observer.complete();
-                            });
-                    });
-            }
-            else {
-                observer.next(that._preferences);
-                observer.complete();
-            }
-        });
-    }
-
-    public fetchUserInfo() : Observable {
-        return new Observable(observer => {
-            if (this._currentUser) {
-                observer.next(this._currentUser);
-                observer.complete();
-                return;
-            }
-
-            this.http.get('/api/users/me')
-                .subscribe(resp => {
-                    this._currentUser = resp.json();
-                    observer.next(this._currentUser);
-                    observer.complete();
-                });
-        });
+    private load(user) {
+        this.http.get('/api/users/' + user.userId + '/preferences')
+            .map(resp => resp.json())
+            .subscribe(prefs => {
+                this._values.next(prefs);
+            });
     }
 
     public setPreference(name, value) {
-        this.fetchUserInfo().subscribe(u => {
+        this.us.currentUser.subscribe(u => {
             if (!u.userId)
                 console && console.log('userId not loaded.');
 
             this.http.put('/api/users/' + u.userId + '/preferences?name=' + name + "&value=" + value)
-                .subscribe(_ => {});
+                .subscribe(_ => {
+                });
         });
     }
 }

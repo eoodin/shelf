@@ -13,7 +13,8 @@ import {Projects} from './pages/projects.ts';
 import {Backlog} from './pages/backlog.ts';
 import {Plans} from './pages/plans.ts';
 import {WorkItems} from './pages/workitems.ts';
-import {AppService} from "./services/app-service";
+import {AppService} from "./services/app-service.ts";
+import {UserService} from "./services/user-service.ts";
 
 @Component({
     selector: '[shelf-app]',
@@ -82,7 +83,7 @@ import {AppService} from "./services/app-service";
     .nav-logo {width: 32px; height:32px;}
     `],
     directives: [Alert, ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
-    providers: [ProjectService, PreferenceService, TeamService, AppService]
+    providers: [ProjectService, PreferenceService, TeamService, AppService, UserService]
 })
 @RouteConfig([
     {path: '/projects', component: Projects, name: 'Projects'},
@@ -104,7 +105,7 @@ export class ShelfApp {
         prjs.projects.subscribe(ps => this.projects = ps);
         prjs.current.subscribe(p => this.project = p);
         
-        pfs.load().subscribe(prjs.load());
+        pfs.values.subscribe(prjs.load());
         apps.info.subscribe(app => this.app = app);
 
         this.ui = {"nav" : {"projectList" : {"show": false}}};

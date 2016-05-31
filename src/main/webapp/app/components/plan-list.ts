@@ -88,7 +88,7 @@ export class PlanList {
         this.selected = null;
         if (plans && plans.length) {
             var list = this;
-            this.pref.load().subscribe(_ => {
+            this.pref.values.subscribe(_ => {
                 var selectPlan = plans[0];
                 if (_['lastSelectedPlan']) {
                     for (var p of plans) {
@@ -117,11 +117,9 @@ export class PlanList {
     }
 
     clickedPlan(plan) {
-        var lastSelectedPlan = this.pref.preferences['lastSelectedPlan'];
-        if (plan.id != lastSelectedPlan) {
-            this.pref.setPreference('lastSelectedPlan', plan.id);
-        }
-
+        this.pref.values
+            .filter(p => p['lastSelectedPlan'] != plan.id)
+            .subscribe(() => this.pref.setPreference('lastSelectedPlan', plan.id));
         this.selectPlan(plan);
     }
 

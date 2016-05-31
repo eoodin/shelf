@@ -3,6 +3,7 @@ import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from 'angular2/c
 import {Http, Request, Response, RequestMethod, RequestOptions} from 'angular2/http';
 import {ProjectService} from '../services/project-service.ts';
 import {TeamService} from '../services/team-service.ts';
+import {UserService} from "../services/user-service.ts";
 
 class Project {
     public id;
@@ -23,7 +24,7 @@ class Project {
         <ul class="sidebar-item-list">
             <li *ngFor="let project of projects" >
                 <a href="#/plans?pid={{project.id}}"><span class="main-title">{{project.name}}</span></a>
-                <button class="btn btn-danger btn-sm" (click)="deleteProject(project)">Delete</button>
+                <button [disabled]="!permitSA" class="btn btn-danger btn-sm" (click)="deleteProject(project)">Delete</button>
             </li>
         </ul>
 
@@ -153,12 +154,13 @@ class Project {
 })
 export class Projects {
     private ui;
-    private user;
+    private permitSA: boolean = false;
     private projects: any[];
 
     constructor(private http:Http,
                 private prjs: ProjectService,
-                private teamService: TeamService) {
+                private teamService: TeamService,
+                private us: UserService) {
         this.ui = {
             createProjectDialog: {show: false, projectName: ''},
             createTeamDialog: {show: false}
@@ -168,8 +170,11 @@ export class Projects {
         this.prjs.projects.subscribe((ps) => {
             this.projects = ps;
         });
-        this.http.get('/api/users/me').subscribe(response => this.user = response.json());
-        
+
+        us.currentUser
+            .subscribe(user => {
+                this.permitSA = user.roles.map(i => i.id).includes(1);
+            });
     }
 
     deleteProject(p:Project) {

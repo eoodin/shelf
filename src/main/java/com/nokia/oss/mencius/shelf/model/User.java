@@ -2,10 +2,7 @@ package com.nokia.oss.mencius.shelf.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.Date;
 
@@ -27,6 +24,9 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy = "user")
     private Collection<UserPreference> preferences;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    private Collection<Role> roles;
 
     public String getUserId() {
         return userId;
@@ -66,5 +66,13 @@ public class User {
 
     public void setPreferences(Collection<UserPreference> preferences) {
         this.preferences = preferences;
+    }
+
+    public Collection<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Collection<Role> roles) {
+        this.roles = roles;
     }
 }
