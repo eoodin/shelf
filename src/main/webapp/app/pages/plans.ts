@@ -176,6 +176,31 @@ import {ModalDialog} from '../components/modal-dialog.ts';
             <button (click)="removeItem(ui.rwd.item)" class="btn btn-default" data-dismiss="modal">Remove</button>
         </div>
     </modal-dialog>
+    
+    <modal-dialog [(show)]="ui.calendar.show" [title]="'Clendar'">
+        <div dialog-body>
+            <table class="month">
+                <tr>
+                    <th>Sun</th><th>Mon</th><th>Tue</th><th>Wen</th><th>Thu</th><th>Fri</th><th>Sat</th>
+                </tr>
+                <tr>
+                    <td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td>
+                </tr>
+                <tr>
+                    <td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td>
+                </tr>
+                <tr>
+                    <td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td>
+                </tr>
+                <tr>
+                    <td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td>
+                </tr>
+                <tr>
+                    <td>28</td><td>29</td><td>30</td><td>31</td><td></td><td></td><td></td>
+                </tr>
+            </table>
+        </div>
+    </modal-dialog>
     `,
     styles: [`
     .project-info { height:40px; padding: 2px 0;}
@@ -199,6 +224,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
     .defect.glyphicon{color: #500;}
     .task.glyphicon{color: #333;}
     .type-and-id input { display: inline-block; }
+    .month{width: 100%;}
     `],
     styleUrls: ['../../deps/css/css-spinner.css']
 })
