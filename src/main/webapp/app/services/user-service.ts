@@ -1,11 +1,11 @@
 import {Injectable} from 'angular2/core';
 import {Http, Response} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
-import {Subject} from 'rxjs/Subject';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class UserService {
-    private _currentUser :Subject<any> = new Subject<any>();
+    private _currentUser :BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
     constructor(private http: Http) {
         this.http.get('/api/users/me')
@@ -14,6 +14,6 @@ export class UserService {
     }
 
     public get currentUser(): Observable {
-        return this._currentUser;
+        return this._currentUser.filter(u => u);
     }
 }

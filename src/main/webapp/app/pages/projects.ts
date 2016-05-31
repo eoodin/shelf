@@ -4,6 +4,7 @@ import {Http, Request, Response, RequestMethod, RequestOptions} from 'angular2/h
 import {ProjectService} from '../services/project-service.ts';
 import {TeamService} from '../services/team-service.ts';
 import {UserService} from "../services/user-service.ts";
+import {ModalDialog} from "../components/modal-dialog.ts";
 
 class Project {
     public id;
@@ -12,7 +13,7 @@ class Project {
 
 @Component({
     selector: 'projects',
-    directives: [FORM_DIRECTIVES],
+    directives: [ModalDialog, FORM_DIRECTIVES],
     template: `
     <div class="row">
      <div class="col-sm-3">
@@ -24,40 +25,11 @@ class Project {
         <ul class="sidebar-item-list">
             <li *ngFor="let project of projects" >
                 <a href="#/plans?pid={{project.id}}"><span class="main-title">{{project.name}}</span></a>
-                <button [disabled]="!permitSA" class="btn btn-danger btn-sm" (click)="deleteProject(project)">Delete</button>
+                <button *ngIf="permitSA" class="btn btn-danger btn-sm" (click)="deleteProject(project)">Delete</button>
             </li>
         </ul>
 
-        <button class="btn btn-primary" (click)="ui.createProjectDialog.show = true;">New Project</button>
-
-        <div class="modal fade in" *ngIf="ui.createProjectDialog.show" [style.display]="ui.createProjectDialog.show ? 'block' : 'block'" role="dialog">
-            <div class="modal-dialog">
-                <form #f="ngForm" (ngSubmit)="onCreateProjectSubmit(f.value)">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" (click)="ui.createProjectDialog.show = false" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Add New Project</h4>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-sm-3">Project name:</div><div class="col-sm-5"> <input type="text" ngControl="projectName"></div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-3">Team:</div>
-                                <div class="col-sm-5">
-                                   <select class="form-control" required ngControl="teamId">
-                                      <option *ngFor="let t of teamService.teams" [value]="t.id">{{t.name}}</option>
-                                   </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-default" data-dismiss="modal">Create</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <button *ngIf="permitSA" class="btn btn-primary" (click)="ui.createProjectDialog.show = true;">New Project</button>
        </div>
       </div>
 
@@ -70,39 +42,52 @@ class Project {
         <ul class="sidebar-item-list">
             <li *ngFor="let team of teamService.teams" >
                 <span class="main-title">{{team.name}}</span>
-                <button class="btn btn-danger btn-sm" (click)="deleteTeam(team)">Delete</button>
+                <button *ngIf="permitSA" class="btn btn-danger btn-sm" (click)="deleteTeam(team)">Delete</button>
             </li>
         </ul>
-        <button class="btn btn-primary" (click)="ui.createTeamDialog.show = true;">Add Team...</button>
+        <button *ngIf="permitSA" class="btn btn-primary" (click)="ui.createTeamDialog.show = true;">Add Team...</button>
 
-        <div class="modal fade in" *ngIf="ui.createTeamDialog.show" [style.display]="ui.createTeamDialog.show ? 'block' : 'block'" role="dialog">
-            <div class="modal-dialog">
+        <modal-dialog [(show)]="ui.createTeamDialog.show" [title]="'Add New Team'">
+            <div dialog-body>
                 <form #f="ngForm" (ngSubmit)="onCreateTeamSubmit(f.value)">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" (click)="ui.createTeamDialog.show = false" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Add New Team</h4>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-sm-3">Team name:</div><div class="col-sm-5"> <input type="text" ngControl="name"></div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm-3">Scrum master:</div><div class="col-sm-5"> <input type="text" ngControl="scrumMaster"></div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm-3">Members:</div><div class="col-sm-5"> <input type="text" ngControl="users"></div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-default" data-dismiss="modal">Add</button>
+                    <div class="row">
+                        <div class="col-sm-3">Team name:</div><div class="col-sm-5"> <input type="text" ngControl="name"></div>
+                    </div>
+    
+                    <div class="row">
+                        <div class="col-sm-3">Scrum master:</div><div class="col-sm-5"> <input type="text" ngControl="scrumMaster"></div>
+                    </div>
+    
+                    <div class="row">
+                        <div class="col-sm-3">Members:</div><div class="col-sm-5"> <input type="text" ngControl="users"></div>
+                    </div>
+                </form>
+            </div>
+            <div dialog-footer>
+                <button (click)="f.onSubmit()" class="btn btn-default" data-dismiss="modal">Add</button>
+            </div>
+        </modal-dialog>
+        
+        <modal-dialog [(show)]="ui.createProjectDialog.show" [title]="'Add New Project'">
+            <div dialog-body>
+                <form #f="ngForm" (ngSubmit)="onCreateProjectSubmit(f.value)">
+                    <div class="row">
+                        <div class="col-sm-3">Project name:</div><div class="col-sm-5"> <input type="text" ngControl="projectName"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">Team:</div>
+                        <div class="col-sm-5">
+                           <select class="form-control" required ngControl="teamId">
+                              <option *ngFor="let t of teamService.teams" [value]="t.id">{{t.name}}</option>
+                           </select>
                         </div>
                     </div>
                 </form>
             </div>
-        </div>
+            <div dialog-footer>
+                <button (click)="f.onSubmit()" class="btn btn-default" data-dismiss="modal">Add</button>
+            </div>
+        </modal-dialog>
        </div>
       </div>
 

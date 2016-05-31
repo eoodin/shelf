@@ -30,13 +30,9 @@ export class PreferenceService {
     }
 
     public setPreference(name, value) {
-        this.us.currentUser.subscribe(u => {
-            if (!u.userId)
-                console && console.log('userId not loaded.');
-
-            this.http.put('/api/users/' + u.userId + '/preferences?name=' + name + "&value=" + value)
-                .subscribe(_ => {
-                });
+        this.us.currentUser.subscribe(user => {
+            this.http.put('/api/users/' + user.userId + '/preferences?name=' + name + "&value=" + value)
+                .subscribe();
         });
     }
 }

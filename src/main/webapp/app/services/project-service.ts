@@ -7,30 +7,42 @@ import {PreferenceService} from './preference-service.ts';
 @Injectable()
 export class ProjectService {
     private loading: boolean = false;
+    private lastProjectId;
     private _current :BehaviorSubject<any> = new BehaviorSubject<any>(null);
-
     private _projects = new BehaviorSubject<any>([]);
+    private _plans = new BehaviorSubject<any>([]);
 
     constructor(private http: Http, private prf:PreferenceService) {
         this._current
             .filter(p => p != null)
             .map(p => p.id)
+            .do(pid => this.loadPlans(pid))
+            .filter(p => !this.loading)
             .subscribe(id => this.prf.setPreference("lastProjectId", id));
+
+        this.prf.values
+            .filter(prefs => prefs['lastProjectId'])
+            .subscribe(prefs => this.lastProjectId = prefs['lastProjectId']);
+
         this._projects
+            .filter(projects => ! projects.length)
+            .subscribe(() => this._current.next(null));
+
+        this._projects
+            .filter(projects => projects.length)
+            .filter((projects) => this.loading)
             .subscribe((projects) => {
-                if (projects.length == 0) {
-                    this._current.next(null);
-                }
-                if (this.loading && projects.length) {
-                    this.prf.values
-                        .filter(p => p.lastProjectId)
-                        .map(pref => {
-                            let found = projects.filter(p => p.id == pref.lastProjectId)[0];
-                            found = found || projects[0];
-                            return found;
-                        }).filter(p => p != this._current.getValue())
-                        .subscribe(p => this.setCurrent(p));
-                }
+                let select = projects[0];
+                this.prf.values
+                    .filter(prefs => prefs['lastProjectId'])
+                    .subscribe(prefs => {
+                        projects
+                            .filter(p => p.id == prefs['lastProjectId'])
+                            .forEach(p => select = p);
+                        if (select != this._current.getValue()) {
+                            this._current.next(select);
+                        }
+                    });
             });
     }
 
@@ -46,6 +58,10 @@ export class ProjectService {
         return this._projects;
     }
 
+    public get plans() : Observable {
+        return this._plans;
+    }
+
     public load() {
         this.loading = true;
         this.http.get('/api/projects/')
@@ -57,6 +73,12 @@ export class ProjectService {
                 },
                 () => this.loading = false,
                 () => this.loading = false);
+    }
+
+    private loadPlans(pid) {
+        this.http.get('/api/plans/?project=' + pid)
+            .map(resp => resp.json())
+            .subscribe(plans => this._plans.next(plans));
     }
     
     public reload() {

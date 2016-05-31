@@ -127,7 +127,6 @@ import {ModalDialog} from '../components/modal-dialog.ts';
                                 <td>{{item.estimation}}</td>
                                 <td>
                                     <a (click)="removingItem(item)"><span class="glyphicon glyphicon-remove"></span></a>
-                                    <a (click)="putToBacklog(item)"><span class="glyphicon glyphicon-copy"></span></a>
                                 </td>
                             </tr>
                         </table>
@@ -138,7 +137,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
                         <button class="btn btn-primary" (click)="showAddItem()">Add Work Item...</button>
                     </div>
                     <div class="col-sm-6">
-                        <button class="btn btn-primary" (click)="showMoveToDialog();">Move To...</button>
+                        <button class="btn btn-primary" (click)="ui.mtd.show = true">Move To...</button>
                     </div>
                 </div>
             </div>
@@ -156,46 +155,27 @@ import {ModalDialog} from '../components/modal-dialog.ts';
                  (saved)="onWorkSaved();">
     </item-detail>
     
-    <div class="modal fade in awd" *ngIf="ui.mtd.show" [style.display]="ui.mtd.show ? 'block' : 'block'" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" (click)="ui.mtd.show = false"
-                            data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Move selected items to plan</h4>
-                </div>
-                <div class="modal-body">
-                    <select #moveTo class="form-control" required>
-                        <option *ngFor="let p of plans" [value]="p.id">{{p.name}}</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button (click)="ui.mtd.show=false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button (click)="moveItemsToPlan(moveTo.value)" class="btn btn-default" data-dismiss="modal">Move</button>
-                </div>
-            </div>
+    <modal-dialog [(show)]="ui.mtd.show" [title]="'Move selected items to plan'">
+        <div dialog-body>
+            <select #moveTo class="form-control" required>
+                <option *ngFor="let p of plans" [value]="p.id">{{p.name}}</option>
+            </select>
         </div>
-    </div>
-    
-    <div class="modal fade in" *ngIf="ui.rwd.show" [style.display]="ui.rwd.show ? 'block' : 'block'" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" (click)="ui.rwd.show = false"
-                            data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Confirm to remove work item</h4>
-                </div>
-                <div class="modal-body">
-                    You are about to remove work item {{ui.rwd.item.id}}. Are you sure?
-                </div>
-                <div class="modal-footer">
-                    <button (click)="ui.rwd.show =false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button (click)="removeItem(ui.rwd.item)" class="btn btn-default" data-dismiss="modal">Remove</button>
-                </div>
-            </div>
+        <div dialog-footer class="modal-footer">
+            <button (click)="ui.mtd.show=false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button (click)="moveItemsToPlan(moveTo.value)" class="btn btn-default" data-dismiss="modal">Move</button>
         </div>
-    </div>
+    </modal-dialog>
 
+    <modal-dialog [(show)]="ui.rwd.show" [title]="'Confirm to remove work item'">
+        <div dialog-body>
+            You are about to remove work item <span *ngIf="ui.rwd.item">{{ui.rwd.item.id}}</span>. Are you sure?
+        </div>
+        <div dialog-footer class="modal-footer">
+            <button (click)="ui.rwd.show =false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button (click)="removeItem(ui.rwd.item)" class="btn btn-default" data-dismiss="modal">Remove</button>
+        </div>
+    </modal-dialog>
     `,
     styles: [`
     .project-info { height:40px; padding: 2px 0;}
@@ -225,7 +205,7 @@ import {ModalDialog} from '../components/modal-dialog.ts';
 export class Plans {
     private current = {};
     private workItems = [];
-    private plans = null;
+    private plans = [];
     private sort = {};
     private members;
     private ui;
@@ -245,6 +225,7 @@ export class Plans {
         };
 
         prjs.current.subscribe(p => this.project = p);
+        prjs.plans.subscribe(plans => this.plans = plans);
         pref.values.subscribe(ps => this.hideFinished = ps.hideFinished);
     }
 
@@ -258,16 +239,6 @@ export class Plans {
                 this.http.get('/api/teams/' + current.team.id + '/members')
                     .subscribe(resp => this.members = resp.json());
             }
-        }
-    }
-
-    showMoveToDialog() {
-        this.ui.mtd.show = true;
-        if (!this.plans) { // TODO: use plan service to manager plan list.
-            this.http.get('/api/plans/?project=' + this.project.id)
-                .subscribe(resp => {
-                    this.plans = resp.json();
-                });
         }
     }
 
@@ -343,10 +314,6 @@ export class Plans {
     removingItem(item) {
         this.ui.rwd.item = item;
         this.ui.rwd.show = true;
-    }
-
-    putToBacklog(item) {
-        // TODO.
     }
 
     removeItem(item) {
@@ -440,7 +407,6 @@ export class Plans {
         this.workItems.forEach(i=>{ total += i.estimation; });
         return total;
     }
-
 
     private getSelectedWorkItemIds() {
         var selected = [];
