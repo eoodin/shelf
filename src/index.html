@@ -20,6 +20,8 @@
   </div>
 
     {{#each scripts.polyfills}}<script src="{{.}}"></script>{{/each}}
+    <script src="./lib/ng2-bootstrap/bundles/ng2-bootstrap.min.js" type="text/javascript"></script>
+    <script src="./lib//moment/min/moment.min.js" type="text/javascript"></script>
     <script>
       System.import('system-config.js').then(function () {
         System.import('main');

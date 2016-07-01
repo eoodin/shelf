@@ -3,7 +3,7 @@
  **********************************************************************************************/
 /** Map relative paths to URLs. */
 const map: any = {
-
+    moment: 'lib/moment/moment.js'
 };
 
 /** User packages configuration. */

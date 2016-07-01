@@ -3,7 +3,7 @@ import {Jsonp} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
-import {UserService} from './user-service.ts';
+import {UserService} from './user-service';
 
 @Injectable()
 export class PreferenceService {

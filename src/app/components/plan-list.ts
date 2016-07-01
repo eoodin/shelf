@@ -1,10 +1,11 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {Http, Request, Jsonp, RequestMethod, RequestOptions} from '@angular/http';
-import {PreferenceService} from '../services/preference-service.ts';
-import {ProjectService} from '../services/project-service.ts';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
+
+import {PreferenceService} from '../services/preference-service';
+import {ProjectService} from '../services/project-service';
 
 @Component({
     selector: 'plan-list',

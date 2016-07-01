@@ -40,5 +40,8 @@ module.exports = function(app) {
     app.post('/login', passport.authenticate('ldapauth', {session: false}), function(req, res) {
         res.send({status: 'ok'});
     });
+
+    // Expose lib to client
+    app.use('/lib', express.static(__dirname + '/../node_modules/'));
 };
 

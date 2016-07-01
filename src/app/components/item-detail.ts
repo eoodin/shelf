@@ -1,7 +1,8 @@
 import {Component, Input, Output, EventEmitter, ElementRef} from '@angular/core';
 import {Http, Request, Response, Jsonp, RequestMethod, RequestOptions} from '@angular/http';
-import {RichEditor} from './rich-editor.ts';
-import {ModalDialog} from './modal-dialog.ts';
+
+import {RichEditor} from './rich-editor';
+import {ModalDialog} from './modal-dialog';
 
 @Component({
     selector: 'item-detail',

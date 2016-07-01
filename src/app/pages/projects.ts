@@ -1,10 +1,11 @@
 import {Component} from '@angular/core';
 import {FORM_DIRECTIVES} from '@angular/common'
 import {Jsonp} from '@angular/http';
-import {ProjectService} from '../services/project-service.ts';
-import {TeamService} from '../services/team-service.ts';
-import {UserService} from "../services/user-service.ts";
-import {ModalDialog} from "../components/modal-dialog.ts";
+
+import {ProjectService} from '../services/project-service';
+import {TeamService} from '../services/team-service';
+import {UserService} from "../services/user-service";
+import {ModalDialog} from "../components/modal-dialog";
 
 class Project {
     public id;

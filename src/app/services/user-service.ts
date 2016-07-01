@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Jsonp} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import 'rxjs/Rx';
 
 @Injectable()
 export class UserService {

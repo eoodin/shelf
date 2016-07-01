@@ -3,15 +3,15 @@ import {ROUTER_DIRECTIVES, Router} from '@angular/router';
 import {Location} from '@angular/common';
 import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 
-import {ProjectService} from './services/project-service.ts';
-import {PreferenceService} from './services/preference-service.ts';
-import {TeamService} from './services/team-service.ts';
-import {Projects} from './pages/projects.ts';
-import {Backlog} from './pages/backlog.ts';
-import {Plans} from './pages/plans.ts';
-import {WorkItems} from './pages/workitems.ts';
-import {AppService} from "./services/app-service.ts";
-import {UserService} from "./services/user-service.ts";
+import {ProjectService} from './services/project-service';
+import {PreferenceService} from './services/preference-service';
+import {TeamService} from './services/team-service';
+import {Projects} from './pages/projects';
+import {Backlog} from './pages/backlog';
+import {Plans} from './pages/plans';
+import {WorkItems} from './pages/workitems';
+import {AppService} from "./services/app-service";
+import {UserService} from "./services/user-service";
 
 @Component({
     selector: '[shelf-app]',

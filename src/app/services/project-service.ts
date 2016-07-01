@@ -2,7 +2,8 @@ import {Injectable, EventEmitter} from '@angular/core';
 import {Jsonp} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {PreferenceService} from './preference-service.ts';
+
+import {PreferenceService} from './preference-service';
 
 @Injectable()
 export class ProjectService {

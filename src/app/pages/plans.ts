@@ -4,11 +4,11 @@ import {Jsonp} from '@angular/http';
 import {DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 import * as moment from 'moment';
 
-import {PlanList} from '../components/plan-list.ts';
-import {ProjectService} from '../services/project-service.ts';
-import {PreferenceService} from '../services/preference-service.ts';
-import {ItemDetail} from '../components/item-detail.ts';
-import {ModalDialog} from '../components/modal-dialog.ts';
+import {PlanList} from '../components/plan-list';
+import {ProjectService} from '../services/project-service';
+import {PreferenceService} from '../services/preference-service';
+import {ItemDetail} from '../components/item-detail';
+import {ModalDialog} from '../components/modal-dialog';
 
 @Component({
     selector: 'plans',
