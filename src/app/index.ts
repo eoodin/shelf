@@ -1,2 +1,2 @@
 export * from './environment';
-export * from './shelf-server.component';
+export * from './shelf.component';
