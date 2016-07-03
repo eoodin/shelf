@@ -224,7 +224,7 @@ import {ModalDialog} from '../components/modal-dialog';
     .type-and-id input { display: inline-block; }
     .month{width: 100%;}
     `],
-    styleUrls: ['../../deps/css/css-spinner.css']
+    styleUrls: ['/css-spinner.css']
 })
 export class Plans {
     private current = {};

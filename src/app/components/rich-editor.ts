@@ -181,19 +181,19 @@ export class RichEditor {
             var editorEle = el.getElementsByClassName("quill-editor")[0];
             var toolbarEle = el.getElementsByClassName('quill-toolbar')[0];
             console.log("quill:", Quill);
-            // this.editor = new Quill(editorEle, {
-            //     'modules': {
-            //         'authorship': {authorId: 'galadriel', enabled: true},
-            //         'multi-cursor': true,
-            //         'link-tooltip': true,
-            //         'toolbar': {'container': toolbarEle}
-            //     },
-            //     'theme': 'snow'
-            // });
-            // var that = this;
-            // this.editor.on('text-change', function(delta, source) {
-            //     that.textChange.next(delta);
-            // });
+            this.editor = new Quill(editorEle, {
+                'modules': {
+                    'authorship': {authorId: 'galadriel', enabled: true},
+                    'multi-cursor': true,
+                    'link-tooltip': true,
+                    'toolbar': {'container': toolbarEle}
+                },
+                'theme': 'snow'
+            });
+            var that = this;
+            this.editor.on('text-change', function(delta, source) {
+                that.textChange.next(delta);
+            });
         }
 
         return this.editor;
