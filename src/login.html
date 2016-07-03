@@ -1,7 +1,8 @@
+<!doctype html>
 <html>
 <head>
     <title>Sign In to Shelf</title>
-    <link href="deps/bootstrap/bootstrap-3.3.5.min.css" rel="stylesheet">
+    <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
         body {
             padding-top: 40px;
@@ -50,9 +51,9 @@
         <form class="form-signin" action='/login' method='POST'>
             <h2 class="form-signin-heading">Please sign in</h2>
             <label for="inputUserName" class="sr-only">User Name</label>
-            <input type="text" id="inputUserName" name="j_username"  class="form-control" placeholder="Your ID" required autofocus>
+            <input type="text" id="inputUserName" name="username"  class="form-control" placeholder="Your ID" required autofocus>
             <label for="inputPassword" class="sr-only">Password</label>
-            <input type="password" id="inputPassword" name="j_password" class="form-control" placeholder="Password" required>
+            <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
             <!--
             <div class="checkbox">
                 <label> <input type="checkbox" value="remember-me" name="remember"> Remember me </label>

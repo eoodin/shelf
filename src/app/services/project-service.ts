@@ -65,10 +65,11 @@ export class ProjectService {
 
     public load() {
         this.loading = true;
-        this.jsonp.get('/api/projects/')
+        this.jsonp.get('/api/projects')
             .map(resp => resp.json())
             .subscribe(
                 (projects) => {
+                    console.log('projects', projects);
                     this._projects.next(projects);
                     this.loading = false;
                 },

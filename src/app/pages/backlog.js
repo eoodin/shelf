@@ -33,7 +33,7 @@ var Backlog = (function () {
     Backlog.prototype.loadItems = function () {
         var _this = this;
         this.jsonp.get('/api/projects/' + this.project.id + '/backlog')
-            .subscribe(function (b) { return _this.items = b.json(); });
+            .subscribe(resp => _this.items = resp.json());
     };
     Backlog.prototype.showAddItem = function (type) {
         this.ui.awd.type = type;

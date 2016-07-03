@@ -1,13 +1,11 @@
 import {Component, Input, Output, EventEmitter, ElementRef} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
-//import Quill = require('./quill');
 declare var Quill:any;
-import {FileUploader} from 'ng2-file-upload';
-import {FileSelectDirective} from 'ng2-file-upload/components/file-upload/file-select.directive';
+import {FileUploader, FILE_UPLOAD_DIRECTIVES} from 'ng2-file-upload';
 
 @Component({
     selector: 'rich-editor',
-    directives: [FileSelectDirective],
+    directives: [FILE_UPLOAD_DIRECTIVES],
     template: `
     <div class="rich-editor">
         <label class="toolbar-toggle" [style.background]="showToolbar?'gray':'white'">

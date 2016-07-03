@@ -10,7 +10,6 @@ export class UserService {
 
     constructor(private jsonp: Jsonp) {
         this.jsonp.get('/api/users/me')
-            .map(resp => resp.json())
             .subscribe(user => this._currentUser.next(user));
     }
 

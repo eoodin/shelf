@@ -30,10 +30,10 @@ import {UserService} from "./services/user-service";
             </div>
             <div class="collapse navbar-collapse">
               <ul class="nav navbar-nav">
-                <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/Projects']" class="link">Dashboard</a></li>
-                <li [class.active]="getLinkStyle('/backlog')"><a [routerLink]="['/Backlog']" class="link">Backlog</a></li>
-                <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/Plans']" class="link">Plans</a></li>
-                <li [class.active]="getLinkStyle('/workitems')"><a [routerLink]="['/WorkItems']" class="link">Work Items</a></li>
+                <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/projects']" class="link">Dashboard</a></li>
+                <li [class.active]="getLinkStyle('/backlog')"><a [routerLink]="['/backlog']" class="link">Backlog</a></li>
+                <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/plans']" class="link">Plans</a></li>
+                <li [class.active]="getLinkStyle('/workitems')"><a [routerLink]="['/workitems']" class="link">Work Items</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">CI Status</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Promotion Status</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Reports</a></li>
@@ -84,12 +84,6 @@ import {UserService} from "./services/user-service";
     directives: [/*Alert, */ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
     providers: [ProjectService, PreferenceService, TeamService, AppService, UserService]
 })
-// @RouterConfig([
-//     {path: '/projects', component: Projects, name: 'Projects'},
-//     {path: '/backlog', component: Backlog, name: 'Backlog'},
-//     {path: '/plans', component: Plans, name: 'Plans'},
-//     {path: '/workitems', component: WorkItems, name: 'WorkItems'}
-// ])
 export class ShelfAppComponent {
     private projects: any[];
     private project = null;
