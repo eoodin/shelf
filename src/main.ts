@@ -2,7 +2,7 @@ import { bootstrap } from '@angular/platform-browser-dynamic';
 import { enableProdMode, provide } from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {LocationStrategy, HashLocationStrategy} from '@angular/common';
-import { JSONP_PROVIDERS }  from '@angular/http';
+import { JSONP_PROVIDERS, HTTP_PROVIDERS }  from '@angular/http';
 import { ShelfAppComponent, environment } from './app/';
 
 import {Projects} from './app/pages/projects';
@@ -25,6 +25,6 @@ let routes = [
 
 bootstrap(ShelfAppComponent, [
   provideRouter(routes),
-  JSONP_PROVIDERS,
+  JSONP_PROVIDERS, HTTP_PROVIDERS,
   provide(LocationStrategy, {useClass: HashLocationStrategy})
 ]);

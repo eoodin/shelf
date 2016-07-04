@@ -1,14 +1,5 @@
 /*jshint node:true*/
 
-// To use it create some files under `mocks/`
-// e.g. `server/mocks/ember-hamsters.js`
-//
-// module.exports = function(app) {
-//   app.get('/ember-hamsters', function(req, res) {
-//     res.send('hello');
-//   });
-// };
-
 module.exports = function(app) {
     var fs = require("fs"),
       express = require('express'),
@@ -18,6 +9,7 @@ module.exports = function(app) {
       session = require('express-session'),
       passport = require('passport'),
       LocalStrategy = require('passport-local');
+    var models = require('../models');
 
     app.use(cookieParser());
     app.use(bodyParser.urlencoded({ extended: false }));
@@ -26,6 +18,12 @@ module.exports = function(app) {
     app.use(session({secret: 'supernova', saveUninitialized: true, resave: true}));
     app.use(passport.initialize());
     app.use(passport.session());
+
+    var databaseReady = false;
+    models.sequelize.sync().then(function() {
+        console.log('database initialized.');
+        databaseReady = true;
+    });
 
     app.use(function(req, res, next){
       var err = req.session.error,
@@ -76,11 +74,13 @@ module.exports = function(app) {
     var route = express.Router();
     
     route.get('/users/me', function(req, res) {
-        res.send({username: 'admin', roles: ['basic-user']});
+        models.User.find({where: {userId: 'jefliu'}}).then(function(user) {
+            res.send(user);
+        });
     });
     
     route.get('/app/info', function(req, res) {
-        res.send({version: '1.0<faked>'});
+        res.send({"commit":"10c93e4","version":"1.0-SNAPSHOT","update":"31.05.2016 @ 22:25:09 CST"});
     });
     
     route.get('/projects', function(req, res){
@@ -102,8 +102,8 @@ module.exports = function(app) {
     app.use('/lib', express.static(__dirname + '/../node_modules/'));
 
     app.post('/login', passport.authenticate('local', {session: false}), function(req, res) {
-        //res.send({status: 'ok'});
-        res.redirect('/');
+        res.send({status: 'ok'});
+        // res.redirect('/');
     });
     app.get('/logout', function(req, res) {
         req.logout();

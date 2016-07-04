@@ -1,15 +1,16 @@
 import {Component, Input, Output, EventEmitter, ElementRef} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 declare var Quill:any;
-import {FileUploader, FILE_UPLOAD_DIRECTIVES} from 'ng2-file-upload';
+import {FileUploader, FileSelectDirective} from 'ng2-file-upload';
 
 @Component({
     selector: 'rich-editor',
-    directives: [FILE_UPLOAD_DIRECTIVES],
+    // TODO: Check why the directive is not working.
+    // directives: [FileSelectDirective],
     template: `
     <div class="rich-editor">
         <label class="toolbar-toggle" [style.background]="showToolbar?'gray':'white'">
-            <input type="file" ng2FileSelect [uploader]="uploader" style="display:none;"/>
+            
             P
         </label>
         <label class="toolbar-toggle" [style.background]="showToolbar?'gray':'white'">
@@ -149,7 +150,7 @@ export class RichEditor {
     private contentCache: string;
     private showToolbar = false;
     private textChange;
-    public uploader = new FileUploader({url: '/api/file/', autoUpload: true});
+    // public uploader = new FileUploader({url: '/api/file/', autoUpload: true});
 
     @Output() update = new EventEmitter();
 
@@ -160,10 +161,10 @@ export class RichEditor {
             .do(()=>this.contentCache = this.getEditor().getHTML())
             .subscribe(() => this.update.next(this.getEditor().getHTML()));
         var editor = this;
-        this.uploader.onCompleteItem = (item, id) => {
-            var last = this.getEditor().getLength() - 1;
-            editor.getEditor().insertEmbed(last, 'image', '/api/file/' + id);
-        }
+        // this.uploader.onCompleteItem = (item, id) => {
+        //     var last = this.getEditor().getLength() - 1;
+        //     editor.getEditor().insertEmbed(last, 'image', '/api/file/' + id);
+        // }
     }
 
     @Input() set content(html) {
@@ -180,7 +181,6 @@ export class RichEditor {
             var el = this.ele.nativeElement;
             var editorEle = el.getElementsByClassName("quill-editor")[0];
             var toolbarEle = el.getElementsByClassName('quill-toolbar')[0];
-            console.log("quill:", Quill);
             this.editor = new Quill(editorEle, {
                 'modules': {
                     'authorship': {authorId: 'galadriel', enabled: true},
