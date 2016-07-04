@@ -1,5 +1,5 @@
 import {Component, ElementRef} from '@angular/core';
-import {Jsonp} from '@angular/http';
+import {Http} from '@angular/http';
 
 import {DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 import * as moment from 'moment';
@@ -237,7 +237,7 @@ export class Plans {
     private project = null;
 
     constructor(private ele: ElementRef,
-                private jsonp: Jsonp,
+                private http: Http,
                 private prjs: ProjectService,
                 private pref : PreferenceService) {
         this.ui = {
@@ -260,7 +260,7 @@ export class Plans {
 
             var current = this.project;
             if (!this.members && current && current.team) {
-                this.jsonp.get('/api/teams/' + current.team['id'] + '/members')
+                this.http.get('/api/teams/' + current.team['id'] + '/members')
                     .subscribe(resp => this.members = resp.json());
             }
         }
@@ -277,7 +277,7 @@ export class Plans {
             return;
         }
 
-        this.jsonp.post('/api/plans/' + planId + '/move-in', JSON.stringify(ids))
+        this.http.post('/api/plans/' + planId + '/move-in', JSON.stringify(ids))
           .subscribe(resp => this.onMoveToPlanResponse(resp));
     }
 
@@ -308,7 +308,7 @@ export class Plans {
     }
 
     removeItem(item) {
-        this.jsonp.delete('/api/work-items/' + item.id)
+        this.http.delete('/api/work-items/' + item.id)
             .subscribe(resp =>
             {
                 this.loadWorkItems();
@@ -327,7 +327,7 @@ export class Plans {
         this.ui.loading.show = true;
 
         var change = {'status': status};
-        this.jsonp.put('api/work-items/' + item.id, JSON.stringify(change))
+        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
             .subscribe(resp => this.onStatusUpdate(resp));
     }
 
@@ -335,7 +335,7 @@ export class Plans {
         this.ui.loading.show = true;
         member = member || {userId: -1};
         var change = {'ownerId': member.userId};
-        this.jsonp.put('api/work-items/' + item.id, JSON.stringify(change))
+        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
             .subscribe(resp => this.onStatusUpdate(resp));
     }
 
@@ -370,7 +370,7 @@ export class Plans {
             this.sort['order'] == 'desc' && (fetchUrl += '&desc=true');
         }
 
-        this.jsonp.get(fetchUrl)
+        this.http.get(fetchUrl)
             .subscribe(resp => this.workItems = resp.json());
     }
 

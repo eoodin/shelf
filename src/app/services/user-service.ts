@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Jsonp} from '@angular/http';
+import {Http} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import 'rxjs/Rx';
@@ -8,8 +8,8 @@ import 'rxjs/Rx';
 export class UserService {
     private _currentUser :BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-    constructor(private jsonp: Jsonp) {
-        this.jsonp.get('/api/users/me')
+    constructor(private http: Http) {
+        this.http.get('/api/users/me')
             .map(res => res.json())
             .subscribe(user => this._currentUser.next(user));
     }

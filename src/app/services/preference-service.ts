@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Jsonp} from '@angular/http';
+import {Http} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
@@ -11,7 +11,7 @@ export class PreferenceService {
 
     private _values :BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
-    constructor(private jsonp: Jsonp, private us: UserService) {
+    constructor(private http: Http, private us: UserService) {
         us.currentUser
             .do(u => this._currentUser = u)
             .subscribe(u => this.load(u));
@@ -22,7 +22,7 @@ export class PreferenceService {
     }
 
     private load(user) {
-        this.jsonp.get('/api/users/' + user.userId + '/preferences')
+        this.http.get('/api/users/' + user.userId + '/preferences')
             .map(resp => resp.json())
             .subscribe(prefs => {
                 this._values.next(prefs);
@@ -31,7 +31,7 @@ export class PreferenceService {
 
     public setPreference(name, value) {
         this.us.currentUser.subscribe(user => {
-            this.jsonp.put('/api/users/' + user.userId + '/preferences?name=' + name + "&value=" + value, '{}')
+            this.http.put('/api/users/' + user.userId + '/preferences?name=' + name + "&value=" + value, '{}')
                 .subscribe();
         });
     }

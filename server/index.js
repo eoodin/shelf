@@ -8,7 +8,7 @@ module.exports = function(app) {
       methodOverride = require('method-override'),
       session = require('express-session'),
       passport = require('passport'),
-      LocalStrategy = require('passport-local');
+      LocalStrategy = require('passport-local').Strategy;
     var models = require('../models');
 
     app.use(cookieParser());
@@ -42,15 +42,12 @@ module.exports = function(app) {
     });
 
     passport.use('local', new LocalStrategy(
-        { passReqToCallback: true },
-        function(req, username, password, done) {
-           if(username == 'admin' && password == '123456') {
-               req.session.success = 'You are logged in';
-               return done(null, {'username': 'admin'});
-           }
-
-           req.session.error = 'Invalid credential.';
-           return false;
+        function(username, password, done) {
+            return models.User.find({where: {userId: username}}).then(function(u) {
+                done(null, u);
+            }, function(error) {
+                console.log('Authenticate failed: ', error);
+            });
         }));
     var ldapConf = __dirname + '/ldap.json';
 
@@ -62,12 +59,10 @@ module.exports = function(app) {
     }
 
     passport.serializeUser(function(user, done) {
-        console.log('Serializing ' + user.username);
-        don(null, user);
+        done(null, user);
     });
 
     passport.deserializeUser(function(obj, done){
-        console.log('deserializing ' + obj);
         done(null, obj);
     });
 
@@ -80,14 +75,60 @@ module.exports = function(app) {
     });
     
     route.get('/app/info', function(req, res) {
+        //TODO: reimplement this.
         res.send({"commit":"10c93e4","version":"1.0-SNAPSHOT","update":"31.05.2016 @ 22:25:09 CST"});
     });
     
-    route.get('/projects', function(req, res){
+    route.get('/users/:userId/preferences', function(req, res){
+        let userId = req.params.userId;
+        if (!userId) {
+            res.status(404).send({error: 'User ID not specified.'});
+            return;
+        }
+        
+        //TODO: Load preferences
         res.send([]);
     });
     
-    route.all('*', function(req, res, next) {
+    route.put('/users/:userId/preferences', function(req, res) {
+        let uid = req.user.userId;
+        if (!req.query.name || !uid) {
+            res.status(500).send({error: 'no entry or user name specified.'})
+        }
+        
+        // TODO: save preference
+        res.send({status: 'OK'});
+    });
+    
+    route.get('/projects', function(req, res){
+        models.Project.findAll().then(function(projects) {
+            res.send(projects);
+        });
+    });
+    
+    route.get('/plans/', function(req, res){
+        let projectId = req.query.project;
+        if (!projectId) {
+            res.status(404).send({error: 'No project ID specified.'});
+            return;
+        }
+        
+        models.Plan.findAll({where: {project_id: projectId}}).then(function(plans) {
+            res.send(plans);
+        });
+    });
+    
+    route.get('/work-items/', function(req, res) {
+        if (!req.query.planId) {
+            //TODO: load all  work items.
+            res.send([]);
+        }
+        
+        //TODO:
+        res.send([]);
+    });
+    
+    app.all('/api/*', function(req, res, next) {
         if (req.isAuthenticated()) { return next(); }
         console.log('Unauthenticated access to ' + req.originalUrl);
         res.status(403).send({error: 'Unauthenticated'});
@@ -101,7 +142,7 @@ module.exports = function(app) {
     app.use("/api", route);
     app.use('/lib', express.static(__dirname + '/../node_modules/'));
 
-    app.post('/login', passport.authenticate('local', {session: false}), function(req, res) {
+    app.post('/login', passport.authenticate('local', { failureRedirect: '/login.html' }), function(req, res) {
         res.send({status: 'ok'});
         // res.redirect('/');
     });
@@ -111,5 +152,6 @@ module.exports = function(app) {
     });
 
     app.use(passport.initialize());
+    app.use(passport.session());
 };
 

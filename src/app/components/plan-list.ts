@@ -1,5 +1,5 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {Http, Request, Jsonp, RequestMethod, RequestOptions} from '@angular/http';
+import {Http, Request, RequestMethod, RequestOptions} from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
@@ -63,7 +63,7 @@ export class PlanList {
 
     private selected: any;
 
-    constructor(private jsonp: Jsonp,
+    constructor(private http: Http,
                 private pref : PreferenceService,
                 private prjs: ProjectService) {
         this.ui = {cpd: {show: false}};
@@ -75,7 +75,8 @@ export class PlanList {
     }
 
     private loadPlans(pid) {
-        this.jsonp.get('/api/plans/?project=' + pid)
+        this.http.get('/api/plans/?project=' + pid)
+            .map(resp => resp.json())
             .subscribe(data => this.setPlans(data));
     }
 
@@ -101,7 +102,7 @@ export class PlanList {
 
     createPlan(data) {
         data['projectId'] = this.project['id'];
-        this.jsonp.post('/api/plans/', JSON.stringify(data))
+        this.http.post('/api/plans/', JSON.stringify(data))
             .subscribe(resp => this.loadPlans(this.project['id']));
 
         this.ui.cpd.show = false;

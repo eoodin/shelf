@@ -2,18 +2,11 @@
 
 module.exports = function (sequelize, DataTypes) {
     /*
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    @Column
-    private String name;
-
+    TODO: following fields
     @OneToOne
     private Team team;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
-    // @OrderBy("id ASC")
     @JsonIgnore
     private List<Plan> plans;
 
