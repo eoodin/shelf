@@ -134,9 +134,9 @@ module.exports = function(app) {
         res.status(403).send({error: 'Unauthenticated'});
     });
     
-    app.all('/index.html', function(req, res, next) {
+    app.all('/', function(req, res, next) {
       if (req.isAuthenticated()) { return next(); }
-      req.session.error = 'Please sign in!';
+      //  req.session.error = 'Please sign in!';
       res.redirect('/login.html');
     });
     app.use("/api", route);
