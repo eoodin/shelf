@@ -21,34 +21,10 @@ module.exports = function(app) {
 
     var databaseReady = false;
     models.sequelize.sync().then(function() {
-        console.log('database initialized.');
         databaseReady = true;
     });
 
-    app.use(function(req, res, next){
-      var err = req.session.error,
-        msg = req.session.notice,
-        success = req.session.success;
-
-      delete req.session.error;
-      delete req.session.success;
-      delete req.session.notice;
-
-      if (err) res.locals.error = err;
-      if (msg) res.locals.notice = msg;
-      if (success) res.locals.success = success;
-
-      next();
-    });
-
-    passport.use('local', new LocalStrategy(
-        function(username, password, done) {
-            return models.User.find({where: {userId: username}}).then(function(u) {
-                done(null, u);
-            }, function(error) {
-                console.log('Authenticate failed: ', error);
-            });
-        }));
+    
     var ldapConf = __dirname + '/ldap.json';
 
     if(fs.existsSync(ldapConf)) {
@@ -56,6 +32,15 @@ module.exports = function(app) {
         var LdapStrategy = require('passport-ldapauth');
         var ldapSetting = require(ldapConf);
         passport.use(new LdapStrategy(ldapSetting));
+    }
+    else {
+        passport.use('local', new LocalStrategy(function(username, password, done) {
+            return models.User.find({where: {userId: username}}).then(function(u) {
+                done(null, u);
+            }, function(error) {
+                console.log('Authenticate failed: ', error);
+            });
+        }));
     }
 
     passport.serializeUser(function(user, done) {
@@ -69,7 +54,9 @@ module.exports = function(app) {
     var route = express.Router();
     
     route.get('/users/me', function(req, res) {
-        models.User.find({where: {userId: 'jefliu'}}).then(function(user) {
+        models.User.find({
+                include: [models.Role],
+                where: {userId: 'jefliu'}}).then(function(user) {
             res.send(user);
         });
     });
@@ -124,6 +111,7 @@ module.exports = function(app) {
             res.send([]);
         }
         
+
         //TODO:
         res.send([]);
     });
@@ -136,16 +124,16 @@ module.exports = function(app) {
     
     app.all('/', function(req, res, next) {
       if (req.isAuthenticated()) { return next(); }
-      //  req.session.error = 'Please sign in!';
       res.redirect('/login.html');
     });
+    
     app.use("/api", route);
     app.use('/lib', express.static(__dirname + '/../node_modules/'));
 
     app.post('/login', passport.authenticate('local', { failureRedirect: '/login.html' }), function(req, res) {
-        res.send({status: 'ok'});
-        // res.redirect('/');
+        res.redirect('/');
     });
+
     app.get('/logout', function(req, res) {
         req.logout();
         res.redirect('/login.html');

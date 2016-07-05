@@ -1,11 +1,11 @@
 "use strict";
-//TODO:...
+
 module.exports = function (sequelize, DataTypes) {
-    var WorkItem = sequelize.define("WorkItem", {
-        id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
-        title: DataTypes.STRING
+    var TeamMember = sequelize.define("TeamMember", {
+        teamId: { type: DataTypes.BIGINT, primaryKey: true},
+        userId: { type: DataTypes.STRING, primaryKey: true}
     }, {
-            tableName: 'WorkItem',
+            tableName: 'TeamMember',
             classMethods: {
                 /*
               associate: function(models) {
@@ -15,5 +15,5 @@ module.exports = function (sequelize, DataTypes) {
             }
         });
 
-    return WorkItem;
+    return TeamMember;
 };

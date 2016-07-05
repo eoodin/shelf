@@ -10,14 +10,11 @@ module.exports = function (sequelize, DataTypes) {
             timestamps: false,
             tableName: 'User',
             classMethods: {
+                /*
               associate: function(models) {
-                User.belongsToMany(models.Role, {
-                    through: {
-                        model: models.UserRole
-                    },
-                    constraints: false
-                })
+                User.hasMany(models.Task)
               }
+              */
             }
         });
 
