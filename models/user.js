@@ -9,12 +9,13 @@ module.exports = function (sequelize, DataTypes) {
     }, {
             timestamps: false,
             tableName: 'User',
+            underscored: true,
             classMethods: {
               associate: function(models) {
                 User.belongsToMany(models.Role, {
-                    through: {
-                        model: models.UserRole
-                    },
+                    through: 'User_Role',
+                    otherKey: 'roles_id',
+                    foreignKey: 'User_userId',
                     constraints: false
                 })
               }

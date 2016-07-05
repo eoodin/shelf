@@ -53,17 +53,23 @@ module.exports = function(app) {
 
     var route = express.Router();
     
+    route.get('/app/info', function(req, res) {
+        //TODO: reimplement this.
+        res.send({"commit":"10c93e4","version":"1.0-SNAPSHOT","update":"31.05.2016 @ 22:25:09 CST"});
+    });
+
     route.get('/users/me', function(req, res) {
         models.User.find({
                 include: [models.Role],
                 where: {userId: 'jefliu'}}).then(function(user) {
+                    // TODO: move to ORM
+                    user = JSON.parse(JSON.stringify(user));
+                    let roles = user['Roles'];
+                    delete roles['User_Role'];
+                    delete user['Roles'];
+                    user['roles'] = roles;                  
             res.send(user);
         });
-    });
-    
-    route.get('/app/info', function(req, res) {
-        //TODO: reimplement this.
-        res.send({"commit":"10c93e4","version":"1.0-SNAPSHOT","update":"31.05.2016 @ 22:25:09 CST"});
     });
     
     route.get('/users/:userId/preferences', function(req, res){
