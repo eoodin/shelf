@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = function (sequelize, DataTypes) {
-    var Role = sequelize.define("Role", {
+    var role = sequelize.define("role", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         description: DataTypes.STRING
     }, {
@@ -9,5 +9,5 @@ module.exports = function (sequelize, DataTypes) {
             tableName: 'Role'
         });
 
-    return Role;
+    return role;
 };

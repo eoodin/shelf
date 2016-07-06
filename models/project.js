@@ -14,20 +14,18 @@ module.exports = function (sequelize, DataTypes) {
     @JsonIgnore
     private Set<WorkItem> items;
  */
-    var Project = sequelize.define("Project", {
+    var project = sequelize.define("project", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         name: DataTypes.STRING
     }, {
             timestamps: false,
             tableName: 'Project',
             classMethods: {
-                /*
-              associate: function(models) {
-                Project.hasMany(models.xx)
-              }
-              */
+                associate: function(models) {
+                    project.belongsTo(models.team);
+                }
             }
         });
 
-    return Project;
+    return project;
 };

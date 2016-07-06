@@ -14,25 +14,24 @@ module.exports = function (sequelize, DataTypes) {
     @OneToOne(mappedBy = "sprint", cascade = CascadeType.REMOVE)
     private Allocation allocation;
  */
-    var Plan = sequelize.define("Plan", {
+    var plan = sequelize.define("plan", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         name: DataTypes.STRING,
         type: DataTypes.STRING,
         start: DataTypes.DATE,
         end: DataTypes.DATE,
-        project_id: DataTypes.BIGINT
         // workItems: ...
         // allocation: ...
     }, {
             timestamps: false,
             tableName: 'Plan',
-            underscored: true,
             classMethods: {
               associate: function(models) {
-                Plan.belongsTo(models.Project)
+                plan.belongsTo(models.project);
+                plan.hasMany(models.workItem);
               }
             }
         });
 
-    return Plan;
+    return plan;
 };

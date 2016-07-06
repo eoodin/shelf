@@ -12,22 +12,23 @@ module.exports = function (sequelize, DataTypes) {
     @OneToOne
     private User scrumMaster;
     */
-    var Team = sequelize.define("Team", {
+    var team = sequelize.define("team", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
-        name: DataTypes.STRING,
-        createdBy: DataTypes.STRING,
-        scrumMaster: DataTypes.STRING,
-        createdAt: DataTypes.DATE
+        name: DataTypes.STRING
     }, {
             tableName: 'Team',
-            underscored: true,
             classMethods: {
-                //TODO
-                // associate: function (models) {
-                //     Team.hasMany(models.User, {through: {model: TeamMember}})
-                // }
+                associate: function(models) {
+                    team.belongsToMany(models.user, {
+                        // as: 'members',
+                        through: 'Team_User',
+                        otherKey: 'members_userId',
+                        foreignKey: 'Team_id',
+                        constraints: false
+                    });
+                }
             }
         });
 
-    return Team;
+    return team;
 };

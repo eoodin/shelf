@@ -3,54 +3,6 @@
 module.exports = function (sequelize, DataTypes) {
     /*
     TODO:
-public enum Status {
-        New,
-        InProgress,
-        Finished,
-        Pending,
-        Dropped,
-        Removed
-    }
-
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    @Column
-    private String title;
-
-    @Column(nullable = false)
-    private int originalEstimation;
-
-    @Column(nullable = false)
-    private int estimation;
-
-    @Lob
-    @Column(length = 524288)
-    private String description;
-
-    @Column
-    private Status status;
-
-    @ManyToOne
-    private WorkItem parent;
-
-    @ManyToOne
-    @JsonIgnore
-    private Project project;
-
-    @ManyToOne
-    @JsonIgnore
-    private Plan plan;
-
-    @OneToOne
-    private User owner;
-
-    @OneToOne
-    private User createdBy;
-
-    @Column
-    private Date createdAt;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
     @OrderBy("changeTime")
@@ -63,19 +15,35 @@ public enum Status {
 
     
     */
-    var WorkItem = sequelize.define("WorkItem", {
+    var workItem = sequelize.define("workItem", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
-        title: DataTypes.STRING
+        title: DataTypes.STRING,
+        originalEstimation: DataTypes.INTEGER,
+        estimation: DataTypes.INTEGER,
+        points: DataTypes.INTEGER,
+        description: {
+            type: DataTypes.STRING,
+            length: 'long' // > 524288
+        },
+        type: {
+            type:   DataTypes.ENUM,
+            values: ['UserStory', 'Task', 'Defect']
+        },
+        status: {
+            type: DataTypes.ENUM,
+            values: ['New', 'InProgress', 'Finished', 'Pending', 'Dropped', 'Removed']
+        }
     }, {
             tableName: 'WorkItem',
             classMethods: {
-                /*
               associate: function(models) {
-                User.hasMany(models.Task)
+                workItem.belongsTo(models.plan);
+                workItem.hasOne(workItem, {as: 'parent', foreignKey: 'parent_id'});
+                workItem.belongsTo(models.user, {as: 'owner', foreignKey: 'owner_userId'});
+                workItem.belongsTo(models.user, {as: 'createdBy', foreignKey: 'createdBy_userId'});
               }
-              */
             }
         });
 
-    return WorkItem;
+    return workItem;
 };

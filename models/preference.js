@@ -6,7 +6,7 @@ module.exports = function (sequelize, DataTypes) {
     @ManyToOne
     private User user;
    */
-    var Preference = sequelize.define("Preference", {
+    var preference = sequelize.define("preference", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         user: DataTypes.STRING,
         name: DataTypes.STRING,
@@ -16,11 +16,11 @@ module.exports = function (sequelize, DataTypes) {
             classMethods: {
                 /*
               associate: function(models) {
-                Preference.hasMany(models.xx)
+                preference.hasMany(models.xx)
               }
               */
             }
         });
 
-    return Preference;
+    return preference;
 };

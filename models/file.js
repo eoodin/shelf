@@ -26,7 +26,7 @@ module.exports = function (sequelize, DataTypes) {
     @Column(length = 10485760)
     private byte[] data;
     */
-    var File = sequelize.define("File", {
+    var file = sequelize.define("file", {
         userId: { type: DataTypes.STRING, primaryKey: true },
         name: DataTypes.STRING,
         createdAt: DataTypes.DATE
@@ -36,11 +36,11 @@ module.exports = function (sequelize, DataTypes) {
             classMethods: {
                 /*
               associate: function(models) {
-                File.hasMany(models.Task)
+                file.hasMany(models.Task)
               }
               */
             }
         });
 
-    return File;
+    return file;
 };

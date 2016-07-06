@@ -35,7 +35,7 @@ module.exports = function(app) {
     }
     else {
         passport.use('local', new LocalStrategy(function(username, password, done) {
-            return models.User.find({where: {userId: username}}).then(function(u) {
+            return models.user.find({where: {userId: username}}).then(function(u) {
                 done(null, u);
             }, function(error) {
                 console.log('Authenticate failed: ', error);
@@ -59,15 +59,9 @@ module.exports = function(app) {
     });
 
     route.get('/users/me', function(req, res) {
-        models.User.find({
-                include: [models.Role],
-                where: {userId: 'jefliu'}}).then(function(user) {
-                    // TODO: move to ORM
-                    user = JSON.parse(JSON.stringify(user));
-                    let roles = user['Roles'];
-                    delete roles['User_Role'];
-                    delete user['Roles'];
-                    user['roles'] = roles;                  
+        models.user.find({
+                include: [models.role],
+                where: {userId: 'jefliu'}}).then(function(user) {               
             res.send(user);
         });
     });
@@ -93,33 +87,56 @@ module.exports = function(app) {
         res.send({status: 'OK'});
     });
     
+    route.get('/teams/:tid/members', function(req, res){
+        if (!req.params.tid) {
+            res.status(404).send({error: 'Team ID not specified.'});
+            return;
+        }
+        
+        models.team.findOne({
+            where: {id: req.params.tid},
+            include: [models.user]
+        }).then(function(team) {
+            // TODO: rename team.users => team.members ?
+            res.send(team.users);
+        });
+
+        
+    });
+    
     route.get('/projects', function(req, res){
-        models.Project.findAll().then(function(projects) {
-            res.send(projects);
+        models.project.findAll({include: [models.team]})
+            .then(function(projects) {
+                res.send(projects);
         });
     });
     
     route.get('/plans/', function(req, res){
-        let projectId = req.query.project;
-        if (!projectId) {
+        let id = req.query.project;
+        if (!id) {
             res.status(404).send({error: 'No project ID specified.'});
             return;
         }
         
-        models.Plan.findAll({where: {project_id: projectId}}).then(function(plans) {
+        models.plan.findAll({where: {projectId: id}}).then(function(plans) {
             res.send(plans);
         });
     });
     
     route.get('/work-items/', function(req, res) {
         if (!req.query.planId) {
-            //TODO: load all  work items.
+            //TODO: change planId as required param, and send 404 if not specified.
             res.send([]);
         }
         
-
-        //TODO:
-        res.send([]);
+        models.workItem.findAll({
+            where: {planId: req.query.planId},
+            include: [
+                {model: models.user, as: 'owner'},
+                {model: models.user, as: 'createdBy'}]
+        }).then(function(items) {
+            res.send(items);
+        })
     });
     
     app.all('/api/*', function(req, res, next) {
@@ -137,6 +154,7 @@ module.exports = function(app) {
     app.use('/lib', express.static(__dirname + '/../node_modules/'));
 
     app.post('/login', passport.authenticate('local', { failureRedirect: '/login.html' }), function(req, res) {
+
         res.redirect('/');
     });
 
@@ -148,4 +166,3 @@ module.exports = function(app) {
     app.use(passport.initialize());
     app.use(passport.session());
 };
-

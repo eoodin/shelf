@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = function (sequelize, DataTypes) {
-    var User = sequelize.define("User", {
+    var user = sequelize.define("user", {
         userId: { type: DataTypes.STRING, primaryKey: true },
         email: DataTypes.STRING,
         name: DataTypes.STRING,
@@ -9,18 +9,17 @@ module.exports = function (sequelize, DataTypes) {
     }, {
             timestamps: false,
             tableName: 'User',
-            underscored: true,
             classMethods: {
               associate: function(models) {
-                User.belongsToMany(models.Role, {
+                user.belongsToMany(models.role, {
                     through: 'User_Role',
                     otherKey: 'roles_id',
                     foreignKey: 'User_userId',
                     constraints: false
-                })
+                });
               }
             }
         });
 
-    return User;
+    return user;
 };
