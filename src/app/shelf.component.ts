@@ -97,10 +97,8 @@ export class ShelfAppComponent {
                 private apps: AppService) {
         prjs.projects.subscribe(ps => this.projects = ps);
         prjs.current.subscribe(p => this.project = p);
-
-        pfs.values.subscribe(() => this.prjs.load());
         apps.info.subscribe(app => this.app = app);
-
+        prjs.load();
         this.ui = {"nav" : {"projectList" : {"show": false}}};
     }
 

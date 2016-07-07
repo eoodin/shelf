@@ -122,6 +122,40 @@ module.exports = function(app) {
             res.send(plans);
         });
     });
+
+    route.post('/plans/', function(req, res){
+        /*
+         Project project = em.find(Project.class, spec.projectId);
+        if (project == null)
+            return null;
+
+        Plan plan = new Plan();
+        plan.setName(spec.name);
+        plan.setType("sprint");
+        plan.setStart(spec.start);
+        plan.setEnd(spec.end);
+        plan.setProject(project);
+        em.persist(plan);
+
+        Allocation allocation = new Allocation();
+        allocation.setTeam(project.getTeam());
+        allocation.setDeveloperHours(spec.devHours);
+        allocation.setTesterHours(spec.tstHours);
+        allocation.setSprint(plan);
+
+        em.persist(allocation);
+        return plan; 
+         */
+        let id = req.body.projectId;
+        if (!id) {
+            res.status(500).send({error: 'No project ID specified.'});
+            return;
+        }
+        
+        models.project.findOne({where: {id: id}}).then(function(project) {
+            
+        })
+    });
     
     route.get('/work-items/', function(req, res) {
         if (!req.query.planId) {

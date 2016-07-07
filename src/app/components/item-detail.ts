@@ -7,7 +7,7 @@ import {ModalDialog} from './modal-dialog';
 @Component({
     selector: 'item-detail',
     template: `
-    <modal-dialog [(show)]="show" [title]="(_item.id ? 'Item Details' : 'Add Item')">
+    <modal-dialog [show]="_show" (showChange)="showChanged($event)" [title]="(_item.id ? 'Item Details' : 'Add Item')">
         <div dialog-body class="item-details">
             <form (ngSubmit)="saveWorkItem()">
                 <div class="row" >
@@ -77,7 +77,7 @@ export class ItemDetail {
     private _type: string = 'Task';
 
     @Output()
-    public closed: EventEmitter<Object> = new EventEmitter();
+    public showChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     @Output()
     public saved: EventEmitter<Object> = new EventEmitter();
@@ -86,9 +86,9 @@ export class ItemDetail {
                 private ele: ElementRef) {
     }
 
-    @Input() set show(p: boolean){
+    @Input()
+    public set show(p: boolean){
         this._show = p;
-        !p && this.closed.emit(null);
     }
 
     @Input()
@@ -99,6 +99,11 @@ export class ItemDetail {
     @Input()
     public set type(t: string) {
         this._type = t;
+    }
+
+    showChanged(e: boolean) {
+        this._show = e;
+        this.showChange.emit(e);
     }
 
     saveWorkItem() {
@@ -112,6 +117,7 @@ export class ItemDetail {
               .subscribe(resp => this.saved.emit(resp));
         }
 
-        this.show = false;
+        this._show = false;
+        this.showChange.emit(false);
     }
 }

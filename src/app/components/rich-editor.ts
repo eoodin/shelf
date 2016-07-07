@@ -10,7 +10,6 @@ import {FileUploader, FileSelectDirective} from 'ng2-file-upload';
     template: `
     <div class="rich-editor">
         <label class="toolbar-toggle" [style.background]="showToolbar?'gray':'white'">
-            
             P
         </label>
         <label class="toolbar-toggle" [style.background]="showToolbar?'gray':'white'">
@@ -143,7 +142,8 @@ import {FileUploader, FileSelectDirective} from 'ng2-file-upload';
         display:inline-block;float:right;width: 28px; height:28px;background: gray;margin: 5px;}
     .description-editor { width: 100%; border: 1px solid #ccc; height: 18em; }
     .quill-toolbar {border-bottom:  1px solid #ccc;}
-    `]
+    `],
+    styleUrls: ['/quill.snow.css']
 })
 export class RichEditor {
     private editor = null;

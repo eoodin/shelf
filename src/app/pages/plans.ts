@@ -147,9 +147,8 @@ import {ModalDialog} from '../components/modal-dialog';
     </div>
     
     <item-detail [item]="ui.awd.item"
-                 [show]="ui.awd.show"
+                 [(show)]="ui.awd.show"
                  [type]="ui.awd.type"
-                 (closed)="ui.awd.show = false"
                  (saved)="onWorkSaved();">
     </item-detail>
     

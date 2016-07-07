@@ -9,20 +9,33 @@ module.exports = {
       Example:
       return queryInterface.createTable('users', { id: Sequelize.INTEGER });
     */
+    // alter table User_Role add column createdAt datetime;
+    // alter table User_Role add column updatedAt datetime;
     queryInterface.addColumn('User_Role', 'createdAt', {type: Sequelize.DATETIME});
     queryInterface.addColumn('User_Role', 'updatedAt', {type: Sequelize.DATETIME});
 
+    // alter table Team add column updatedAt datetime; 
     queryInterface.addColumn('Team', 'updatedAt', {type: Sequelize.DATETIME});
+    // alter table Team change column createdBy_userId createdBy varchar(255);
     queryInterface.renameColumn('Team', 'createdBy_userId', 'createdBy');
+    // alter table Team change column scrumMaster_userId scrumMaster varchar(255);
     queryInterface.renameColumn('Team', 'scrumMaster_userId', 'scrumMaster');
 
+    // alter table Project change column team_id teamId bigint(21);
     queryInterface.renameColumn('Project', 'team_id', 'teamId');
+    // alter table Project change column backlog_id backlogId bigint(21);
+    queryInterface.renameColumn('Project', 'backlog_id', 'backlogId');
 
+    // alter table Team_User add column createdAt datetime;
+    // alter table Team_User add column updatedAt datetime;
     queryInterface.addColumn('Team_User', 'createdAt', {type: Sequelize.DATETIME});
     queryInterface.addColumn('Team_User', 'updatedAt', {type: Sequelize.DATETIME});
 
+    // alter table WorkItem add column updatedAt datetime;
     queryInterface.addColumn('WorkItem', 'updatedAt', {type: Sequelize.DATETIME});
+    // alter table WorkItem change column plan_id planId bigint(21);
     queryInterface.renameColumn('WorkItem', 'plan_id', 'planId');
+    // alter table WorkItem change column DTYPE type varchar(31);
     queryInterface.renameColumn('WorkItem', 'DTYPE', 'type');
     queryInterface.migrator.sequelize.query(
       "UPDATE WorkItem SET type = 'UserStory' WHERE type LIKE 'US'");
@@ -30,7 +43,8 @@ module.exports = {
       "UPDATE WorkItem SET type = 'Defect' WHERE type LIKE 'DE'");
       queryInterface.migrator.sequelize.query(
       "UPDATE WorkItem SET type = 'Task' WHERE type LIKE 'TA'");
-
+    
+    // alter table WorkItem change column status status varchar(31);
     queryInterface.changeColumn('WorkItem', 'status', {
         type: Sequelize.ENUM,
         allowNull: false,
@@ -51,6 +65,7 @@ module.exports = {
     queryInterface.migrator.sequelize.query(
       "UPDATE WorkItem SET status = 'Removed' WHERE status LIKE '5'");
 
+    // alter table Plan change column project_id projectId bigint(20);
     queryInterface.renameColumn('Plan', 'project_id', 'projectId');
   },
 

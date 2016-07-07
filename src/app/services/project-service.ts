@@ -34,16 +34,12 @@ export class ProjectService {
             .filter((projects) => this.loading)
             .subscribe((projects) => {
                 let select = projects[0];
-                this.prf.values
-                    .filter(prefs => prefs['lastProjectId'])
-                    .subscribe(prefs => {
-                        projects
-                            .filter(p => p.id == prefs['lastProjectId'])
+                let pref = this.prf.values.getValue();
+                if (pref['lastProjectId'] && select != pref['lastProjectId']) {
+                    projects.filter(p => p.id == pref['lastProjectId'])
                             .forEach(p => select = p);
-                        if (select != this._current.getValue()) {
-                            this._current.next(select);
-                        }
-                    });
+                }
+                this._current.next(select);
             });
     }
 
@@ -66,6 +62,7 @@ export class ProjectService {
     public load() {
         this.loading = true;
         this.http.get('/api/projects')
+            .share()
             .map(resp => resp.json())
             .subscribe(
                 (projects) => {

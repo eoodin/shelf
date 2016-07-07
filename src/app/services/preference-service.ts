@@ -17,7 +17,7 @@ export class PreferenceService {
             .subscribe(u => this.load(u));
     }
 
-    get values(): Observable<any> {
+    get values(): BehaviorSubject<any> {
         return this._values;
     }
 
