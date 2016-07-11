@@ -1,5 +1,5 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {Http, Request, RequestMethod, RequestOptions} from '@angular/http';
+import {Http, Request, Headers, RequestOptions} from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
@@ -101,8 +101,10 @@ export class PlanList {
     }
 
     createPlan(data) {
+        let headers = new Headers({ 'Content-Type': 'application/json' });
+        let options = new RequestOptions({ headers: headers });
         data['projectId'] = this.project['id'];
-        this.http.post('/api/plans/', JSON.stringify(data))
+        this.http.post('/api/plans/', JSON.stringify(data), options)
             .subscribe(resp => this.loadPlans(this.project['id']));
 
         this.ui.cpd.show = false;

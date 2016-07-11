@@ -13,43 +13,27 @@ module.exports = function(app) {
 
     app.use(cookieParser());
     app.use(bodyParser.urlencoded({ extended: false }));
-    app.use(bodyParser.json());
+    // app.use(bodyParser.json({ type: 'application/*+json' }));
+
+    app.use(function(req, res, next) {
+        if (!req.readable) {
+            return next();
+        }
+
+        var rawBody = '';
+        req.on('data', function(chunk) {
+            rawBody += chunk;
+        });
+        req.on('end', function() {
+            if (rawBody) req.rawBody = JSON.parse(rawBody);
+            next(); 
+        });
+    });
     app.use(methodOverride('X-HTTP-Method-Override'));
-    app.use(session({secret: 'supernova', saveUninitialized: true, resave: true}));
-    app.use(passport.initialize());
-    app.use(passport.session());
-
-    var databaseReady = false;
     models.sequelize.sync().then(function() {
-        databaseReady = true;
+        console.log('Database synchronized.')
     });
 
-    
-    var ldapConf = __dirname + '/ldap.json';
-
-    if(fs.existsSync(ldapConf)) {
-        console.log('ldap.json found, using ldap auth');
-        var LdapStrategy = require('passport-ldapauth');
-        var ldapSetting = require(ldapConf);
-        passport.use(new LdapStrategy(ldapSetting));
-    }
-    else {
-        passport.use('local', new LocalStrategy(function(username, password, done) {
-            return models.user.find({where: {userId: username}}).then(function(u) {
-                done(null, u);
-            }, function(error) {
-                console.log('Authenticate failed: ', error);
-            });
-        }));
-    }
-
-    passport.serializeUser(function(user, done) {
-        done(null, user);
-    });
-
-    passport.deserializeUser(function(obj, done){
-        done(null, obj);
-    });
 
     var route = express.Router();
     
@@ -66,10 +50,10 @@ module.exports = function(app) {
         });
     });
     
-    route.get('/users/:userId/preferences', function(req, res){
-        let userId = req.params.userId;
-        if (!userId) {
-            res.status(404).send({error: 'User ID not specified.'});
+    route.get('/users/:uid/preferences', function(req, res){
+        let uid = req.params.uid;
+        if (!uid) {
+            res.sendStatus(404);
             return;
         }
         
@@ -77,10 +61,10 @@ module.exports = function(app) {
         res.send([]);
     });
     
-    route.put('/users/:userId/preferences', function(req, res) {
-        let uid = req.user.userId;
-        if (!req.query.name || !uid) {
-            res.status(500).send({error: 'no entry or user name specified.'})
+    route.put('/users/:uid/preferences', function(req, res) {
+        if (!req.query.name || !req.params.uiduid) {
+            res.sendStatus(500);
+            return;
         }
         
         // TODO: save preference
@@ -146,15 +130,18 @@ module.exports = function(app) {
         em.persist(allocation);
         return plan; 
          */
-        let id = req.body.projectId;
+        console.log('data', req.rawBody);
+
+        let id = req.rawBody.projectId;
         if (!id) {
-            res.status(500).send({error: 'No project ID specified.'});
+            res.sendStatus(500);
             return;
         }
         
-        models.project.findOne({where: {id: id}}).then(function(project) {
-            
-        })
+        models.project.findById(id).then(function(project) {
+            console.log('project', project);
+            res.send(project);
+        });
     });
     
     route.get('/work-items/', function(req, res) {
@@ -172,6 +159,40 @@ module.exports = function(app) {
             res.send(items);
         })
     });
+    app.use("/api", route);
+    app.use('/lib', express.static(__dirname + '/../node_modules/'));
+
+
+    app.use(session({secret: 'supernova', saveUninitialized: true, resave: true}));
+    app.use(passport.initialize());
+    app.use(passport.session());
+
+
+    var ldapConf = __dirname + '/ldap.json';
+
+    if(fs.existsSync(ldapConf)) {
+        console.log('ldap.json found, using ldap auth');
+        var LdapStrategy = require('passport-ldapauth');
+        var ldapSetting = require(ldapConf);
+        passport.use(new LdapStrategy(ldapSetting));
+    }
+    else {
+        passport.use('local', new LocalStrategy(function(username, password, done) {
+            return models.user.find({where: {userId: username}}).then(function(u) {
+                done(null, u);
+            }, function(error) {
+                console.log('Authenticate failed: ', error);
+            });
+        }));
+    }
+
+    passport.serializeUser(function(user, done) {
+        done(null, user);
+    });
+
+    passport.deserializeUser(function(obj, done){
+        done(null, obj);
+    });
     
     app.all('/api/*', function(req, res, next) {
         if (req.isAuthenticated()) { return next(); }
@@ -184,11 +205,7 @@ module.exports = function(app) {
       res.redirect('/login.html');
     });
     
-    app.use("/api", route);
-    app.use('/lib', express.static(__dirname + '/../node_modules/'));
-
     app.post('/login', passport.authenticate('local', { failureRedirect: '/login.html' }), function(req, res) {
-
         res.redirect('/');
     });
 
@@ -196,7 +213,4 @@ module.exports = function(app) {
         req.logout();
         res.redirect('/login.html');
     });
-
-    app.use(passport.initialize());
-    app.use(passport.session());
 };
