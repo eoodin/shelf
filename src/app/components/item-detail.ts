@@ -1,5 +1,5 @@
 import {Component, Input, Output, EventEmitter, ElementRef} from '@angular/core';
-import {Http, Request, Response, Jsonp, RequestMethod, RequestOptions} from '@angular/http';
+import {Http, Request, Response, RequestMethod, RequestOptions} from '@angular/http';
 
 import {RichEditor} from './rich-editor';
 import {ModalDialog} from './modal-dialog';
@@ -82,7 +82,7 @@ export class ItemDetail {
     @Output()
     public saved: EventEmitter<Object> = new EventEmitter();
 
-    constructor(private jsonp: Jsonp,
+    constructor(private http: Http,
                 private ele: ElementRef) {
     }
 
@@ -109,11 +109,11 @@ export class ItemDetail {
     saveWorkItem() {
         var data = JSON.parse(JSON.stringify(this._item));
         if (!data['id']) {
-            this.jsonp.post('/api/work-items/', JSON.stringify(data))
+            this.http.post('/api/work-items/', JSON.stringify(data))
               .subscribe(resp => this.saved.emit(resp));
         }
         else {
-            this.jsonp.put('/api/work-items/' + data['id'], JSON.stringify(data))
+            this.http.put('/api/work-items/' + data['id'], JSON.stringify(data))
               .subscribe(resp => this.saved.emit(resp));
         }
 

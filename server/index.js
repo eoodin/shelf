@@ -5,9 +5,10 @@ module.exports = function(app) {
       express = require('express'),
       bodyParser = require('body-parser'),
       methodOverride = require('method-override');
-      
     var models = require('../models');
-
+    models.sequelize.sync().then(function() {
+        console.log('Database synchronized.')
+    });
 
     app.use(bodyParser.urlencoded({ extended: false }));
     // app.use(bodyParser.json({ type: 'application/*+json' }));
@@ -27,9 +28,7 @@ module.exports = function(app) {
         });
     });
     app.use(methodOverride('X-HTTP-Method-Override'));
-    models.sequelize.sync().then(function() {
-        console.log('Database synchronized.')
-    });
+
 
     require('./secure.js')(app);
     app.use("/api", require('./route.js')());

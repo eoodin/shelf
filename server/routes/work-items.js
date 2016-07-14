@@ -15,4 +15,9 @@ module.exports = function(route) {
             res.send(items);
         })
     });
+
+    route.post('/', function(req, res) {
+        console.log('request', req.rawBody);
+        res.send('hello');
+    });
 }
