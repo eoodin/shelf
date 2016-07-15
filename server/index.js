@@ -9,33 +9,10 @@ module.exports = function(app) {
     models.sequelize.sync().then(function() {
         console.log('Database synchronized.')
     });
-
-    app.use(bodyParser.urlencoded({ extended: false }));
-    // app.use(bodyParser.json({ type: 'application/*+json' }));
-
-    app.use(function(req, res, next) {
-        if (!req.readable) {
-            return next();
-        }
-
-        var rawBody = '';
-        req.on('data', function(chunk) {
-            rawBody += chunk;
-        });
-        req.on('end', function() {
-            if (rawBody) req.rawBody = JSON.parse(rawBody);
-            next(); 
-        });
-    });
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json({ type: 'application/json' }));
     app.use(methodOverride('X-HTTP-Method-Override'));
-
-
-    require('./secure.js')(app);
-    app.use("/api", require('./route.js')());
-    
-    // TODO: 
+    require('./secure')(app);
+    require('./route')(app);
     app.use('/lib', express.static(__dirname + '/../node_modules/'));
-
-
-    
 };

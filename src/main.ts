@@ -2,7 +2,7 @@ import { bootstrap } from '@angular/platform-browser-dynamic';
 import { enableProdMode, provide } from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {LocationStrategy, HashLocationStrategy} from '@angular/common';
-import { JSONP_PROVIDERS, HTTP_PROVIDERS }  from '@angular/http';
+import { HTTP_PROVIDERS, RequestOptions, BaseRequestOptions, Headers }  from '@angular/http';
 import { ShelfAppComponent, environment } from './app/';
 
 import {Projects} from './app/pages/projects';
@@ -14,7 +14,6 @@ if (environment.production) {
   enableProdMode();
 }
 
-
 let routes = [
   {path: '', terminal: true, redirectTo: 'plans'},
   {path: 'projects', component: Projects},
@@ -23,8 +22,13 @@ let routes = [
   {path: 'workitems', component: WorkItems}
 ];
 
+class DefaultHttpOptions extends BaseRequestOptions {
+  headers: Headers = new Headers({'Content-Type': 'application/json'});
+}
+
 bootstrap(ShelfAppComponent, [
   provideRouter(routes),
-  JSONP_PROVIDERS, HTTP_PROVIDERS,
+  HTTP_PROVIDERS,
+  provide(RequestOptions, {useClass:DefaultHttpOptions}),
   provide(LocationStrategy, {useClass: HashLocationStrategy})
 ]);

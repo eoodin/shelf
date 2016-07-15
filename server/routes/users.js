@@ -1,10 +1,10 @@
-module.exports = function(route) {
+module.exports = function(router) {
     var models = require('../../models');
-    route.get('/me', function(req, res) {
+    router.route('/users/me').get(function(req, res) {
         models.user.find({
                 include: [models.role],
                 where: {userId: 'jefliu'}}).then(function(user) {               
-            res.send(user);
+            res.json(user);
         });
     });
 }

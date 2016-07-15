@@ -1,9 +1,10 @@
-module.exports = function(route) {
+module.exports = function(router) {
     var models = require('../../models');
-    route.get('/', function(req, res){
+    
+    router.route('/projects').get(function(req, res){
         models.project.findAll({include: [models.team]})
             .then(function(projects) {
-                res.send(projects);
+                res.json(projects);
         });
     });
 }

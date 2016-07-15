@@ -1,12 +1,13 @@
-module.exports = function(route) {
+module.exports = function(router) {
     var models = require('../../models');
-    route.get('/', function(req, res){
+
+    router.route('/preferences').get(function(req, res){
         //TODO: Load preferences
-        res.send([]);
+        res.json([]);
     });
     
-    route.put('/:name', function(req, res) {
+    router.route('/preferences/:name').put(function(req, res) {
         // TODO: save preference
-        res.send({status: 'OK'});
+        res.json({status: 'OK'});
     });
 }

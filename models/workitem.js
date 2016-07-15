@@ -1,20 +1,6 @@
 "use strict";
-//TODO:...
+
 module.exports = function (sequelize, DataTypes) {
-    /*
-    TODO:
-
-    @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
-    @OrderBy("changeTime")
-    @JsonIgnore
-    private List<ChangeLog> changes;
-
-    for userstory
-    @Column
-    private int points;
-
-    
-    */
     var workItem = sequelize.define("workItem", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         title: DataTypes.STRING,
@@ -32,6 +18,14 @@ module.exports = function (sequelize, DataTypes) {
         status: {
             type: DataTypes.ENUM,
             values: ['New', 'InProgress', 'Finished', 'Pending', 'Dropped', 'Removed']
+        },
+        severity: {
+            type: DataTypes.ENUM,
+            values: ['Blocker','Critical','Major','Minor']
+        },
+        state: {
+            type: DataTypes.ENUM,
+            values: ['Created','Analyzing','Analyzed','Fixing','Fixed','Testing','Tested','Failed']
         }
     }, {
             tableName: 'WorkItem',

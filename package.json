@@ -25,6 +25,7 @@
     "es6-shim": "^0.35.0",
     "exists-sync": "0.0.3",
     "express": "^4.14.0",
+    "express-rest": "^1.0.4",
     "express-session": "^1.14.0",
     "method-override": "^2.3.6",
     "moment": "^2.13.0",

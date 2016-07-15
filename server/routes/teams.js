@@ -1,8 +1,8 @@
-module.exports = function(route) {
+module.exports = function(router) {
     var models = require('../../models');
-    route.get('/:tid/members', function(req, res){
+    router.route('/teams/:tid/members').get(function(req, res){
         if (!req.params.tid) {
-            res.status(404).send({error: 'Team ID not specified.'});
+            res.sendStatus(404)
             return;
         }
         
@@ -11,7 +11,7 @@ module.exports = function(route) {
             include: [models.user]
         }).then(function(team) {
             // TODO: rename team.users => team.members ?
-            res.send(team.users);
+            res.json(team.users);
         });
     });
 }

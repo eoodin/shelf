@@ -276,8 +276,10 @@ export class Plans {
             return;
         }
 
-        this.http.post('/api/plans/' + planId + '/move-in', JSON.stringify(ids))
+        this.http.put('/api/work-item/' + planId, JSON.stringify(ids))
           .subscribe(resp => this.onMoveToPlanResponse(resp));
+        // this.http.post('/api/plans/' + planId + '/move-in', JSON.stringify(ids))
+        //   .subscribe(resp => this.onMoveToPlanResponse(resp));
     }
 
     onMoveToPlanResponse(response) {

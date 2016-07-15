@@ -1,7 +1,7 @@
-module.exports = function() {
+module.exports = function(app) {
     var path      = require('path');
     var express = require('express');
-    var route = express.Router();
+    var router = express.Router();
     var fs        = require('fs');
 
     let routesFolder = __dirname + '/routes'
@@ -9,14 +9,10 @@ module.exports = function() {
         .filter(function(file) {
             return (file.indexOf('.') !== 0) && (file.slice(-3) === '.js');
         })
-        .map(function(file) {
-            return file.substring(0, file.length - 3);
-        })
-        .forEach(function(name) {
-            let subRoute = express.Router();
-            require(path.join(routesFolder, name + '.js'))(subRoute);
-            route.use('/' + name, subRoute);
+        .forEach(function(file) {
+            let subroute = require(path.join(routesFolder, file));
+            subroute(router);
         });
 
-    return route;
+    app.use("/api", router);
 }

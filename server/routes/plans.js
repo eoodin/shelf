@@ -1,19 +1,19 @@
-module.exports = function(route) {
+module.exports = function(router) {
     var models = require('../../models');
-
-    route.get('/', function(req, res){
+    var route = router.route('/plans');
+    route.get(function(req, res){
         let id = req.query.project;
         if (!id) {
-            res.status(404).send({error: 'No project ID specified.'});
+            res.sendStatus(404);
             return;
         }
         
         models.plan.findAll({where: {projectId: id}}).then(function(plans) {
-            res.send(plans);
+            res.json(plans);
         });
     });
 
-    route.post('/', function(req, res){
+    route.post(function(req, res){
         //  Project project = em.find(Project.class, spec.projectId);
         // if (project == null)
         //     return null;
@@ -44,7 +44,7 @@ module.exports = function(route) {
         
         models.project.find(id).then(function(project) {
             console.log('project', project);
-            res.send(project);
+            res.json(project);
         });
     });
 }
