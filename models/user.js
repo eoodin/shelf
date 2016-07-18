@@ -17,6 +17,13 @@ module.exports = function (sequelize, DataTypes) {
                     foreignKey: 'User_userId',
                     constraints: false
                 });
+                // user.belongsToMany(models.team, {
+                //         // as: 'members',
+                //         through: 'Team_User',
+                //         otherKey: 'Team_id',
+                //         foreignKey: 'member_userId',
+                //         constraints: false
+                //     });
               }
             }
         });

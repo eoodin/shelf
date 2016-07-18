@@ -1,19 +1,6 @@
 "use strict";
 
 module.exports = function (sequelize, DataTypes) {
-    /*
-    TODO: following fields
-    @OneToOne
-    private Team team;
-
-    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
-    @JsonIgnore
-    private List<Plan> plans;
-
-    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
-    @JsonIgnore
-    private Set<WorkItem> items;
- */
     var project = sequelize.define("project", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         name: DataTypes.STRING
@@ -23,6 +10,8 @@ module.exports = function (sequelize, DataTypes) {
             classMethods: {
                 associate: function(models) {
                     project.belongsTo(models.team);
+                    project.hasMany(models.plan); //  cascade = CascadeType.REMOVE
+                    project.hasMany(models.workItem); //  cascade = CascadeType.REMOVE
                 }
             }
         });

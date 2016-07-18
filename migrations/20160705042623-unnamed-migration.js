@@ -64,9 +64,17 @@ module.exports = {
       "UPDATE WorkItem SET status = 'Dropped' WHERE status LIKE '4'");
     queryInterface.migrator.sequelize.query(
       "UPDATE WorkItem SET status = 'Removed' WHERE status LIKE '5'");
+    // alter table WorkItem change column project_id projectId bigint(20);
+    queryInterface.renameColumn('WorkItem', 'project_id', 'projectId');
+
 
     // alter table Plan change column project_id projectId bigint(20);
     queryInterface.renameColumn('Plan', 'project_id', 'projectId');
+
+    // alter table Allocation change column sprint_id sprintId bigint(20);
+    queryInterface.renameColumn('Allocation', 'sprint_id', 'sprintId');
+    // alter table Allocation change column team_id teamId bigint(20);
+    queryInterface.renameColumn('Allocation', 'team_id', 'teamId');
   },
 
   down: function (queryInterface, Sequelize) {

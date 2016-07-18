@@ -44,12 +44,25 @@ module.exports = function(app) {
     });
     
     app.all('/', function(req, res, next) {
-      if (req.isAuthenticated()) { return next(); }
-      res.redirect('/login.html');
+        if (!req.isAuthenticated()) {
+            let auth = passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login.html'});
+            req.body.username = 'jefliu';
+            req.body.password = '123';
+            return auth(req, res, next);
+        }
+
+        if (req.isAuthenticated()) { return next(); }
+        res.redirect('/login.html');
     });
     
+    /*
     app.post('/login', passport.authenticate('local', { failureRedirect: '/login.html' }), function(req, res) {
         res.redirect('/');
+    });
+    */
+    app.post('/login', function(req, res) {
+        let auth = passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login.html'});
+        auth(req, res);
     });
 
     app.get('/logout', function(req, res) {

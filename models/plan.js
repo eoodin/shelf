@@ -29,6 +29,7 @@ module.exports = function (sequelize, DataTypes) {
               associate: function(models) {
                 plan.belongsTo(models.project);
                 plan.hasMany(models.workItem);
+                plan.hasOne(models.allocation, {as: 'allocation', foreignKey: 'sprint_id'});
               }
             }
         });
