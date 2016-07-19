@@ -8,7 +8,10 @@ module.exports = function(router) {
             return;
         }
         
-        models.plan.findAll({where: {projectId: id}}).then(function(plans) {
+        models.plan.findAll({
+            include: [models.allocation],
+            where: {projectId: id
+                }}).then(function(plans) {
             res.json(plans);
         });
     });
@@ -31,7 +34,7 @@ module.exports = function(router) {
                     teamId: project.teamId,
                     developerHours: req.body.devHours,
                     testerHours: req.body.tstHours,
-                    plan: plan
+                    planId: plan.id
                 }).then(function(alloc) {
                     plan.save({allocation: alloc}).then(function() {
                         res.json(plan);

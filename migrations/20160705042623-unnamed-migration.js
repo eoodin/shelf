@@ -72,7 +72,7 @@ module.exports = {
     queryInterface.renameColumn('Plan', 'project_id', 'projectId');
 
     // alter table Allocation change column sprint_id sprintId bigint(20);
-    queryInterface.renameColumn('Allocation', 'sprint_id', 'sprintId');
+    queryInterface.renameColumn('Allocation', 'sprint_id', 'planId');
     // alter table Allocation change column team_id teamId bigint(20);
     queryInterface.renameColumn('Allocation', 'team_id', 'teamId');
   },
