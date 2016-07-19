@@ -143,13 +143,14 @@ declare var Quill:any;
         display:inline-block;float:right;width: 28px; height:28px;background: gray;margin: 5px;}
     .description-editor { width: 100%; border: 1px solid #ccc; height: 18em; }
     .quill-toolbar {border-bottom:  1px solid #ccc;}
+    .ql-container {padding: 5px; min-height: 120px; max-height: 420px;}
     `],
     styleUrls: ['/quill.snow.css']
 })
 export class RichEditor {
     private editor = null;
     private contentCache: string;
-    private showToolbar = false;
+    private showToolbar;
     private textChange;
     public uploader:FileUploader = new FileUploader({url: '/api/file/', autoUpload: true});
 
@@ -165,7 +166,8 @@ export class RichEditor {
         this.uploader.onCompleteItem = (item, id) => {
             let last = this.getEditor().getLength() - 1;
             editor.getEditor().insertEmbed(last, 'image', '/api/file/' + id);
-        }
+        };
+        this.showToolbar = true;
     }
 
     @Input() set content(html) {

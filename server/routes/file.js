@@ -9,7 +9,6 @@ module.exports = function(router) {
         req.storage = storage;
         uploader(req, res, next);
     }, function(req, res) {
-        console.log('file: ' + JSON.stringify(req.file));
         models.file.create({
             name: req.file.originalname,
             size: req.file.size,
@@ -17,23 +16,23 @@ module.exports = function(router) {
             data: req.file.buffer
         }).then(function(file) {
             res.json(file.id);
-        });
+        }).catch(function(errors){
+            console.log('Unable to save file: ' + JSON.stringify(errors));
+            res.sendStatus(500);
+        });;
     });
+
     router.route('/file/:id').get(function(req, res) {
-        console.log('finding file...');
         models.file.findById(req.params.id).then(function(file) {
-            console.log('sending file...');
             res.set({
                 'Content-Type': file.mimetype,
                 'Last-Modified': file.createdAt,
                 'Accept-Ranges': 'none', // set to 'bytes' to support ranges
                 'Content-Length': file.size
             });
-            console.log('writing data, length=' + file.data.length);
-            console.log('file length: ' + file.size);
             res.end(file.data, 'binary');
         }).catch(function(errors){
             res.sendStatus(500);
         });
-    })
+    });
 }

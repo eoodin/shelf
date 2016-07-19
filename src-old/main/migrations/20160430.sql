@@ -1,1 +1,0 @@
-UPDATE WorkItem,Plan,Project SET WorkItem.project_id = Project.id WHERE WorkItem.plan_id=Plan.id AND Plan.project_id=Project.id;

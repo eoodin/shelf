@@ -10,7 +10,9 @@ module.exports = function(router) {
         
         models.plan.findAll({
             include: [models.allocation],
-            where: {projectId: id
+            where: {
+                projectId: id,
+                type: 'sprint'
                 }}).then(function(plans) {
             res.json(plans);
         });

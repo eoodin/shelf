@@ -1,5 +1,5 @@
 import {Component, ElementRef} from '@angular/core';
-import {Jsonp} from '@angular/http';
+import {Http} from '@angular/http';
 import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from '@angular/common'
 
 import {DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
@@ -138,7 +138,7 @@ export class Backlog {
     private requesting = false;
 
     constructor(private ele: ElementRef,
-                private jsonp: Jsonp,
+                private http: Http,
                 private prs: ProjectService,
                 private pref : PreferenceService) {
         this.ui = {
@@ -155,7 +155,7 @@ export class Backlog {
     }
 
     loadItems() {
-        this.jsonp.get('/api/projects/' + this.project.id + '/backlog')
+        this.http.get('/api/work-items/?types=UserStory,Defect&projectId=' + this.project.id)
             .subscribe(b => this.items = b.json());
     }
 
@@ -173,7 +173,7 @@ export class Backlog {
 
     startFix(item) {
         this.requesting = true;
-        this.jsonp.post('/api/defects/' + item.id + '/fix', '{}')
+        this.http.post('/api/defects/' + item.id + '/fix', '{}')
             .subscribe(
                 () => this.loadItems(),
                 () => window.alert('Error occurred.'),
@@ -183,7 +183,7 @@ export class Backlog {
 
     startTest(item) {
         this.requesting = true;
-        this.jsonp.post('/api/defects/' + item.id + '/test', '{}')
+        this.http.post('/api/defects/' + item.id + '/test', '{}')
             .subscribe(
                 () => this.loadItems(),
                 () => window.alert('Error occurred.'),
@@ -202,7 +202,7 @@ export class Backlog {
     }
 
     removeItem(item) {
-        this.jsonp.delete('/api/work-items/' + item.id)
+        this.http.delete('/api/work-items/' + item.id)
             .subscribe(resp =>
             {
                 this.loadItems();

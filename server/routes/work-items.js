@@ -9,9 +9,21 @@ module.exports = function(router) {
             if (req.query.desc) {
                 ob = [[ob, 'desc']]
             }
+            let where = {};
+            if (req.query.projectId) {
+                where = {projectId: req.query.projectId};
+            }
+            else if (req.query.planId) {
+                where = {planId: req.query.planId}; 
+            }
+
+            if (req.query.types) {
+                let types = req.query.types.split(',');
+                where['type'] = {$in : types}
+            }
 
             models.workItem.findAll({
-                where: {planId: req.query.planId},
+                where: where,
                 // TODO: keep only id of owner and creator to reduce data size
                 include: [
                     {model: models.user, as: 'owner'},

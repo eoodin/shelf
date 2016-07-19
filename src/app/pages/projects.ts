@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
-import {FORM_DIRECTIVES} from '@angular/common'
-import {Jsonp} from '@angular/http';
-
+import {FORM_DIRECTIVES} from '@angular/common';
+import { Http } from '@angular/http';
 import {ProjectService} from '../services/project-service';
 import {TeamService} from '../services/team-service';
 import {UserService} from "../services/user-service";
@@ -143,7 +142,7 @@ export class Projects {
     private permitSA: boolean = false;
     private projects: any[];
 
-    constructor(private jsonp: Jsonp,
+    constructor(private http: Http,
                 private prjs: ProjectService,
                 private teamService: TeamService,
                 private us: UserService) {
@@ -164,12 +163,12 @@ export class Projects {
     }
 
     deleteProject(p:Project) {
-        this.jsonp.delete('/api/projects/' + p.id)
+        this.http.delete('/api/projects/' + p.id)
             .subscribe(() => this.prjs.reload());
     }
 
     onCreateProjectSubmit(data) {
-        this.jsonp.post('/api/projects/', JSON.stringify(data))
+        this.http.post('/api/projects/', JSON.stringify(data))
             .subscribe(() => this.prjs.reload());
 
         this.ui.createProjectDialog.show = false;
@@ -178,14 +177,14 @@ export class Projects {
     onCreateTeamSubmit(data) {
         data.users = data.users.split(',');
 
-        this.jsonp.post('/api/teams/', JSON.stringify(data))
+        this.http.post('/api/teams/', JSON.stringify(data))
             .subscribe(resp => this.teamService.reload());
 
         this.ui.createTeamDialog.show = false;
     }
 
     deleteTeam(team) {
-        this.jsonp.delete('/api/teams/' + team.id)
+        this.http.delete('/api/teams/' + team.id)
             .subscribe(response => this.teamService.reload());
     }
 }

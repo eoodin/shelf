@@ -30,13 +30,14 @@ import {ModalDialog} from './modal-dialog';
                     </div>
                 </div>
                 <div *ngIf="_item.type == 'Defect'" class="row">
-                    <div class="col-sm-12">Found in:
+                    <div class="col-sm-12 field-row">
+                        <span class="field-label">Found in:</span>
                         <input [(ngModel)]="_item.version">
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-12">
-                        Title: <input type="text" class="work-item-title" [(ngModel)]="_item.title">
+                    <div class="col-sm-12 field-row">
+                        <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="_item.title">
                     </div>
                 </div>
                 <div class="row">
@@ -68,6 +69,9 @@ import {ModalDialog} from './modal-dialog';
     .item-details li .title { font-weight: 700; }
     .item-details li .big-section { display: block;}
     .item-details .row {margin: 8px 0;}
+    .field-row {display: flex; flex-direction: row; flex-wrap: nowrap;}
+    .field-row .field-label { margin-right: 20px;}
+    .field-row input,select {flex-grow: 1;}
      `]
 
 })
