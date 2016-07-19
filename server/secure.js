@@ -11,13 +11,25 @@ module.exports = function(app) {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    var ldapConf = __dirname + '/ldap.json';
+    var securityConfig = __dirname + '/../config/security.json';
 
-    if(fs.existsSync(ldapConf)) {
+    var usingLdap = fs.existsSync(securityConfig);
+    if(usingLdap) {
         console.log('ldap.json found, using ldap auth');
-        var LdapStrategy = require('passport-ldapauth');
-        var ldapSetting = require(ldapConf);
-        passport.use(new LdapStrategy(ldapSetting));
+        var LdapAuth = require('ldapauth-fork');
+        var conf = require(securityConfig);
+        console.log("ldap setting: " + JSON.stringify(conf.server));
+        var auth = new LdapAuth(conf.server);
+        passport.use("ldapauth", new LocalStrategy(function(username, password, done) {
+            auth.authenticate(username, password, function(err, user, info){
+                if (err || !user) {
+                    console.log('error: ' + JSON.stringify(err));
+                    return done(null, false, {message: 'Failed to authenticate'});// todo
+                }
+                
+                done(null, user);
+            });
+        }));
     }
     else {
         passport.use('local', new LocalStrategy(function(username, password, done) {
@@ -44,27 +56,40 @@ module.exports = function(app) {
     });
     
     app.all('/', function(req, res, next) {
-        if (!req.isAuthenticated()) {
+            // Automatic login
+            // if (!req.isAuthenticated()) {
+            //     let auth = passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login.html'});
+            //     req.body.username = 'someuser';
+            //     req.body.password = '123';
+            //     return auth(req, res, next);
+            // }
+            if (req.isAuthenticated()) { return next(); }
+            res.redirect('/login.html');
+        });
+
+    if (usingLdap) {
+        app.post('/login', function(req, res, next) {
+            passport.authenticate('ldapauth', 
+                { successRedirect: '/', failureRedirect: '/login.html' },
+                function(err, user, info) {
+                    if (err) {
+                        return next(err);
+                    }
+                    if (!user) {
+                        return res.json({error: 'authentication failed'});
+                    }
+                    return res.json({error: 'authentication failed'});
+                }
+            )(req, res, next);
+        });
+    }
+    else {
+        app.post('/login', function(req, res, next) {
             let auth = passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login.html'});
-            req.body.username = 'jefliu';
-            req.body.password = '123';
-            return auth(req, res, next);
-        }
-
-        if (req.isAuthenticated()) { return next(); }
-        res.redirect('/login.html');
-    });
+            auth(req, res, next);
+        });
+    }
     
-    /*
-    app.post('/login', passport.authenticate('local', { failureRedirect: '/login.html' }), function(req, res) {
-        res.redirect('/');
-    });
-    */
-    app.post('/login', function(req, res) {
-        let auth = passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login.html'});
-        auth(req, res);
-    });
-
     app.get('/logout', function(req, res) {
         req.logout();
         res.redirect('/login.html');

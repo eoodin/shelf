@@ -135,4 +135,77 @@ module.exports = function(router) {
                 res.json(affected);
             })
         });
+
+    router.route('/defect/:id/fix')
+        .post(function(req, res) {
+            /*
+            public void startFix(@PathVariable("id") Long id, HttpServletRequest request) throws ShelfException {
+        Defect defect = em.find(Defect.class, id);
+        if (defect == null)
+            throw new NotFoundException("Defect not exist ID=" + id);
+
+        Plan currentSprint = planController.getCurrentSprint(defect.getProject());
+        if (currentSprint == null)
+            throw new ShelfException("No sprint info found");
+
+        User user = em.find(User.class, request.getRemoteUser());
+        defect.setStatus(WorkItem.Status.InProgress);
+        defect.setState(Defect.State.Fixing); // to simplify.
+        Task fixingTask = new Task();
+        fixingTask.setCatalog(Task.Catalog.Development);
+        fixingTask.setStatus(WorkItem.Status.InProgress);
+        fixingTask.setTitle("Fix #" + defect.getId() + ": "  + defect.getTitle());
+        fixingTask.setEstimation(8);
+        fixingTask.setProject(defect.getProject());
+        fixingTask.setCreatedAt(new Date());
+        fixingTask.setDescription("Auto generated task for fixing issue #" + id);
+        fixingTask.setOriginalEstimation(8);
+        fixingTask.setOwner(user);
+        fixingTask.setParent(defect);
+        defect.setPlan(currentSprint);
+        fixingTask.setPlan(currentSprint);
+        em.merge(defect);
+        em.persist(fixingTask);
+    }
+
+
+            */
+        });
+
+    router.route('/defect/:id/test')
+        .post(function(req, res) {
+            /*
+                @RequestMapping(value="/{id}/test", method = RequestMethod.POST)
+    @ResponseBody
+    @Transactional
+    public void startTest(@PathVariable("id") Long id, HttpServletRequest request) throws ShelfException {
+        Defect defect = em.find(Defect.class, id);
+        if (defect == null)
+            throw new NotFoundException("Defect not exist ID=" + id);
+
+        Plan currentSprint = planController.getCurrentSprint(defect.getProject());
+        if (currentSprint == null)
+            throw new ShelfException("No sprint info found");
+
+        User user = em.find(User.class, request.getRemoteUser());
+        defect.setState(Defect.State.Testing); // to simplify.
+        Task testingTask = new Task();
+        testingTask.setStatus(WorkItem.Status.InProgress);
+        testingTask.setCatalog(Task.Catalog.Testing);
+        testingTask.setTitle("Test #" + defect.getId() + ": " + defect.getTitle());
+        testingTask.setEstimation(8);
+        testingTask.setProject(defect.getProject());
+        testingTask.setCreatedAt(new Date());
+        testingTask.setDescription("Auto generated task for testing issue #" + id);
+        testingTask.setOriginalEstimation(8);
+        testingTask.setOwner(user);
+        testingTask.setParent(defect);
+        defect.setPlan(currentSprint);
+        testingTask.setPlan(currentSprint);
+        em.merge(defect);
+        em.persist(testingTask);
+    }
+            */
+        });
+
 }
