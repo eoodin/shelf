@@ -58,9 +58,31 @@ module.exports = function(router) {
                 if (req.body.ownerId) {
                     req.body.owner_userId = req.body.ownerId;
                 }
-                
-                item.update(req.body).then(function(item) {
-                    res.json(item);
+
+                var origin = {};
+                var changes = {};
+                for(let f in req.body) {
+                    // TODO: optimistic lock?
+                    if (f == 'updatedAt' || f == 'createdAt') {
+                        continue;
+                    }
+                    
+                    if (item[f] != req.body[f]) {
+                        origin[f] = item[f];
+                        changes[f] = req.body[f];
+                    }
+                    
+                }
+
+                item.update(changes).then(function(item) {
+                    models.changeLog.create({
+                        originalData: JSON.stringify(origin),
+                        changedData: JSON.stringify(changes),
+                        actor_userId: req.user.userId,
+                        item_id: item.id
+                    }).then(function() {
+                        res.json(item);
+                    });
                 });
             }).catch(function(errors){
                 console.log("Error: " + JSON.stringify(errors));
@@ -70,6 +92,7 @@ module.exports = function(router) {
         .delete(function(req, res){
             models.workItem.findById(req.params.id).then(function(item) {
                 console.log('deleting workitem id=' + req.params.id);
+
                 item.destroy().then(function(item) {
                     res.json(req.params.id);
                 })

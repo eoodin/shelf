@@ -3,12 +3,13 @@
  **********************************************************************************************/
 /** Map relative paths to URLs. */
 const map: any = {
-    moment: 'lib/moment/moment.js',
-    'ng2-file-upload': 'lib/ng2-file-upload/bundles/ng2-file-upload.min.js',
+    'moment': 'lib/moment/moment.js',
+    'ng2-file-upload': 'lib/ng2-file-upload'
 };
 
 /** User packages configuration. */
 const packages: any = {
+  'ng2-file-upload': {defaultExtension: 'js', main: 'ng2-file-upload.js'}
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

@@ -75,6 +75,14 @@ module.exports = {
     queryInterface.renameColumn('Allocation', 'sprint_id', 'planId');
     // alter table Allocation change column team_id teamId bigint(20);
     queryInterface.renameColumn('Allocation', 'team_id', 'teamId');
+
+    // alter table ChangeLog change column changeTime createdAt datetime;
+    queryInterface.renameColumn('ChangeLog', 'changeTime', 'createdAt');
+    // alter table ChangeLog add column updatedAt datetime;
+    queryInterface.addColumn('ChangeLog', 'updatedAt', {type: Sequelize.DATETIME});
+
+    // alter table GenericFile change column modifiedAt updatedAt datetime;
+    queryInterface.renameColumn('GenericFile', 'modifiedAt', 'updatedAt');
   },
 
   down: function (queryInterface, Sequelize) {

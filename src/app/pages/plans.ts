@@ -222,8 +222,7 @@ import {ModalDialog} from '../components/modal-dialog';
     .task.glyphicon{color: #333;}
     .type-and-id input { display: inline-block; }
     .month{width: 100%;}
-    `],
-    styleUrls: ['/css-spinner.css']
+    `]
 })
 export class Plans {
     private current = {};
@@ -276,7 +275,7 @@ export class Plans {
             return;
         }
 
-        this.http.put('/api/work-item/' + planId, JSON.stringify(ids))
+        this.http.put('/api/work-item/bunch', JSON.stringify({'ids': ids, 'changes': {'planId': planId}}))
           .subscribe(resp => this.onMoveToPlanResponse(resp));
         // this.http.post('/api/plans/' + planId + '/move-in', JSON.stringify(ids))
         //   .subscribe(resp => this.onMoveToPlanResponse(resp));

@@ -1,38 +1,14 @@
 "use strict";
 
 module.exports = function (sequelize, DataTypes) {
-    /*
-    TODO:
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    @Column
-    private String name;
-
-    @Column
-    private Long size;
-
-    @Column
-    private String mime;
-
-    @Column
-    private Date createdAt;
-
-    @Column
-    private Date modifiedAt;
-
-    @Lob
-    @Column(length = 10485760)
-    private byte[] data;
-    */
     var file = sequelize.define("file", {
-        userId: { type: DataTypes.STRING, primaryKey: true },
+        id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         name: DataTypes.STRING,
-        createdAt: DataTypes.DATE
+        size: DataTypes.BIGINT(20),
+        mime: DataTypes.STRING,
+        data: DataTypes.BLOB
     }, {
-            timestamps: false,
-            tableName: 'File',
+            tableName: 'GenericFile',
             classMethods: {
                 /*
               associate: function(models) {

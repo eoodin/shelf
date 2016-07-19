@@ -128,8 +128,7 @@ import {ItemDetail} from '../components/item-detail';
     .defect.glyphicon{color: #500;}
     .task.glyphicon{color: #333;}
     .type-and-id input { display: inline-block; }
-    `],
-    styleUrls: ['../../deps/css/css-spinner.css']
+    `]
 })
 export class Backlog {
     private project = null;

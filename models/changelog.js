@@ -2,16 +2,16 @@
 
 module.exports = function (sequelize, DataTypes) {
     var changeLog = sequelize.define("changeLog", {
-        userId: { type: DataTypes.STRING, primaryKey: true }
+        id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
+        originalData: { type: DataTypes.STRING, length: 'long' /* > 524288 */ },
+        changedData:  { type: DataTypes.STRING, length: 'long' /* > 524288 */ }
     }, {
-            timestamps: false,
             tableName: 'ChangeLog',
             classMethods: {
-                /*
               associate: function(models) {
-                changeLog.hasMany(models.Task)
+                changeLog.belongsTo(models.workItem, {as: 'item', foreignKey: 'item_id'});
+                changeLog.belongsTo(models.user, {as: 'user', foreignKey: 'actor_userId'})
               }
-              */
             }
         });
 
