@@ -144,6 +144,7 @@ declare var Quill:any;
     .description-editor { width: 100%; border: 1px solid #ccc; height: 18em; }
     .quill-toolbar {border-bottom:  1px solid #ccc;}
     .ql-container {padding: 5px; min-height: 120px; max-height: 420px;}
+    .ql-container .ql-editor {height: 100%;}
     `],
     styleUrls: ['/quill.snow.css']
 })

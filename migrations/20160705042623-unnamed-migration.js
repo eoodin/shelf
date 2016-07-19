@@ -71,7 +71,7 @@ module.exports = {
     // alter table Plan change column project_id projectId bigint(20);
     queryInterface.renameColumn('Plan', 'project_id', 'projectId');
 
-    // alter table Allocation change column sprint_id sprintId bigint(20);
+    // alter table Allocation change column sprint_id planId bigint(20);
     queryInterface.renameColumn('Allocation', 'sprint_id', 'planId');
     // alter table Allocation change column team_id teamId bigint(20);
     queryInterface.renameColumn('Allocation', 'team_id', 'teamId');
@@ -83,6 +83,39 @@ module.exports = {
 
     // alter table GenericFile change column modifiedAt updatedAt datetime;
     queryInterface.renameColumn('GenericFile', 'modifiedAt', 'updatedAt');
+
+    /** corresponding SQL: */
+    /*
+    alter table User_Role add column createdAt datetime;
+    alter table User_Role add column updatedAt datetime;
+    alter table Team add column updatedAt datetime; 
+    alter table Team change column createdBy_userId createdBy varchar(255);
+    alter table Team change column scrumMaster_userId scrumMaster varchar(255);
+    alter table Project change column team_id teamId bigint(21);
+    alter table Project change column backlog_id backlogId bigint(21);
+    alter table Team_User add column createdAt datetime;
+    alter table Team_User add column updatedAt datetime;
+    alter table WorkItem add column updatedAt datetime;
+    alter table WorkItem change column plan_id planId bigint(21);
+    alter table WorkItem change column DTYPE type varchar(31);
+    UPDATE WorkItem SET type = 'UserStory' WHERE type LIKE 'US';
+    UPDATE WorkItem SET type = 'Defect' WHERE type LIKE 'DE';
+    UPDATE WorkItem SET type = 'Task' WHERE type LIKE 'TA';
+    alter table WorkItem change column status status varchar(31);
+    UPDATE WorkItem SET status = 'New' WHERE status LIKE '0';
+    UPDATE WorkItem SET status = 'InProgress' WHERE status LIKE '1';
+    UPDATE WorkItem SET status = 'Finished' WHERE status LIKE '2';
+    UPDATE WorkItem SET status = 'Pending' WHERE status LIKE '3';
+    UPDATE WorkItem SET status = 'Dropped' WHERE status LIKE '4';
+    UPDATE WorkItem SET status = 'Removed' WHERE status LIKE '5';
+    alter table WorkItem change column project_id projectId bigint(20);
+    alter table Plan change column project_id projectId bigint(20);
+    alter table Allocation change column sprint_id planId bigint(20);
+    alter table Allocation change column team_id teamId bigint(20);
+    alter table ChangeLog change column changeTime createdAt datetime;
+    alter table ChangeLog add column updatedAt datetime;
+    alter table GenericFile change column modifiedAt updatedAt datetime;
+    */
   },
 
   down: function (queryInterface, Sequelize) {

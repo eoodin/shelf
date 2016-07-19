@@ -13,9 +13,13 @@ module.exports = function(router) {
             where: {
                 projectId: id,
                 type: 'sprint'
-                }}).then(function(plans) {
-            res.json(plans);
-        });
+                }})
+            .then(function(plans) {
+                res.json(plans);
+            }).catch(function(errors) {
+                console.log('error' + JSON.stringify(errors));
+                res.sendStatus(500);
+            });
     });
 
     route.post(function(req, res){
