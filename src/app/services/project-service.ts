@@ -47,7 +47,7 @@ export class ProjectService {
         this._current.next(p);
     }
 
-    get current(): Observable<any> {
+    get current(): BehaviorSubject<any> {
         return this._current;
     }
 

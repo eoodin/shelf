@@ -3,6 +3,8 @@ import {Http, Request, Response, RequestMethod, RequestOptions} from '@angular/h
 
 import {RichEditor} from './rich-editor';
 import {ModalDialog} from './modal-dialog';
+import {ProjectService} from '../services/project-service';
+
 
 @Component({
     selector: 'item-detail',
@@ -87,7 +89,8 @@ export class ItemDetail {
     public saved: EventEmitter<Object> = new EventEmitter();
 
     constructor(private http: Http,
-                private ele: ElementRef) {
+                private ele: ElementRef,
+                private prjs: ProjectService) {
     }
 
     @Input()
@@ -112,6 +115,7 @@ export class ItemDetail {
 
     saveWorkItem() {
         var data = JSON.parse(JSON.stringify(this._item));
+        data.projectId = this.prjs.current.getValue()['id'];
         if (!data['id']) {
             this.http.post('/api/work-items/', JSON.stringify(data))
               .subscribe(resp => this.saved.emit(resp));

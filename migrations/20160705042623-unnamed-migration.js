@@ -64,6 +64,33 @@ module.exports = {
       "UPDATE WorkItem SET status = 'Dropped' WHERE status LIKE '4'");
     queryInterface.migrator.sequelize.query(
       "UPDATE WorkItem SET status = 'Removed' WHERE status LIKE '5'");
+  
+    //['Created','Analyzing','Analyzed','Fixing','Fixed','Testing','Tested','Failed']
+    // alter table WorkItem change column state state varchar(31);
+    queryInterface.changeColumn('WorkItem', 'state', {
+        type: Sequelize.ENUM,
+        allowNull: false,
+        defaultValue: 'Created'
+      }
+    );
+
+    queryInterface.migrator.sequelize.query(
+      "UPDATE WorkItem SET state = 'Created' WHERE state LIKE '0'");
+    queryInterface.migrator.sequelize.query(
+      "UPDATE WorkItem SET state = 'Analyzing' WHERE state LIKE '1'");
+    queryInterface.migrator.sequelize.query(
+      "UPDATE WorkItem SET state = 'Analyzed' WHERE state LIKE '2'");
+    queryInterface.migrator.sequelize.query(
+      "UPDATE WorkItem SET state = 'Fixing' WHERE state LIKE '3'");
+    queryInterface.migrator.sequelize.query(
+      "UPDATE WorkItem SET state = 'Fixed' WHERE state LIKE '4'");
+    queryInterface.migrator.sequelize.query(
+      "UPDATE WorkItem SET state = 'Testing' WHERE state LIKE '5'");
+    queryInterface.migrator.sequelize.query(
+      "UPDATE WorkItem SET state = 'Tested' WHERE state LIKE '6'");
+    queryInterface.migrator.sequelize.query(
+      "UPDATE WorkItem SET state = 'Failed' WHERE state LIKE '7'");
+
     // alter table WorkItem change column project_id projectId bigint(20);
     queryInterface.renameColumn('WorkItem', 'project_id', 'projectId');
 
@@ -108,6 +135,15 @@ module.exports = {
     UPDATE WorkItem SET status = 'Pending' WHERE status LIKE '3';
     UPDATE WorkItem SET status = 'Dropped' WHERE status LIKE '4';
     UPDATE WorkItem SET status = 'Removed' WHERE status LIKE '5';
+    alter table WorkItem change column state state varchar(31);
+    UPDATE WorkItem SET state = 'Created' WHERE state LIKE '0';
+    UPDATE WorkItem SET state = 'Analyzing' WHERE state LIKE '1';
+    UPDATE WorkItem SET state = 'Analyzed' WHERE state LIKE '2';
+    UPDATE WorkItem SET state = 'Fixing' WHERE state LIKE '3';
+    UPDATE WorkItem SET state = 'Fixed' WHERE state LIKE '4';
+    UPDATE WorkItem SET state = 'Testing' WHERE state LIKE '5';
+    UPDATE WorkItem SET state = 'Tested' WHERE state LIKE '6';
+    UPDATE WorkItem SET state = 'Failed' WHERE state LIKE '7';
     alter table WorkItem change column project_id projectId bigint(20);
     alter table Plan change column project_id projectId bigint(20);
     alter table Allocation change column sprint_id planId bigint(20);

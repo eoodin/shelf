@@ -46,7 +46,7 @@ module.exports = function(router) {
                 type: req.body.type,
                 status: 'New',
                 estimation: req.body.estimation,
-                originEstimation: req.body.estimation,
+                originalEstimation: req.body.estimation,
                 title: req.body.title,
                 description: req.body.description,
                 owner: req.user,
@@ -82,6 +82,44 @@ module.exports = function(router) {
                     if (item[f] != req.body[f]) {
                         origin[f] = item[f];
                         changes[f] = req.body[f];
+                    }
+                    
+                    if (item.type == 'Task') {
+                        let toFinish = false;
+                        if (f == 'estimation' && req.body[f] == 0) {
+                            origin.status = item.status;
+                            changes.status = 'Finished';
+                            toFinish = true;
+                        }
+                        else if (f == 'status' && req.body.status == 'Finished') {
+                            origin.estimation = item.estimation;
+                            changes.estimation = 0;
+                            toFinish = true;
+                        }
+
+                        if (toFinish && item.parent_id) {
+                            console.log('Finding defect for task ' + item.parent_id);
+                            models.workItem.findOne({
+                                where: {
+                                    type: 'Defect',
+                                    id : item.parent_id
+                                }
+                            }).then(function(defect) {
+                                if (!defect) { return; }
+
+                                console.log('automatically change relevant defect status.');
+                                if (defect.state == 'Fixing') {
+                                    defect.update({
+                                        state: 'Fixed'
+                                    }).then(function() {});
+                                }
+                                else if (defect.state = 'Testing') {
+                                    defect.update({
+                                        state: 'Tested'
+                                    }).then(function() {});
+                                }
+                            });
+                        }
                     }
                     
                 }
@@ -135,77 +173,4 @@ module.exports = function(router) {
                 res.json(affected);
             })
         });
-
-    router.route('/defect/:id/fix')
-        .post(function(req, res) {
-            /*
-            public void startFix(@PathVariable("id") Long id, HttpServletRequest request) throws ShelfException {
-        Defect defect = em.find(Defect.class, id);
-        if (defect == null)
-            throw new NotFoundException("Defect not exist ID=" + id);
-
-        Plan currentSprint = planController.getCurrentSprint(defect.getProject());
-        if (currentSprint == null)
-            throw new ShelfException("No sprint info found");
-
-        User user = em.find(User.class, request.getRemoteUser());
-        defect.setStatus(WorkItem.Status.InProgress);
-        defect.setState(Defect.State.Fixing); // to simplify.
-        Task fixingTask = new Task();
-        fixingTask.setCatalog(Task.Catalog.Development);
-        fixingTask.setStatus(WorkItem.Status.InProgress);
-        fixingTask.setTitle("Fix #" + defect.getId() + ": "  + defect.getTitle());
-        fixingTask.setEstimation(8);
-        fixingTask.setProject(defect.getProject());
-        fixingTask.setCreatedAt(new Date());
-        fixingTask.setDescription("Auto generated task for fixing issue #" + id);
-        fixingTask.setOriginalEstimation(8);
-        fixingTask.setOwner(user);
-        fixingTask.setParent(defect);
-        defect.setPlan(currentSprint);
-        fixingTask.setPlan(currentSprint);
-        em.merge(defect);
-        em.persist(fixingTask);
-    }
-
-
-            */
-        });
-
-    router.route('/defect/:id/test')
-        .post(function(req, res) {
-            /*
-                @RequestMapping(value="/{id}/test", method = RequestMethod.POST)
-    @ResponseBody
-    @Transactional
-    public void startTest(@PathVariable("id") Long id, HttpServletRequest request) throws ShelfException {
-        Defect defect = em.find(Defect.class, id);
-        if (defect == null)
-            throw new NotFoundException("Defect not exist ID=" + id);
-
-        Plan currentSprint = planController.getCurrentSprint(defect.getProject());
-        if (currentSprint == null)
-            throw new ShelfException("No sprint info found");
-
-        User user = em.find(User.class, request.getRemoteUser());
-        defect.setState(Defect.State.Testing); // to simplify.
-        Task testingTask = new Task();
-        testingTask.setStatus(WorkItem.Status.InProgress);
-        testingTask.setCatalog(Task.Catalog.Testing);
-        testingTask.setTitle("Test #" + defect.getId() + ": " + defect.getTitle());
-        testingTask.setEstimation(8);
-        testingTask.setProject(defect.getProject());
-        testingTask.setCreatedAt(new Date());
-        testingTask.setDescription("Auto generated task for testing issue #" + id);
-        testingTask.setOriginalEstimation(8);
-        testingTask.setOwner(user);
-        testingTask.setParent(defect);
-        defect.setPlan(currentSprint);
-        testingTask.setPlan(currentSprint);
-        em.merge(defect);
-        em.persist(testingTask);
-    }
-            */
-        });
-
 }

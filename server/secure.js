@@ -44,13 +44,13 @@ module.exports = function(app) {
     });
     
     app.all('/', function(req, res, next) {
-            // Automatic login
-            // if (!req.isAuthenticated()) {
-            //     let auth = passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login.html'});
-            //     req.body.username = 'someuser';
-            //     req.body.password = '123';
-            //     return auth(req, res, next);
-            // }
+            //Automatic login
+            if (!req.isAuthenticated()) {
+                let auth = passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login.html'});
+                req.body.username = 'jefliu';
+                req.body.password = '123';
+                return auth(req, res, next);
+            }
             if (req.isAuthenticated()) {
                 // check and create user in database
                 // fields fetched from ldap: user.mail, user.displayName, user.employeeNumber
