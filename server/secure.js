@@ -16,20 +16,8 @@ module.exports = function(app) {
     var usingLdap = fs.existsSync(securityConfig);
     if(usingLdap) {
         console.log('ldap.json found, using ldap auth');
-        var LdapAuth = require('ldapauth-fork');
-        var conf = require(securityConfig);
-        console.log("ldap setting: " + JSON.stringify(conf.server));
-        var auth = new LdapAuth(conf.server);
-        passport.use("ldapauth", new LocalStrategy(function(username, password, done) {
-            auth.authenticate(username, password, function(err, user, info){
-                if (err || !user) {
-                    console.log('error: ' + JSON.stringify(err));
-                    return done(null, false, {message: 'Failed to authenticate'});// todo
-                }
-                
-                done(null, user);
-            });
-        }));
+        var LdapStrategy = require('passport-ldapauth');
+        passport.use(new LdapStrategy(require(securityConfig)));
     }
     else {
         passport.use('local', new LocalStrategy(function(username, password, done) {
@@ -63,24 +51,18 @@ module.exports = function(app) {
             //     req.body.password = '123';
             //     return auth(req, res, next);
             // }
-            if (req.isAuthenticated()) { return next(); }
+            if (req.isAuthenticated()) {
+                // check and create user in database
+                // fields fetched from ldap: user.mail, user.displayName, user.employeeNumber
+                return next(); 
+            }
             res.redirect('/login.html');
         });
 
     if (usingLdap) {
         app.post('/login', function(req, res, next) {
-            passport.authenticate('ldapauth', 
-                { successRedirect: '/', failureRedirect: '/login.html' },
-                function(err, user, info) {
-                    if (err) {
-                        return next(err);
-                    }
-                    if (!user) {
-                        return res.json({error: 'authentication failed'});
-                    }
-                    return res.json({error: 'authentication failed'});
-                }
-            )(req, res, next);
+            console.log('Authenticating: ' + JSON.stringify(req.body));
+            passport.authenticate('ldapauth', { successRedirect: '/', failureRedirect: '/login.html' })(req, res, next);
         });
     }
     else {
