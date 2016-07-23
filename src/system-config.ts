@@ -4,12 +4,14 @@
 /** Map relative paths to URLs. */
 const map: any = {
     'moment': 'lib/moment/moment.js',
-    'ng2-file-upload': 'lib/ng2-file-upload'
+    'ng2-file-upload': 'lib/ng2-file-upload',
+    'ckeditor': 'lib/ckeditor'
 };
 
 /** User packages configuration. */
 const packages: any = {
-  'ng2-file-upload': {defaultExtension: 'js', main: 'ng2-file-upload.js'}
+  'ng2-file-upload': {defaultExtension: 'js', main: 'ng2-file-upload.js'},
+  'ckeditor': {defaultExtension: 'js', main: 'ckeditor.js'}
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

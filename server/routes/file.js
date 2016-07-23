@@ -5,7 +5,12 @@ module.exports = function(router) {
     router.route('/file').post(function(req, res, next) {
         var storage = multer.memoryStorage()
         var upload = multer({ storage: storage })
-        let uploader = upload.single('file');
+        var field = 'file';
+        if (req.query.api && req.query.api.indexOf('ckeditor') == 0) {
+            field = 'upload';
+        }
+
+        let uploader = upload.single(field);
         req.storage = storage;
         uploader(req, res, next);
     }, function(req, res) {
@@ -15,6 +20,10 @@ module.exports = function(router) {
             mime: req.file.mime,
             data: req.file.buffer
         }).then(function(file) {
+            if (req.query.api == 'ckeditor-uploadimage') {
+                return res.json({uploaded: 1,fileName: file.id, url: '/api/file/' + file.id});
+            }
+
             res.json(file.id);
         }).catch(function(errors){
             console.log('Unable to save file: ' + JSON.stringify(errors));
