@@ -111,6 +111,8 @@ module.exports = {
     // alter table GenericFile change column modifiedAt updatedAt datetime;
     queryInterface.renameColumn('GenericFile', 'modifiedAt', 'updatedAt');
 
+   // alter table UserPreference change column changedAt updatedAt datetime;
+    queryInterface.renameColumn('UserPreference', 'changedAt', 'updatedAt');
     /** corresponding SQL: */
     /*
     alter table User_Role add column createdAt datetime;
@@ -151,6 +153,7 @@ module.exports = {
     alter table ChangeLog change column changeTime createdAt datetime;
     alter table ChangeLog add column updatedAt datetime;
     alter table GenericFile change column modifiedAt updatedAt datetime;
+    alter table UserPreference change column changedAt updatedAt datetime;
     */
   },
 
