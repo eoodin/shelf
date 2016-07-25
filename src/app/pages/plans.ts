@@ -42,7 +42,7 @@ import {ModalDialog} from '../components/modal-dialog';
                     <div class="panel panel-default">
                         <div class="panel-heading work-items-heading">
                             <div>
-                                <label  >
+                                <label>
                                     <input type="checkbox" [(ngModel)]="hideFinished"  (click)="loadWorkItems();" (click)="onHideFinishedCheck()"/>
                                     Hide Finished
                                 </label>
@@ -51,13 +51,16 @@ import {ModalDialog} from '../components/modal-dialog';
                         <table *ngIf="workItems" class="table">
                             <tr>
                                 <th>
-                                    <a href="javascript:void(0);" (click)="sortResult('id')">ID
-                                    <span *ngIf="sort.field=='id'">
-                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                                    </span>
-                                    </a>
+                                    <label>
+                                        <input type="checkbox" [checked]="allChecked()" (click)="onAllCheck($event.target.checked)" class="checkbox" title="Select/unselect all" />
+                                        <a href="javascript:void(0);" (click)="sortResult('id')">ID
+                                        <span *ngIf="sort.field=='id'">
+                                            <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                                        </span>
+                                        </a>
+                                    </label>
                                 </th>
-                                <th>
+                                <th class="header-title">
                                     <a href="javascript:void(0);" (click)="sortResult('title')">Title
                                     <span *ngIf="sort.field=='title'">
                                         <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
@@ -81,16 +84,18 @@ import {ModalDialog} from '../components/modal-dialog';
                                 <th>Operations</th>
                             </tr>
                             <tr *ngFor="let item of getShowingItems()">
-                                <td class="type-and-id">
+                                <td class="id">
                                     <label>
                                         <input class="checkbox" [(ngModel)]="item.checked" type="checkbox">
-                                        <span *ngIf="item.type=='UserStory'" class="us glyphicon glyphicon-edit"></span>
-                                        <span *ngIf="item.type=='Defect'" class="defect glyphicon glyphicon-fire"></span>
-                                        <span *ngIf="item.type=='Task'" class="task glyphicon glyphicon-check"></span>
                                         {{item.id}}
                                     </label>
                                 </td>
-                                <td><a (click)="showItem(item)">{{item.title}}</a></td>
+                                <td>
+                                    <span *ngIf="item.type=='UserStory'" class="us glyphicon glyphicon-edit"></span>
+                                    <span *ngIf="item.type=='Defect'" class="defect glyphicon glyphicon-fire"></span>
+                                    <span *ngIf="item.type=='Task'" class="task glyphicon glyphicon-check"></span>
+                                    <a (click)="showItem(item)">{{item.title}}</a>
+                                </td>
                                 <td>
                                     <div class="btn-group" dropdown keyboardNav>
                                         <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
@@ -206,6 +211,7 @@ import {ModalDialog} from '../components/modal-dialog';
     .work-items-heading > div{float:right;}
     .work-items-heading { height: 38px; }
     .right{ padding: 0 15px; }
+    .header-title {padding-left: 24px;}
     .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
     [ngcontrol='title'] { width: 100%; }
@@ -213,14 +219,14 @@ import {ModalDialog} from '../components/modal-dialog';
     .plan-head ul {padding-left: 0;}
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
     .plan-head ul li span {font-weight: normal}
-    .item-table{position:relative;}
-    .checkbox{margin:0; width: 22px; height: 22px;}
+    .item-table label { margin: 0;}
+    .item-table label input[type="checkbox"] { vertical-align: bottom;}
+    .item-table table .checkbox{ display: inline-block; margin:0; width: 22px; height: 22px;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
-    .type-and-id .glyphicon {margin-right: 8px;}
+    .id .glyphicon {margin-right: 8px;}
     .us.glyphicon{color: #050;}
     .defect.glyphicon{color: #500;}
     .task.glyphicon{color: #333;}
-    .type-and-id input { display: inline-block; }
     .month{width: 100%;}
     `]
 })
@@ -385,6 +391,14 @@ export class Plans {
         var total = 0;
         this.workItems.forEach(i=>{ total += i.estimation; });
         return total;
+    }
+
+    onAllCheck(checked) {
+        this.workItems.forEach( item => item.checked = checked);
+    }
+
+    allChecked():boolean {
+        return this.workItems.every( item => item.checked );
     }
 
     private getSelectedWorkItemIds() {
