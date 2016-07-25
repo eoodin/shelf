@@ -11,16 +11,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style type="text/css">
+    html, body, [shelf-app] {height: 100%; margin: 0; padding: 0; }
+    .loading-icon-large {position: relative; top: 50%; left: 50%; width: 72px; height: 72px; margin-left: -36px;margin-top: -36px;}
+  </style>
 </head>
 <body>
-  <div style="height:100%;" shelf-app>
-    <div style="position: relative;top: 50%;left: 50%;margin-left: -36px;margin-top: -36px;">
+  <div shelf-app>
+    <div class="loading-icon-large">
       <link href="/css-spinner.css" rel="stylesheet">
       <img src="/spin.gif"/>
     </div>
   </div>
 
-    {{#each scripts.polyfills}}<script src="{{.}}"></script>{{/each}}
+    {{#each scripts.polyfills}}
+    <script src="{{.}}"></script>
+    {{/each}}
     <script src="./lib/ng2-bootstrap/bundles/ng2-bootstrap.min.js" type="text/javascript"></script>
     <script src="./lib/moment/min/moment.min.js" type="text/javascript"></script>
     <script src="./lib/ckeditor/ckeditor.js" type="text/javascript"></script>
