@@ -3,15 +3,16 @@
  **********************************************************************************************/
 /** Map relative paths to URLs. */
 const map: any = {
-    'moment': 'lib/moment/moment.js',
-    'ng2-file-upload': 'lib/ng2-file-upload',
-    'ckeditor': 'lib/ckeditor'
+    'moment': 'vendor/moment/moment.js',
+    'ng2-bootstrap': 'vendor/ng2-bootstrap',
+    'ng2-file-upload': 'vendor/ng2-file-upload',
 };
 
 /** User packages configuration. */
 const packages: any = {
+  'moment': { format: 'cjs'},
   'ng2-file-upload': {defaultExtension: 'js', main: 'ng2-file-upload.js'},
-  'ckeditor': {defaultExtension: 'js', main: 'ckeditor.js'}
+  'ng2-bootstrap': {defaultExtension: 'js', main: 'ng2-bootstrap.js'},
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

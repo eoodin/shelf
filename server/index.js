@@ -14,5 +14,5 @@ module.exports = function(app) {
     app.use(methodOverride('X-HTTP-Method-Override'));
     require('./secure')(app);
     require('./route')(app);
-    app.use('/lib', express.static(__dirname + '/../node_modules/'));
+    app.use('/vendor/ckeditor', express.static(__dirname + '/../node_modules/ckeditor'));
 };
