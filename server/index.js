@@ -6,9 +6,12 @@ module.exports = function(app) {
       bodyParser = require('body-parser'),
       methodOverride = require('method-override');
     var models = require('../models');
-    models.sequelize.sync().then(function() {
-        console.log('Database synchronized.')
+    models.sequelize.authenticate().then(function() {
+        console.log('Db connected.')
+    }).catch(function(err){
+        console.log('Unable to connect to db.', err);
     });
+    
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json({ type: 'application/json' }));
     app.use(methodOverride('X-HTTP-Method-Override'));

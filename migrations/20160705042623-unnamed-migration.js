@@ -154,6 +154,13 @@ module.exports = {
     alter table ChangeLog add column updatedAt datetime;
     alter table GenericFile change column modifiedAt updatedAt datetime;
     alter table UserPreference change column changedAt updatedAt datetime;
+
+    // Added 2016-08-01
+    alter table WorkItem change column severity severity varchar(31);
+    UPDATE WorkItem SET severity = 'Blocker' WHERE severity LIKE '0';
+    UPDATE WorkItem SET severity = 'Critical' WHERE severity LIKE '1';
+    UPDATE WorkItem SET severity = 'Major' WHERE severity LIKE '2';
+    UPDATE WorkItem SET severity = 'Minor' WHERE severity LIKE '3';
     */
   },
 

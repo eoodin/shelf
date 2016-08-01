@@ -18,30 +18,38 @@ module.exports = function(router) {
     });
     
     router.route('/preferences/:name').put(function(req, res) {
-        models.preference.findOne({
-            where: { 
-                name: req.params.name,
-                user_userId: req.user.userId 
-            }
-        }).then(function(exist) {
-            if (!exist) {
-                console.log('Saving ' + req.params.name +' ' + req.body.value);
-                return models.preference.create({
+        models.sequelize.transaction(function(t) {
+            return models.preference.findOne({
+                where: { 
                     name: req.params.name,
-                    value: req.body.value,
-                    user_userId: req.user.userId
-                }).then(function(item) {
-                    res.json({status: 'OK'});
-                });
-            }
-            else if (exist.value != req.body.value) {
-                console.log('Updating ' + req.params.name +' from ' + exist.value + ' to ' + req.body.value);
-                return exist.update({
-                    value: req.body.value
-                }).then(function(i){
-                    res.json({status: 'OK'});
-                });
-            }
+                    user_userId: req.user.userId 
+                }
+            }).then(function(exist) {
+                if (!exist) {
+                    console.log('Saving ' + req.params.name +' ' + req.body.value);
+                    return models.preference.create({
+                        name: req.params.name,
+                        value: req.body.value,
+                        user_userId: req.user.userId
+                    }).then(function(item) {
+                        res.json({status: 'OK'});
+                    });
+                }
+                else if (exist.value != req.body.value) {
+                    console.log('Updating ' + req.params.name +' from ' + exist.value + ' to ' + req.body.value);
+                    return exist.update({
+                        value: req.body.value
+                    }).then(function(i){
+                        res.json({status: 'OK'});
+                    });
+                }
+            });
+        }).then(function() {
+            console.log('Preference saved');
+            res.end();
+        }).catch(function(err){
+            console.log('Error caught!', err);
+            res.sendStatus(500);
         });
     });
 }

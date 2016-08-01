@@ -176,7 +176,7 @@ export class Backlog {
         this.http.post('/api/defects/' + item.id + '/fix', '{}')
             .subscribe(
                 () => this.loadItems(),
-                () => window.alert('Error occurred.'),
+                (resp) => {window.alert('Error occurred: ' + resp.json()['error'])},
                 () => this.requesting = false
             );
     }
