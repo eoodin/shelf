@@ -15,7 +15,7 @@ import {ProjectService} from '../services/project-service';
                 <div class="row" >
                     <div class="col-sm-12">
                         Type:
-                        <select *ngIf="!_item.id" [(ngModel)]="_item.type" [disabled]="_type">
+                        <select *ngIf="!_item.id" [(ngModel)]="_item.type" [ngModelOptions]="{standalone: true}" [disabled]="_type">
                             <option value="UserStory" selected="selected">User Story</option>
                             <option value="Task">Task</option>
                             <option value="Defect">Defect</option>
@@ -34,12 +34,12 @@ import {ProjectService} from '../services/project-service';
                 <div *ngIf="_item.type == 'Defect'" class="row">
                     <div class="col-sm-12 field-row">
                         <span class="field-label">Found in:</span>
-                        <input [(ngModel)]="_item.version">
+                        <input [(ngModel)]="_item.version" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-12 field-row">
-                        <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="_item.title">
+                        <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="_item.title" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="row">
@@ -51,10 +51,10 @@ import {ProjectService} from '../services/project-service';
                     </div>
                 </div>
                 <div *ngIf="_item.type == 'Task'" class="row">
-                    <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="_item.estimation"></div>
+                    <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="_item.estimation" [ngModelOptions]="{standalone: true}"></div>
                 </div>
                 <div class="row" *ngIf="_item.type == 'UserStory'">
-                    <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="_item.points" value="0"></div>
+                    <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="_item.points" [ngModelOptions]="{standalone: true}" value="0"></div>
                 </div>
             </form>
         </div>

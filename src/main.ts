@@ -4,6 +4,7 @@ import {provideRouter} from '@angular/router';
 import {LocationStrategy, HashLocationStrategy} from '@angular/common';
 import { HTTP_PROVIDERS, RequestOptions, BaseRequestOptions, Headers }  from '@angular/http';
 import { ShelfAppComponent, environment } from './app/';
+import { disableDeprecatedForms, provideForms } from '@angular/forms';
 
 import {Projects} from './app/pages/projects';
 import {Backlog} from './app/pages/backlog';
@@ -27,6 +28,8 @@ class DefaultHttpOptions extends BaseRequestOptions {
 }
 
 bootstrap(ShelfAppComponent, [
+  disableDeprecatedForms(),
+  provideForms(),
   provideRouter(routes),
   HTTP_PROVIDERS,
   provide(RequestOptions, {useClass:DefaultHttpOptions}),

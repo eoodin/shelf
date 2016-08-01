@@ -28,10 +28,10 @@ import {ProjectService} from '../services/project-service';
                             <div class="col-sm-3">Sprint name:</div><div class="col-sm-5"> <input type="text" ngControl="name"></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Start from:</div><div class="col-sm-5"> <input type="date" ngControl="start"></div>
+                            <div class="col-sm-3">Start from:</div><div class="col-sm-5"> <input type="date" ngControl="start" name="sprintStart"></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Due date:</div><div class="col-sm-5"> <input type="date" ngControl="end"></div>
+                            <div class="col-sm-3">Due date:</div><div class="col-sm-5"> <input type="date" ngControl="end" name="sprintEnd"></div>
                         </div>
                         <div class="row"></div>
                         <div class="row plan-field-row">
