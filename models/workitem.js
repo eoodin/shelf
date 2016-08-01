@@ -4,13 +4,10 @@ module.exports = function (sequelize, DataTypes) {
     var workItem = sequelize.define("workItem", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         title: DataTypes.STRING,
-        originalEstimation: DataTypes.INTEGER,
-        estimation: DataTypes.INTEGER,
-        points: DataTypes.INTEGER,
-        description: {
-            type: DataTypes.STRING,
-            length: 'long' // > 524288
-        },
+        originalEstimation: { type: DataTypes.INTEGER, defaultValue: 0 },
+        estimation: { type: DataTypes.INTEGER, defaultValue: 0 },
+        points: { type: DataTypes.INTEGER, defaultValue: 0 },
+        description: { type: DataTypes.STRING, length: 'long' /*524288*/ },
         type: {
             type:   DataTypes.ENUM,
             values: ['UserStory', 'Task', 'Defect']

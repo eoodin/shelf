@@ -1,5 +1,5 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {Http, Request, Headers, RequestOptions} from '@angular/http';
+import {Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
@@ -25,20 +25,20 @@ import {ProjectService} from '../services/project-service';
                     </div>
                     <div class="modal-body">
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Sprint name:</div><div class="col-sm-5"> <input type="text" ngControl="name"></div>
+                            <div class="col-sm-3">Sprint name:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="name" name="name"></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Start from:</div><div class="col-sm-5"> <input type="date" ngControl="start" name="sprintStart"></div>
+                            <div class="col-sm-3">Start from:</div><div class="col-sm-5"> <input type="date" [(ngModel)]="start" name="start"></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Due date:</div><div class="col-sm-5"> <input type="date" ngControl="end" name="sprintEnd"></div>
+                            <div class="col-sm-3">Due date:</div><div class="col-sm-5"> <input type="date" [(ngModel)]="end" name="end"></div>
                         </div>
                         <div class="row"></div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Developer hours:</div><div class="col-sm-5"> <input type="text" ngControl="devHours"></div>
+                            <div class="col-sm-3">Developer hours:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="devHours" name="devHours"></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Tester hours:</div><div class="col-sm-5"> <input type="text" ngControl="tstHours"></div>
+                            <div class="col-sm-3">Tester hours:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="tstHours" name="devHours"></div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -101,10 +101,8 @@ export class PlanList {
     }
 
     createPlan(data) {
-        let headers = new Headers({ 'Content-Type': 'application/json' });
-        let options = new RequestOptions({ headers: headers });
         data['projectId'] = this.project['id'];
-        this.http.post('/api/plans/', JSON.stringify(data), options)
+        this.http.post('/api/plans/', JSON.stringify(data))
             .subscribe(resp => this.loadPlans(this.project['id']));
 
         this.ui.cpd.show = false;

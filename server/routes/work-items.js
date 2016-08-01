@@ -57,21 +57,27 @@ module.exports = function(router) {
                 return res.sendStatus(403);
             }
             
-            models.workItem.create({
-                type: req.body.type,
-                status: 'New',
-                estimation: req.body.estimation,
-                originalEstimation: req.body.estimation,
-                title: req.body.title,
-                description: req.body.description,
-                owner: req.user,
-                createdBy: req.user,
-                planId: req.body.planId,
-                project_id: req.body.projectId,
-                points: req.body.points,
-                severity: req.body.severity
-            }).then(function (item) {
-                res.json(item.id);
+            models.user.findById(req.user.userId).then(function(u) {
+                let def = {
+                    type: req.body.type,
+                    status: 'New',
+                    state: 'Created',
+                    estimation: (req.body.estimation || 0),
+                    originalEstimation: (req.body.estimation || 0),
+                    title: req.body.title,
+                    description: req.body.description,
+                    owner: u, // TODO:  check why not working
+                    createdBy: u,
+                    planId: (req.body.planId || null),
+                    projectId: (req.body.projectId || null),
+                    points: req.body.points,
+                    severity: req.body.severity
+                };
+                console.log('Definition composed', def);
+                var item = models.workItem.build(def);
+                item.save().then(function (item) {
+                    res.json(item.id);
+                })
             }).catch(function(errors){
                 console.log("Error: " + JSON.stringify(errors));
                 res.sendStatus(500);

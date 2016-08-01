@@ -80,9 +80,8 @@ import {ItemDetail} from '../components/item-detail';
     </div>
     
     <item-detail [item]="ui.awd.item"
-                 [show]="ui.awd.show"
+                 [(show)]="ui.awd.show"
                  [type]="ui.awd.type"
-                 (closed)="ui.awd.show = false"
                  (saved)="loadItems();">
     </item-detail>
 
@@ -161,7 +160,7 @@ export class Backlog {
 
     showAddItem(type) {
         this.ui.awd.type = type;
-        this.ui.awd.item.type = type;
+        this.ui.awd.item = {type: type};
         if (this.project)
             this.ui.awd.item.projectId = this.project.id;
 
@@ -171,23 +170,25 @@ export class Backlog {
         this.ui.awd.show = true;
     }
 
+    
+
     startFix(item) {
         this.requesting = true;
         this.http.post('/api/defects/' + item.id + '/fix', '{}')
+            .finally(() => this.requesting = false)
             .subscribe(
                 () => this.loadItems(),
-                (resp) => {window.alert('Error occurred: ' + resp.json()['error'])},
-                () => this.requesting = false
+                (resp) => {window.alert('Error occurred: ' + resp.json()['error'])}
             );
     }
 
     startTest(item) {
         this.requesting = true;
         this.http.post('/api/defects/' + item.id + '/test', '{}')
+            .finally(() => this.requesting = false)
             .subscribe(
                 () => this.loadItems(),
-                () => window.alert('Error occurred.'),
-                () => this.requesting = false
+                () => window.alert('Error occurred.')
             );
     }
 
