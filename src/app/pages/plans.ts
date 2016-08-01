@@ -1,4 +1,4 @@
-import {Component, ElementRef} from '@angular/core';
+import {Component, ElementRef, ViewChild} from '@angular/core';
 import {Http} from '@angular/http';
 
 import {DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
@@ -31,7 +31,11 @@ import {ModalDialog} from '../components/modal-dialog';
             </div>
             <div class="project-info">
                 <div class="project-operations">
-                    <button class="btn btn-warning" (click)="showAddItem('Defect')">Report A Problem</button>
+                    <iframe #downloader style="display:none;"></iframe>
+                    <button (click)="exportCsv()" class="btn btn-primary">
+                        <i class="glyphicon glyphicon-export" aria-hidden="true"></i> Export as CSV
+                    </button>
+                    <button class="btn btn-warning" (click)="showAddItem('Defect')">Report Problem</button>
                 </div>
             </div>
             <div class="plan-body">
@@ -240,6 +244,8 @@ export class Plans {
     private hideFinished = false;
     private project = null;
 
+    @ViewChild('downloader') downloader;
+
     constructor(private ele: ElementRef,
                 private http: Http,
                 private prjs: ProjectService,
@@ -281,10 +287,8 @@ export class Plans {
             return;
         }
 
-        this.http.put('/api/work-item/bunch', JSON.stringify({'ids': ids, 'changes': {'planId': planId}}))
+        this.http.patch('/api/work-item/bunch', JSON.stringify({'ids': ids, 'changes': {'planId': planId}}))
           .subscribe(resp => this.onMoveToPlanResponse(resp));
-        // this.http.post('/api/plans/' + planId + '/move-in', JSON.stringify(ids))
-        //   .subscribe(resp => this.onMoveToPlanResponse(resp));
     }
 
     onMoveToPlanResponse(response) {
@@ -401,6 +405,10 @@ export class Plans {
         return this.workItems.every( item => item.checked );
     }
 
+    exportCsv() {
+        this.downloader.nativeElement.src = '/api/work-items/?format=csv&planId=' + this.current['id']
+        console.log('downloader', this.downloader);
+    }
     private getSelectedWorkItemIds() {
         var selected = [];
         this.workItems.forEach( wi=> {

@@ -1,5 +1,6 @@
 module.exports = function(router) {
     var models = require('../../models');
+    var csv = require('../modules/csv');
     router.route('/work-items')
         .get(function(req, res) {
             var ob = req.query.sortBy ? req.query.sortBy : 'id';
@@ -30,6 +31,20 @@ module.exports = function(router) {
                     {model: models.user, as: 'createdBy'}],
                 order: ob
             }).then(function(items) {
+                if ('csv' == req.query.format) {
+                    res.set('Content-disposition', 'attachment; filename=plan' + (req.query.planId ? req.query.planId : '') + '.csv');
+                    res.set('Content-Type', 'text/csv');
+                    return csv(res, items, [
+                        'id',
+                        'status',
+                        'type',
+                        'title', 
+                        { field: 'createdBy', title: 'Creator', map: function(f) { return f == null ? 'Unknonwn' : f.name; } },
+                        { field: 'owner', title: 'Owner', map: function(f) { return f == null ? 'Unassigned' : f.name; } }, 
+                        { field: 'originalEstimation', title: 'Original estimation'}, 
+                        { field: 'estimation', title: 'Remaining'}]);
+                }
+
                 res.json(items);
             })
         })
