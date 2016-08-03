@@ -8,15 +8,9 @@ module.exports = function (sequelize, DataTypes) {
         createdAt: DataTypes.DATE
     }, {
             timestamps: false,
-            tableName: 'User',
             classMethods: {
               associate: function(models) {
-                user.belongsToMany(models.role, {
-                    through: 'User_Role',
-                    otherKey: 'roles_id',
-                    foreignKey: 'User_userId',
-                    constraints: false
-                });
+                user.belongsToMany(models.role, {through: 'user_roles', otherKey: 'roleId',foreignKey: 'userId'});
                 // user.belongsToMany(models.team, {
                 //         // as: 'members',
                 //         through: 'Team_User',

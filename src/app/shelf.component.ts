@@ -33,11 +33,12 @@ import {UserService} from "./services/user-service";
                 <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/projects']" class="link">Dashboard</a></li>
                 <li [class.active]="getLinkStyle('/backlog')"><a [routerLink]="['/backlog']" class="link">Backlog</a></li>
                 <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/plans']" class="link">Plans</a></li>
+                <!--
                 <li [class.active]="getLinkStyle('/workitems')"><a [routerLink]="['/workitems']" class="link">Work Items</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">CI Status</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Promotion Status</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Reports</a></li>
-
+                -->
                 <li *ngIf="!projects.length"><a href="javascript:void(0);">No Project</a></li>
                 <li *ngIf="projects.length" class="dropdown" dropdown keyboard-nav>
                     <a href="javascript:void(0);" class="dropdown-toggle" dropdownToggle>
@@ -49,19 +50,12 @@ import {UserService} from "./services/user-service";
                       </li>
                     </ul>
                  </li>
+                 <li [class.active]="getLinkStyle('/settings')"><a href="javascript:void(0);" class="link">Settings</a></li>
               </ul>
-              <form class="navbar-form navbar-right">
-                <div ><a href="javascript:void(0);" title="{{app.commit}} at {{app.update}}">{{app.version}}</a></div>
-                <!-- TODO: show user name/user settings entry here
-                <div class="form-group">
-                  <input type="text" placeholder="Email" class="form-control">
-                </div>
-                <div class="form-group">
-                  <input type="password" placeholder="Password" class="form-control">
-                </div>
-                <button type="submit" class="btn btn-success">Sign in</button>
-                -->
-              </form>
+              <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Settings</a></li>
+                <li><a href="javascript:void(0);" title="{{app.version}}({{app.commit}} at {{app.update}})">About</a></li>
+              </ul>
             </div><!--/.nav-collapse -->
           </div>
         </nav>

@@ -11,7 +11,7 @@ module.exports = function (sequelize, DataTypes) {
                 associate: function(models) {
                     project.belongsTo(models.team);
                     project.hasMany(models.plan); //  cascade = CascadeType.REMOVE
-                    project.hasMany(models.workItem); //  cascade = CascadeType.REMOVE
+                    project.hasMany(models.item); //  cascade = CascadeType.REMOVE
                 }
             }
         });

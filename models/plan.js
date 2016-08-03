@@ -13,7 +13,7 @@ module.exports = function (sequelize, DataTypes) {
             classMethods: {
               associate: function(models) {
                 plan.belongsTo(models.project);
-                plan.hasMany(models.workItem);
+                plan.hasMany(models.item);
                 plan.hasOne(models.allocation);
               }
             }

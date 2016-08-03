@@ -4,7 +4,7 @@ module.exports = function(router) {
     router.route('/preferences').get(function(req, res){
         models.preference.findAll({
             where: {
-                user_userId: req.user.userId
+                userId: req.user.userId
             },
             attributes: ['name', 'value']
         }).then(function(prefs) {
@@ -22,7 +22,7 @@ module.exports = function(router) {
             return models.preference.findOne({
                 where: { 
                     name: req.params.name,
-                    user_userId: req.user.userId 
+                    userId: req.user.userId 
                 }
             }).then(function(exist) {
                 if (!exist) {
@@ -30,7 +30,7 @@ module.exports = function(router) {
                     return models.preference.create({
                         name: req.params.name,
                         value: req.body.value,
-                        user_userId: req.user.userId
+                        userId: req.user.userId
                     }).then(function(item) {
                         res.json({status: 'OK'});
                     });

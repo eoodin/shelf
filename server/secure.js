@@ -48,7 +48,7 @@ module.exports = function(app) {
             if (!usingLdap && !req.isAuthenticated()) {
                 let auth = passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login.html'});
                 req.body.username = 'jefliu';
-                req.body.password = '';
+                req.body.password = '1';
                 return auth(req, res, next);
             }
 

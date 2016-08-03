@@ -11,7 +11,7 @@ import {ProjectService} from '../services/project-service';
     template: `
     <modal-dialog [show]="_show" (showChange)="showChanged($event)" [title]="(_item.id ? 'Item Details' : 'Add Item')">
         <div dialog-body class="item-details">
-            <form (ngSubmit)="saveWorkItem()">
+            <form (ngSubmit)="saveItem()">
                 <div class="row" >
                     <div class="col-sm-12">
                         Type:
@@ -59,7 +59,7 @@ import {ProjectService} from '../services/project-service';
             </form>
         </div>
         <div dialog-footer>
-            <button (click)="saveWorkItem()" class="btn btn-default">{{(_item.id ? 'Save' : 'Add')}}</button>
+            <button (click)="saveItem()" class="btn btn-default">{{(_item.id ? 'Save' : 'Add')}}</button>
         </div>
     </modal-dialog>
     `,
@@ -113,7 +113,7 @@ export class ItemDetail {
         this.showChange.emit(e);
     }
 
-    saveWorkItem() {
+    saveItem() {
         var data = JSON.parse(JSON.stringify(this._item));
         data.projectId = this.prjs.current.getValue()['id'];
         if (!data['id']) {

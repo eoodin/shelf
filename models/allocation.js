@@ -6,8 +6,6 @@ module.exports = function (sequelize, DataTypes) {
         developerHours: DataTypes.INTEGER,
         testerHours: DataTypes.INTEGER,
     }, {
-            timestamps: false,
-            tableName: 'Allocation',
             classMethods: {
                 associate: function (models) {
                     allocation.belongsTo(models.plan);

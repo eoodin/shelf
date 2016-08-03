@@ -162,6 +162,42 @@ module.exports = {
     UPDATE WorkItem SET severity = 'Major' WHERE severity LIKE '2';
     UPDATE WorkItem SET severity = 'Minor' WHERE severity LIKE '3';
     */
+
+    // Added 2016-08-03
+    /*
+    rename table Allocation to allocations;
+    alter table allocations add column createdAt datetime;
+    alter table allocations add column updatedAt datetime;
+
+    rename table ChangeLog to changes;
+    alter table changes change column item_id itemId bigint(20);
+
+    rename table WorkItem to items;
+     alter table changes change actor_userId userId varchar(255);
+
+     rename table UserPreference to preferences;
+     alter table preferences change user_userId userId varchar(255);
+
+     rename table User to users;
+     rename table Role to roles;
+      alter table roles add column createdAt datetime;
+    alter table roles add column updatedAt datetime;
+     rename table User_Role to user_roles;
+
+     alter table user_roles change User_userId userId varchar(255) not null;
+     alter table user_roles change roles_id roleId bigint(20) not null;
+
+  rename table Team to teams;
+rename table Team_User to team_members;
+alter table team_members change Team_id teamId bigint(20);
+alter table team_members change members_userId userId varchar(255);
+
+// SELECT constraint_name FROM   information_schema.KEY_COLUMN_USAGE WHERE   constraint_schema = 'shelf' AND table_name = 'team_members' AND      referenced_table_name IS NOT NULL and column_name = 'members_userId';
+alter table team_members drop foreign key <>;
+alter table team_members change members_userId userId varchar(255);
+alter table team_members add foreign key (userId) REFERENCES `users` (`userId`);
+    */
+
   },
 
   down: function (queryInterface, Sequelize) {

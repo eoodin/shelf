@@ -17,14 +17,14 @@ module.exports = function(router) {
     router.route('/defects/:id/fix')
         .post(function(req, res) {
             models.sequelize.transaction(function(t) {
-                return models.workItem.findById(req.params.id)
+                return models.item.findById(req.params.id)
                     .then(function(defect) {
                         return currentPlan(defect.projectId).then(function(plan) {
                             if (!plan) {
                                 throw new Error('Cannot locate current plan.');
                             }
 
-                            return models.workItem.create({
+                            return models.item.create({
                                 type:'Task',
                                 catalog:  'Development',
                                 status: 'InProgress',
@@ -54,13 +54,13 @@ module.exports = function(router) {
     router.route('/defects/:id/test')
         .post(function(req, res) {
             models.sequelize.transaction(function(t) {
-                return models.workItem.findById(req.params.id).then(function(defect) {
+                return models.item.findById(req.params.id).then(function(defect) {
                     return currentPlan(defect.projectId).then(function(plan) {
                         if (!plan) {
                             return res.status(501).json({error: 'Cannot locate current plan.'})
                         }
                         
-                        return models.workItem.create({
+                        return models.item.create({
                             type:'Task',
                             catalog:  'Testing',
                             status: 'InProgress',

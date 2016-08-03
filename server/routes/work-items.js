@@ -28,12 +28,14 @@ module.exports = function(router) {
                 where['status'] = {$in : status};
             }
 
-            models.workItem.findAll({
+            models.item.findAll({
                 where: where,
                 // TODO: keep only id of owner and creator to reduce data size
                 include: [
                     {model: models.user, as: 'owner'},
-                    {model: models.user, as: 'createdBy'}],
+                    {model: models.user, as: 'createdBy'},
+                    {model: models.change}
+                ],
                 order: ob
             }).then(function(items) {
                 if ('csv' == req.query.format) {
@@ -79,7 +81,7 @@ module.exports = function(router) {
                     severity: req.body.severity
                 };
                 console.log('Definition composed', def);
-                var item = models.workItem.build(def);
+                var item = models.item.build(def);
                 item.save().then(function (item) {
                     res.json(item.id);
                 })
@@ -91,7 +93,7 @@ module.exports = function(router) {
 
     router.route('/work-items/:id')
         .put(function(req, res) {
-            models.workItem.findById(req.params.id).then(function(item) {
+            models.item.findById(req.params.id).then(function(item) {
                 // TODO: change this.
                 if (req.body.ownerId) {
                     req.body.owner_userId = req.body.ownerId;
@@ -125,7 +127,7 @@ module.exports = function(router) {
 
                         if (toFinish && item.parent_id) {
                             console.log('Finding defect for task ' + item.parent_id);
-                            models.workItem.findOne({
+                            models.item.findOne({
                                 where: {
                                     type: 'Defect',
                                     id : item.parent_id
@@ -151,7 +153,7 @@ module.exports = function(router) {
                 }
 
                 item.update(changes).then(function(item) {
-                    models.changeLog.create({
+                    models.change.create({
                         originalData: JSON.stringify(origin),
                         changedData: JSON.stringify(changes),
                         actor_userId: req.user.userId,
@@ -166,9 +168,7 @@ module.exports = function(router) {
             });
         })
         .delete(function(req, res){
-            models.workItem.findById(req.params.id).then(function(item) {
-                console.log('deleting workitem id=' + req.params.id);
-
+            models.item.findById(req.params.id).then(function(item) {
                 item.destroy().then(function(item) {
                     res.json(req.params.id);
                 })
@@ -191,7 +191,7 @@ module.exports = function(router) {
             }
 
             let changes = req.body.changes;
-            models.workItem.update(changes, {
+            models.item.update(changes, {
                 where: {
                     id: { $in: ids }
                 }

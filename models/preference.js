@@ -7,10 +7,9 @@ module.exports = function (sequelize, DataTypes) {
         name: DataTypes.STRING,
         value: DataTypes.STRING
     }, {
-            tableName: 'UserPreference',
             classMethods: {
               associate: function(models) {
-                preference.belongsTo(models.user, {foreignKey: 'user_userId'});
+                preference.belongsTo(models.user, {foreignKey: 'userId'});
               }
             }
         });

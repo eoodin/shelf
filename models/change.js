@@ -1,19 +1,18 @@
 "use strict";
 
 module.exports = function (sequelize, DataTypes) {
-    var changeLog = sequelize.define("changeLog", {
+    var change = sequelize.define("change", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         originalData: { type: DataTypes.STRING, length: 'long' /* > 524288 */ },
         changedData:  { type: DataTypes.STRING, length: 'long' /* > 524288 */ }
     }, {
-            tableName: 'ChangeLog',
             classMethods: {
               associate: function(models) {
-                changeLog.belongsTo(models.workItem, {as: 'item', foreignKey: 'item_id'});
-                changeLog.belongsTo(models.user, {as: 'user', foreignKey: 'actor_userId'})
+                change.belongsTo(models.item);
+                change.belongsTo(models.user, {foreignKey: 'userId'})
               }
             }
         });
 
-    return changeLog;
+    return change;
 };
