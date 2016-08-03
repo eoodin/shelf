@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {Jsonp} from '@angular/http';
+import {Http} from '@angular/http';
 
 import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 
@@ -16,6 +16,6 @@ import {ModalDialog} from '../components/modal-dialog';
     styles: [``]
 })
 export class WorkItems {
-    constructor(private jsonp: Jsonp, private prjs: ProjectService) {
+    constructor(private http: Http, private prjs: ProjectService) {
     }
 }
