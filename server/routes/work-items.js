@@ -23,6 +23,11 @@ module.exports = function(router) {
                 where['type'] = {$in : types}
             }
 
+            if (req.query.status) {
+                let status = req.query.status.split(',');
+                where['status'] = {$in : status};
+            }
+
             models.workItem.findAll({
                 where: where,
                 // TODO: keep only id of owner and creator to reduce data size

@@ -26,6 +26,19 @@ import {ItemDetail} from '../components/item-detail';
                     <div class="spinner-loader"></div>
                 </div>
                 <div class="panel panel-default">
+                    <div class="panel-heading work-items-heading">
+                        <div>
+                            <label>
+                                <input type="checkbox" [ngModel]="showTasks"  (ngModelChange)="showTasks = $event; loadItems();"/>
+                                Show tasks
+                            </label>
+
+                            <label>
+                                <input type="checkbox" [ngModel]="hideFinished" [disabled]="!showTasks" (ngModelChange)="hideFinished = $event; loadItems();"/>
+                                Hide finished
+                            </label>
+                        </div>
+                    </div>
                     <table *ngIf="items" class="table">
                         <tr>
                             <th> ID </th>
@@ -135,11 +148,15 @@ export class Backlog {
     private ui;
     private sort: any;
     private requesting = false;
+    private showTasks: boolean;
+    private hideFinished: boolean;
 
     constructor(private ele: ElementRef,
                 private http: Http,
                 private prs: ProjectService,
                 private pref : PreferenceService) {
+        this.showTasks = false; // TODO: save to preference
+        this.hideFinished = false; // TODO: save to preference
         this.ui = {
             'loading': {'show': false},
             'awd': {'show': false, 'loading': false, 'item': {}},
@@ -154,7 +171,13 @@ export class Backlog {
     }
 
     loadItems() {
-        this.http.get('/api/work-items/?types=UserStory,Defect&projectId=' + this.project.id)
+        let q = 'projectId=' + this.project.id;
+        let types = 'UserStory,Defect';
+        if (this.showTasks) { types += ',Task'}
+        q += '&types=' + types;
+        if (this.showTasks && this.hideFinished) { q += '&status=New,InProgress,Pending,Dropped' }
+        
+        this.http.get('/api/work-items/?' + q)
             .subscribe(b => this.items = b.json());
     }
 
@@ -169,8 +192,6 @@ export class Backlog {
 
         this.ui.awd.show = true;
     }
-
-    
 
     startFix(item) {
         this.requesting = true;

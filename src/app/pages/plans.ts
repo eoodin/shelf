@@ -47,7 +47,7 @@ import {ModalDialog} from '../components/modal-dialog';
                         <div class="panel-heading work-items-heading">
                             <div>
                                 <label>
-                                    <input type="checkbox" [(ngModel)]="hideFinished"  (click)="loadWorkItems();" (click)="onHideFinishedCheck()"/>
+                                    <input type="checkbox" [(ngModel)]="hideFinished"  (click)="onHideFinishedCheck()"/>
                                     Hide Finished
                                 </label>
                             </div>
@@ -133,7 +133,8 @@ import {ModalDialog} from '../components/modal-dialog';
                                 </td>
                                 <td>{{item.estimation}}</td>
                                 <td>
-                                    <a (click)="removingItem(item)"><span class="glyphicon glyphicon-remove"></span></a>
+                                    <a title="Remove this work item" (click)="removingItem(item)"><span class="glyphicon glyphicon-remove"></span></a>
+                                    <a title="Put back to backlog" (click)="moveToBacklog(item)"><span class="glyphicon glyphicon-level-up"></span></a>
                                 </td>
                             </tr>
                         </table>
@@ -277,6 +278,7 @@ export class Plans {
     }
 
     onHideFinishedCheck() {
+        this.loadWorkItems();
         this.pref.setPreference('hideFinished',  !this.hideFinished);
     }
 
@@ -317,6 +319,14 @@ export class Plans {
         this.ui.rwd.show = true;
     }
 
+    moveToBacklog(item) {
+        this.ui.loading.show = true;
+        var change = {'planId': null};
+        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
+            .finally(() => this.ui.loading.show = false)
+            .subscribe(resp => this.loadWorkItems());
+    }
+
     removeItem(item) {
         this.http.delete('/api/work-items/' + item.id)
             .subscribe(resp =>
@@ -338,7 +348,8 @@ export class Plans {
 
         var change = {'status': status};
         this.http.put('api/work-items/' + item.id, JSON.stringify(change))
-            .subscribe(resp => this.onStatusUpdate(resp));
+            .finally(() => this.ui.loading.show = false)
+            .subscribe(resp => this.loadWorkItems());
     }
 
     assignTo(item, member) {
@@ -346,16 +357,12 @@ export class Plans {
         member = member || {userId: -1};
         var change = {'ownerId': member.userId};
         this.http.put('api/work-items/' + item.id, JSON.stringify(change))
-            .subscribe(resp => this.onStatusUpdate(resp));
+            .finally(() => this.ui.loading.show = false)
+            .subscribe(resp => this.loadWorkItems());
     }
 
     onWorkSaved(resp) {
         this.ui.awd.show = false;
-        this.loadWorkItems();
-    }
-
-    onStatusUpdate(resp) {
-        this.ui.loading.show = false;
         this.loadWorkItems();
     }
 
