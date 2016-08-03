@@ -45,12 +45,13 @@ module.exports = function(app) {
     
     app.all('/', function(req, res, next) {
             //Automatic login
-            if (!req.isAuthenticated()) {
+            if (!usingLdap && !req.isAuthenticated()) {
                 let auth = passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login.html'});
                 req.body.username = 'jefliu';
-                req.body.password = '123';
+                req.body.password = '';
                 return auth(req, res, next);
             }
+
             if (req.isAuthenticated()) {
                 // check and create user in database
                 // fields fetched from ldap: user.mail, user.displayName, user.employeeNumber
@@ -61,7 +62,6 @@ module.exports = function(app) {
 
     if (usingLdap) {
         app.post('/login', function(req, res, next) {
-            console.log('Authenticating: ' + JSON.stringify(req.body));
             passport.authenticate('ldapauth', { successRedirect: '/', failureRedirect: '/login.html' })(req, res, next);
         });
     }
