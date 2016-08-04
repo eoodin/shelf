@@ -65,7 +65,7 @@ module.exports = function(app) {
             passport.authenticate('ldapauth', function(err, user, info) {
                 if (err) { return next(err); }
                 if (!user) { return res.redirect('/login.html'); }
-                user[id] = user[uid];
+                user['id'] = user['uid'];
                 req.logIn(user, function(err) {
                     if (err) { return next(err); }
                     return res.redirect('/');
