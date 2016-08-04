@@ -11,6 +11,9 @@
 /dist
 /tmp
 
+# typescript generated files
+/src/**/*.js
+/src/**/*.js.map
 
 # dependencies
 /node_modules
