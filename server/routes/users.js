@@ -3,7 +3,7 @@ module.exports = function(router) {
     router.route('/users/me').get(function(req, res) {
         models.user.find({
                 include: [models.role],
-                where: {userId: 'jefliu'}}).then(function(user) {               
+                where: {id: req.user.id}}).then(function(user) {               
             res.json(user);
         });
     });

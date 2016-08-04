@@ -2,7 +2,7 @@
 
 module.exports = function (sequelize, DataTypes) {
     var user = sequelize.define("user", {
-        userId: { type: DataTypes.STRING, primaryKey: true },
+        id: { type: DataTypes.STRING, primaryKey: true },
         email: DataTypes.STRING,
         name: DataTypes.STRING,
         createdAt: DataTypes.DATE

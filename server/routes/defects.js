@@ -33,7 +33,7 @@ module.exports = function(router) {
                                 estimation: 8,
                                 originalEstimation: 8,
                                 projectId: defect.projectId,
-                                owner_userId: req.user.userId,
+                                owner_userId: req.user.id,
                                 parent_id: defect.id,
                                 planId: plan.id
                             }).then(function(task) {
@@ -69,7 +69,7 @@ module.exports = function(router) {
                             estimation: 8,
                             originalEstimation: 8,
                             projectId: defect.projectId,
-                            owner_userId: req.user.userId,
+                            owner_userId: req.user.id,
                             parent_id: defect.id,
                             planId: plan.id
                         }).then(function(task){

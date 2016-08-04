@@ -60,11 +60,11 @@ module.exports = function(router) {
                 return res.sendStatus(500);
             }
             
-            if (!req.user || !req.user.userId) {
+            if (!req.user || !req.user.id) {
                 return res.sendStatus(403);
             }
             
-            models.user.findById(req.user.userId).then(function(u) {
+            models.user.findById(req.user.id).then(function(u) {
                 let def = {
                     type: req.body.type,
                     status: 'New',
@@ -156,7 +156,7 @@ module.exports = function(router) {
                     models.change.create({
                         originalData: JSON.stringify(origin),
                         changedData: JSON.stringify(changes),
-                        actor_userId: req.user.userId,
+                        actor_userId: req.user.id,
                         item_id: item.id
                     }).then(function() {
                         res.json(item);

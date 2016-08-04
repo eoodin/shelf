@@ -190,12 +190,59 @@ module.exports = {
   rename table Team to teams;
 rename table Team_User to team_members;
 alter table team_members change Team_id teamId bigint(20);
+
+// team_members -> users
+SELECT constraint_name INTO @cn FROM  information_schema.KEY_COLUMN_USAGE WHERE table_name = 'team_members' AND column_name = 'members_userId';
+
+select CONCAT('alter table team_members drop foreign key ', @cn) into @sql;
+prepare stmt from @sql;
+execute stmt;
+deallocate prepare stmt;
+
 alter table team_members change members_userId userId varchar(255);
 
-// SELECT constraint_name FROM   information_schema.KEY_COLUMN_USAGE WHERE   constraint_schema = 'shelf' AND table_name = 'team_members' AND      referenced_table_name IS NOT NULL and column_name = 'members_userId';
-alter table team_members drop foreign key <>;
-alter table team_members change members_userId userId varchar(255);
-alter table team_members add foreign key (userId) REFERENCES `users` (`userId`);
+SELECT constraint_name INTO @cn FROM  information_schema.KEY_COLUMN_USAGE WHERE table_name = 'changes' AND column_name = 'userId';
+select CONCAT('alter table changes drop foreign key ', @cn) into @sql;
+prepare stmt from @sql;
+execute stmt;
+deallocate prepare stmt;
+
+
+SELECT constraint_name INTO @cn FROM  information_schema.KEY_COLUMN_USAGE WHERE table_name = 'preferences' AND column_name = 'userId';
+select CONCAT('alter table preferences drop foreign key ', @cn) into @sql;
+prepare stmt from @sql;
+execute stmt;
+deallocate prepare stmt;
+
+
+SELECT constraint_name INTO @cn FROM  information_schema.KEY_COLUMN_USAGE WHERE table_name = 'teams' AND column_name = 'scrumMaster';
+select CONCAT('alter table teams drop foreign key ', @cn) into @sql;
+prepare stmt from @sql;
+execute stmt;
+deallocate prepare stmt;
+SELECT constraint_name INTO @cn FROM  information_schema.KEY_COLUMN_USAGE WHERE table_name = 'teams' AND column_name = 'createdBy';
+select CONCAT('alter table teams drop foreign key ', @cn) into @sql;
+prepare stmt from @sql;
+execute stmt;
+deallocate prepare stmt;
+
+
+SELECT constraint_name INTO @cn FROM  information_schema.KEY_COLUMN_USAGE WHERE table_name = 'user_roles' AND column_name = 'userId';
+select CONCAT('alter table user_roles drop foreign key ', @cn) into @sql;
+prepare stmt from @sql;
+execute stmt;
+deallocate prepare stmt;
+
+
+alter table users change userId id varchar(255);
+
+alter table team_members add foreign key (userId) REFERENCES `users` (`id`);
+alter table changes add foreign key (userId) REFERENCES `users` (`id`);
+alter table preferences add foreign key (userId) REFERENCES `users` (`id`);
+alter table teams add foreign key (scrumMaster) REFERENCES `users` (`id`);
+alter table teams add foreign key (createdBy) REFERENCES `users` (`id`);
+alter table user_roles add foreign key (userId) REFERENCES `users` (`id`);
+
     */
 
   },

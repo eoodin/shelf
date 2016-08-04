@@ -354,7 +354,7 @@ export class Plans {
 
     assignTo(item, member) {
         this.ui.loading.show = true;
-        var change = {'ownerId': member ? member.userId : null};
+        var change = {'ownerId': member ? member.id : null};
         this.http.put('api/work-items/' + item.id, JSON.stringify(change))
             .finally(() => this.ui.loading.show = false)
             .subscribe(resp => this.loadWorkItems());

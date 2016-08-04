@@ -21,7 +21,7 @@ module.exports = function(app) {
     }
     else {
         passport.use('local', new LocalStrategy(function(username, password, done) {
-            return models.user.find({where: {userId: username}}).then(function(u) {
+            return models.user.find({where: {id: username}}).then(function(u) {
                 done(null, u);
             }, function(error) {
                 console.log('Authenticate failed: ', error);
@@ -62,13 +62,26 @@ module.exports = function(app) {
 
     if (usingLdap) {
         app.post('/login', function(req, res, next) {
-            passport.authenticate('ldapauth', { successRedirect: '/', failureRedirect: '/login.html' })(req, res, next);
+            passport.authenticate('ldapauth', function(err, user, info) {
+                if (err) { return next(err); }
+                if (!user) { return res.redirect('/login.html'); }
+                user[id] = user[uid];
+                req.logIn(user, function(err) {
+                    if (err) { return next(err); }
+                    return res.redirect('/');
+                });
+            })(req, res, next);
+            // passport.authenticate('ldapauth', { successRedirect: '/', failureRedirect: '/login.html' })(req, res, next);
         });
     }
     else {
         app.post('/login', function(req, res, next) {
-            let auth = passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login.html'});
+            let auth = passport.authenticate('local', 
+            {failureRedirect: '/login.html'});
             auth(req, res, next);
+        }, function(req, res) {
+
+            res.redirect('/');
         });
     }
     
