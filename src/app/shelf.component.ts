@@ -6,10 +6,6 @@ import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 import {ProjectService} from './services/project-service';
 import {PreferenceService} from './services/preference-service';
 import {TeamService} from './services/team-service';
-import {Projects} from './pages/projects';
-import {Backlog} from './pages/backlog';
-import {Plans} from './pages/plans';
-import {WorkItems} from './pages/workitems';
 import {AppService} from "./services/app-service";
 import {UserService} from "./services/user-service";
 
@@ -34,7 +30,7 @@ import {UserService} from "./services/user-service";
                 <li [class.active]="getLinkStyle('/backlog')"><a [routerLink]="['/backlog']" class="link">Backlog</a></li>
                 <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/plans']" class="link">Plans</a></li>
                 <!--
-                <li [class.active]="getLinkStyle('/workitems')"><a [routerLink]="['/workitems']" class="link">Work Items</a></li>
+                <li [class.active]="getLinkStyle('/workitems')"><a [routerLink]="['/items']" class="link">Work Items</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">CI Status</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Promotion Status</a></li>
                 <li [class.active]="getLinkStyle('/my-task')"><a href="javascript:void(0);" class="link">Reports</a></li>
@@ -50,10 +46,9 @@ import {UserService} from "./services/user-service";
                       </li>
                     </ul>
                  </li>
-                 <li [class.active]="getLinkStyle('/settings')"><a href="javascript:void(0);" class="link">Settings</a></li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">Settings</a></li>
+                <li [class.active]="getLinkStyle('/settings')"><a [routerLink]="['/settings']">Settings</a></li>
                 <li><a href="javascript:void(0);" title="{{app.version}}({{app.commit}} at {{app.update}})">About</a></li>
               </ul>
             </div><!--/.nav-collapse -->
@@ -61,11 +56,6 @@ import {UserService} from "./services/user-service";
         </nav>
 
         <div class="container-fluid">
-        <!--
-            <alert [type]="'warning'" dismissible="true">
-                <p>Notice: This tool is under development. Help us by submitting idea to "Shelf" project.</p>
-            </alert>
-          -->
             <router-outlet></router-outlet>
         </div>
     </div>
@@ -75,7 +65,7 @@ import {UserService} from "./services/user-service";
     .app-page { padding-top: 70px; }
     .nav-logo {width: 32px; height:32px;}
     `],
-    directives: [/*Alert, */ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
+    directives: [ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
     providers: [ProjectService, PreferenceService, TeamService, AppService, UserService]
 })
 export class ShelfAppComponent {
