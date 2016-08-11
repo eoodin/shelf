@@ -11,6 +11,7 @@ import {Backlog} from './app/pages/backlog';
 import {Plans} from './app/pages/plans';
 import {WorkItems} from './app/pages/workitems';
 import {SettingsPageComponent} from './app/settings-page';
+import {NotifyService} from "./app/notify.service";
 
 if (environment.production) {
   enableProdMode();
@@ -34,6 +35,7 @@ bootstrap(ShelfAppComponent, [
   provideForms(),
   provideRouter(routes),
   HTTP_PROVIDERS,
-  provide(RequestOptions, {useClass:DefaultHttpOptions}),
+  provide(NotifyService, {useClass: NotifyService}),
+  provide(RequestOptions, {useClass: DefaultHttpOptions}),
   provide(LocationStrategy, {useClass: HashLocationStrategy})
 ]);

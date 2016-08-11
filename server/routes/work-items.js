@@ -6,7 +6,7 @@ module.exports = function(router) {
             var ob = req.query.sortBy ? req.query.sortBy : 'id';
             // TODO: rename this field to eleminate the code.
             if (ob == 'owner') ob = 'ownerId';
-            
+
             if (req.query.desc) {
                 ob = [[ob, 'desc']]
             }
@@ -15,7 +15,7 @@ module.exports = function(router) {
                 where = {projectId: req.query.projectId};
             }
             else if (req.query.planId) {
-                where = {planId: req.query.planId}; 
+                where = {planId: req.query.planId};
             }
 
             if (req.query.types) {
@@ -45,10 +45,10 @@ module.exports = function(router) {
                         'id',
                         'status',
                         'type',
-                        'title', 
+                        'title',
                         { field: 'creator', title: 'Creator', map: function(f) { return f == null ? 'Unknonwn' : f.name; } },
-                        { field: 'owner', title: 'Owner', map: function(f) { return f == null ? 'Unassigned' : f.name; } }, 
-                        { field: 'originalEstimation', title: 'Original estimation'}, 
+                        { field: 'owner', title: 'Owner', map: function(f) { return f == null ? 'Unassigned' : f.name; } },
+                        { field: 'originalEstimation', title: 'Original estimation'},
                         { field: 'estimation', title: 'Remaining'}]);
                 }
 
@@ -59,11 +59,11 @@ module.exports = function(router) {
             if (!req.body.planId && !req.body.projectId) {
                 return res.sendStatus(500);
             }
-            
+
             if (!req.user || !req.user.id) {
                 return res.sendStatus(403);
             }
-            
+
             models.user.findById(req.user.id).then(function(u) {
                 let def = {
                     type: req.body.type,
@@ -80,7 +80,6 @@ module.exports = function(router) {
                     points: req.body.points,
                     severity: req.body.severity
                 };
-                console.log('Definition composed', def);
                 var item = models.item.build(def);
                 item.save().then(function (item) {
                     res.json(item.id);
@@ -101,12 +100,12 @@ module.exports = function(router) {
                     if (f == 'updatedAt' || f == 'createdAt') {
                         continue;
                     }
-                    
+
                     if (item[f] != req.body[f]) {
                         origin[f] = item[f];
                         changes[f] = req.body[f];
                     }
-                    
+
                     if (item.type == 'Task') {
                         let toFinish = false;
                         if (f == 'estimation' && req.body[f] == 0) {
@@ -144,7 +143,7 @@ module.exports = function(router) {
                             });
                         }
                     }
-                    
+
                 }
 
                 item.update(changes).then(function(item) {
@@ -194,4 +193,4 @@ module.exports = function(router) {
                 res.json(affected);
             })
         });
-}
+};

@@ -8,6 +8,9 @@ import {PreferenceService} from './services/preference-service';
 import {TeamService} from './services/team-service';
 import {AppService} from "./services/app-service";
 import {UserService} from "./services/user-service";
+import {NotifyService} from "./notify.service";
+
+import {Observable} from 'rxjs/Rx';
 
 @Component({
     selector: '[shelf-app]',
@@ -77,13 +80,19 @@ export class ShelfAppComponent {
     constructor(private router:Router,
                 private location:Location,
                 private prjs: ProjectService,
-                private pfs: PreferenceService,
+                private notify: NotifyService,
                 private apps: AppService) {
         prjs.projects.subscribe(ps => this.projects = ps);
         prjs.current.subscribe(p => this.project = p);
         apps.info.subscribe(app => this.app = app);
         prjs.load();
         this.ui = {"nav" : {"projectList" : {"show": false}}};
+
+        Observable.interval(1000 * 60)
+          .map(() => new Date())
+          .filter(now => now.getMinutes() == 0)
+          .filter(now => now.getHours() == 10 || now.getHours() == 17)
+          .subscribe(() => this.notify.notify('Update task status', 'Please update task status.'));
     }
 
     getLinkStyle(path) {
