@@ -73,8 +73,6 @@ module.exports = function(router) {
                     originalEstimation: (req.body.estimation || 0),
                     title: req.body.title,
                     description: req.body.description,
-                    owner: u, // TODO:  check why not working
-                    creator: u,
                     planId: (req.body.planId || null),
                     projectId: (req.body.projectId || null),
                     points: req.body.points,
@@ -82,6 +80,8 @@ module.exports = function(router) {
                 };
                 console.log('Definition composed', def);
                 var item = models.item.build(def);
+                item.setOwner(u);
+                item.setCreator(u);
                 item.save().then(function (item) {
                     res.json(item.id);
                 })
