@@ -6,10 +6,9 @@ module.exports = function (sequelize, DataTypes) {
         name: DataTypes.STRING,
         type: DataTypes.STRING,
         start: DataTypes.DATE,
-        end: DataTypes.DATE,
+        end: DataTypes.DATE
     }, {
             timestamps: false,
-            tableName: 'Plan',
             classMethods: {
               associate: function(models) {
                 plan.belongsTo(models.project);

@@ -6,7 +6,6 @@ module.exports = function (sequelize, DataTypes) {
         name: DataTypes.STRING
     }, {
             timestamps: false,
-            tableName: 'Project',
             classMethods: {
                 associate: function(models) {
                     project.belongsTo(models.team);

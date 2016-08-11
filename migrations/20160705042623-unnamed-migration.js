@@ -14,7 +14,7 @@ module.exports = {
     queryInterface.addColumn('User_Role', 'createdAt', {type: Sequelize.DATETIME});
     queryInterface.addColumn('User_Role', 'updatedAt', {type: Sequelize.DATETIME});
 
-    // alter table Team add column updatedAt datetime; 
+    // alter table Team add column updatedAt datetime;
     queryInterface.addColumn('Team', 'updatedAt', {type: Sequelize.DATETIME});
     // alter table Team change column createdBy_userId createdBy varchar(255);
     queryInterface.renameColumn('Team', 'createdBy_userId', 'createdBy');
@@ -43,7 +43,7 @@ module.exports = {
       "UPDATE WorkItem SET type = 'Defect' WHERE type LIKE 'DE'");
       queryInterface.migrator.sequelize.query(
       "UPDATE WorkItem SET type = 'Task' WHERE type LIKE 'TA'");
-    
+
     // alter table WorkItem change column status status varchar(31);
     queryInterface.changeColumn('WorkItem', 'status', {
         type: Sequelize.ENUM,
@@ -64,7 +64,7 @@ module.exports = {
       "UPDATE WorkItem SET status = 'Dropped' WHERE status LIKE '4'");
     queryInterface.migrator.sequelize.query(
       "UPDATE WorkItem SET status = 'Removed' WHERE status LIKE '5'");
-  
+
     //['Created','Analyzing','Analyzed','Fixing','Fixed','Testing','Tested','Failed']
     // alter table WorkItem change column state state varchar(31);
     queryInterface.changeColumn('WorkItem', 'state', {
@@ -117,7 +117,7 @@ module.exports = {
     /*
     alter table User_Role add column createdAt datetime;
     alter table User_Role add column updatedAt datetime;
-    alter table Team add column updatedAt datetime; 
+    alter table Team add column updatedAt datetime;
     alter table Team change column createdBy_userId createdBy varchar(255);
     alter table Team change column scrumMaster_userId scrumMaster varchar(255);
     alter table Project change column team_id teamId bigint(21);
@@ -253,7 +253,13 @@ deallocate prepare stmt;
 alter table items change column parent_id parentId bigint(20);
 alter table items add foreign key (parentId) REFERENCES `items` (`id`);
 rename table GenericFile to File;
-    */
+
+// Added 2016-08-11
+     rename table Project to projects;
+     rename table File to files;
+     rename table Plan to plans;
+
+     */
 
   },
 
