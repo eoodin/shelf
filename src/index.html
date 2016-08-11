@@ -18,9 +18,18 @@
 </head>
 <body>
   <div shelf-app>
-    <div class="loading-icon-large">
+    <div id="loading-icon" class="loading-icon-large">
       <link href="/css-spinner.css" rel="stylesheet">
       <img src="/spin.gif"/>
+    </div>
+    <div id="compatibility-notice" style="margin: 10px; display:none;">
+      <h3>Your browser is not compatible</h3>
+      <h4>If your are using Internet Explorer</h4>
+      <ol>
+        <li>Go to 'Tools' => 'Compatibility view settings' to open compatibility view setting dialog</li>
+        <li>Uncheck option 'Display intranet sites in Compatibility View'</li>
+        <li>Close the dialog and reload the page if it is not reloading.</li>
+      </ol>
     </div>
   </div>
 
@@ -32,6 +41,14 @@
       System.import('system-config.js').then(function () {
         System.import('main');
       }).catch(console.error.bind(console));
+    </script>
+    <script type="text/javascript">
+      if (typeof(Function.call.bind) == 'undefined') {
+        var loading = document.getElementById("loading-icon");
+        loading.style.display = "none";
+        var mask = document.getElementById("compatibility-notice");
+        mask.style.display = "block";
+      }
     </script>
 </body>
 </html>
