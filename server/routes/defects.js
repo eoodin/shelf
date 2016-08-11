@@ -33,8 +33,8 @@ module.exports = function(router) {
                                 estimation: 8,
                                 originalEstimation: 8,
                                 projectId: defect.projectId,
-                                owner_userId: req.user.id,
-                                parent_id: defect.id,
+                                ownerId: req.user.id,
+                                parentId: defect.id,
                                 planId: plan.id
                             }).then(function(task) {
                                 // change log writing is missing, aspect programming?
@@ -69,8 +69,8 @@ module.exports = function(router) {
                             estimation: 8,
                             originalEstimation: 8,
                             projectId: defect.projectId,
-                            owner_userId: req.user.id,
-                            parent_id: defect.id,
+                            ownerId: req.user.id,
+                            parentId: defect.id,
                             planId: plan.id
                         }).then(function(task){
                             return defect.update({status: 'InProgress', state: 'Testing'}).then(function() {

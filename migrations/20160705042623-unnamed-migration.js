@@ -243,6 +243,16 @@ alter table teams add foreign key (scrumMaster) REFERENCES `users` (`id`);
 alter table teams add foreign key (createdBy) REFERENCES `users` (`id`);
 alter table user_roles add foreign key (userId) REFERENCES `users` (`id`);
 
+alter table items change column createdBy_userId creatorId varchar(255);
+alter table items change column owner_userId ownerId varchar(255);
+SELECT constraint_name INTO @cn FROM  information_schema.KEY_COLUMN_USAGE WHERE table_name = 'items' AND column_name = 'parent_id';
+select CONCAT('alter table items drop foreign key ', @cn) into @sql;
+prepare stmt from @sql;
+execute stmt;
+deallocate prepare stmt;
+alter table items change column parent_id parentId bigint(20);
+alter table items add foreign key (parentId) REFERENCES `items` (`id`);
+rename table GenericFile to File;
     */
 
   },

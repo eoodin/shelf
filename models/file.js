@@ -7,16 +7,7 @@ module.exports = function (sequelize, DataTypes) {
         size: DataTypes.BIGINT(20),
         mime: DataTypes.STRING,
         data: DataTypes.BLOB
-    }, {
-            tableName: 'GenericFile',
-            classMethods: {
-                /*
-              associate: function(models) {
-                file.hasMany(models.Task)
-              }
-              */
-            }
-        });
+    });
 
     return file;
 };

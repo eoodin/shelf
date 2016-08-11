@@ -5,7 +5,7 @@ module.exports = function(router) {
         .get(function(req, res) {
             var ob = req.query.sortBy ? req.query.sortBy : 'id';
             // TODO: rename this field to eleminate the code.
-            if (ob == 'owner') ob = 'owner_userId';
+            if (ob == 'owner') ob = 'ownerId';
             
             if (req.query.desc) {
                 ob = [[ob, 'desc']]
@@ -33,7 +33,7 @@ module.exports = function(router) {
                 // TODO: keep only id of owner and creator to reduce data size
                 include: [
                     {model: models.user, as: 'owner'},
-                    {model: models.user, as: 'createdBy'},
+                    {model: models.user, as: 'creator'},
                     {model: models.change}
                 ],
                 order: ob
@@ -46,7 +46,7 @@ module.exports = function(router) {
                         'status',
                         'type',
                         'title', 
-                        { field: 'createdBy', title: 'Creator', map: function(f) { return f == null ? 'Unknonwn' : f.name; } },
+                        { field: 'creator', title: 'Creator', map: function(f) { return f == null ? 'Unknonwn' : f.name; } },
                         { field: 'owner', title: 'Owner', map: function(f) { return f == null ? 'Unassigned' : f.name; } }, 
                         { field: 'originalEstimation', title: 'Original estimation'}, 
                         { field: 'estimation', title: 'Remaining'}]);
@@ -74,7 +74,7 @@ module.exports = function(router) {
                     title: req.body.title,
                     description: req.body.description,
                     owner: u, // TODO:  check why not working
-                    createdBy: u,
+                    creator: u,
                     planId: (req.body.planId || null),
                     projectId: (req.body.projectId || null),
                     points: req.body.points,
@@ -94,11 +94,6 @@ module.exports = function(router) {
     router.route('/work-items/:id')
         .put(function(req, res) {
             models.item.findById(req.params.id).then(function(item) {
-                // TODO: change this.
-                if (req.body.ownerId) {
-                    req.body.owner_userId = req.body.ownerId;
-                }
-
                 var origin = {};
                 var changes = {};
                 for(let f in req.body) {
@@ -125,12 +120,12 @@ module.exports = function(router) {
                             toFinish = true;
                         }
 
-                        if (toFinish && item.parent_id) {
-                            console.log('Finding defect for task ' + item.parent_id);
+                        if (toFinish && item.parentId) {
+                            console.log('Finding defect for task ' + item.parentId);
                             models.item.findOne({
                                 where: {
                                     type: 'Defect',
-                                    id : item.parent_id
+                                    id : item.parentId
                                 }
                             }).then(function(defect) {
                                 if (!defect) { return; }

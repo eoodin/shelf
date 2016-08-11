@@ -28,9 +28,9 @@ module.exports = function (sequelize, DataTypes) {
             classMethods: {
               associate: function(models) {
                 item.belongsTo(models.plan);
-                item.hasOne(item, {as: 'parent', foreignKey: 'parent_id'});
-                item.belongsTo(models.user, {as: 'owner', foreignKey: 'owner_userId'});
-                item.belongsTo(models.user, {as: 'createdBy', foreignKey: 'createdBy_userId'});
+                item.belongsTo(item, {as: 'parent'});
+                item.belongsTo(models.user, {as: 'owner'});
+                item.belongsTo(models.user, {as: 'creator'});
                 item.hasMany(models.change);
               }
             }
