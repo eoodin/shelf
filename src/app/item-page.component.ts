@@ -1,20 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
-  moduleId: module.id,
-  selector: 'app-item-page',
-  template: `
+    moduleId: module.id,
+    selector: 'app-item-page',
+    template: `
     <p>
       item-page Works!
     </p>
   `,
-  styles: []
+    styles: []
 })
 export class ItemPageComponent implements OnInit {
 
-  constructor() { }
+    constructor() {
+    }
 
-  ngOnInit() {
-  }
+    ngOnInit() {
+    }
 
 }

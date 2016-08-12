@@ -64,14 +64,16 @@ export class PlanList {
     private selected: any;
 
     constructor(private http: Http,
-                private pref : PreferenceService,
+                private pref: PreferenceService,
                 private prjs: ProjectService) {
         this.ui = {cpd: {show: false}};
         prjs.current
             .filter((id) => id)
             .do((p) => this.project = p)
             .map((p) => p.id)
-            .subscribe((id) => {this.loadPlans(id)});
+            .subscribe((id) => {
+                this.loadPlans(id)
+            });
     }
 
     private loadPlans(pid) {

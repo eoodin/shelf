@@ -9,11 +9,11 @@ import {PreferenceService} from './preference-service';
 export class ProjectService {
     private loading: boolean = false;
     private lastProjectId;
-    private _current :BehaviorSubject<any> = new BehaviorSubject<any>(null);
+    private _current: BehaviorSubject<any> = new BehaviorSubject<any>(null);
     private _projects = new BehaviorSubject<any>([]);
     private _plans = new BehaviorSubject<any>([]);
 
-    constructor(private http: Http, private prf:PreferenceService) {
+    constructor(private http: Http, private prf: PreferenceService) {
         this._current
             .filter(p => p != null)
             .map(p => p.id)
@@ -26,7 +26,7 @@ export class ProjectService {
             .subscribe(prefs => this.lastProjectId = prefs['lastProjectId']);
 
         this._projects
-            .filter(projects => ! projects.length)
+            .filter(projects => !projects.length)
             .subscribe(() => this._current.next(null));
 
         this._projects
@@ -37,7 +37,7 @@ export class ProjectService {
                 let pref = this.prf.values.getValue();
                 if (pref['lastProjectId'] && select != pref['lastProjectId']) {
                     projects.filter(p => p.id == pref['lastProjectId'])
-                            .forEach(p => select = p);
+                        .forEach(p => select = p);
                 }
                 this._current.next(select);
             });
@@ -55,7 +55,7 @@ export class ProjectService {
         return this._projects;
     }
 
-    public get plans() : Observable<any> {
+    public get plans(): Observable<any> {
         return this._plans;
     }
 

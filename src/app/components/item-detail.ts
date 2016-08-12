@@ -1,10 +1,8 @@
-import {Component, Input, Output, EventEmitter, ElementRef} from '@angular/core';
-import {Http, Request, Response, RequestMethod, RequestOptions} from '@angular/http';
+import {Component, Input, Output, EventEmitter} from '@angular/core';
+import {Http} from '@angular/http';
 
 import {RichEditor} from './rich-editor';
-import {ModalDialog} from './modal-dialog';
 import {ProjectService} from '../services/project-service';
-
 
 @Component({
     selector: 'item-detail',
@@ -15,7 +13,7 @@ import {ProjectService} from '../services/project-service';
                 <div class="row" >
                     <div class="col-sm-12">
                         Type:
-                        <select *ngIf="!_item.id" [(ngModel)]="_item.type" [ngModelOptions]="{standalone: true}" [disabled]="_type">
+                        <select *ngIf="!_item.id" [(ngModel)]="_item.type" [disabled]="_type">
                             <option value="UserStory" selected="selected">User Story</option>
                             <option value="Task">Task</option>
                             <option value="Defect">Defect</option>
@@ -34,12 +32,12 @@ import {ProjectService} from '../services/project-service';
                 <div *ngIf="_item.type == 'Defect'" class="row">
                     <div class="col-sm-12 field-row">
                         <span class="field-label">Found in:</span>
-                        <input [(ngModel)]="_item.version" [ngModelOptions]="{standalone: true}">
+                        <input [(ngModel)]="_item.version">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-12 field-row">
-                        <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="_item.title" [ngModelOptions]="{standalone: true}">
+                        <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="_item.title">
                     </div>
                 </div>
                 <div class="row">
@@ -51,10 +49,10 @@ import {ProjectService} from '../services/project-service';
                     </div>
                 </div>
                 <div *ngIf="_item.type == 'Task'" class="row">
-                    <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="_item.estimation" [ngModelOptions]="{standalone: true}"></div>
+                    <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="_item.estimation" ></div>
                 </div>
                 <div class="row" *ngIf="_item.type == 'UserStory'">
-                    <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="_item.points" [ngModelOptions]="{standalone: true}" value="0"></div>
+                    <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="_item.points" value="0"></div>
                 </div>
             </form>
         </div>
@@ -63,7 +61,7 @@ import {ProjectService} from '../services/project-service';
         </div>
     </modal-dialog>
     `,
-    directives: [RichEditor, ModalDialog],
+    directives: [RichEditor],
     styles: [`
     .item-details { padding-left: 0;}
     .item-details li { list-style:none; margin-bottom: 10px;}
@@ -89,12 +87,11 @@ export class ItemDetail {
     public saved: EventEmitter<Object> = new EventEmitter();
 
     constructor(private http: Http,
-                private ele: ElementRef,
                 private prjs: ProjectService) {
     }
 
     @Input()
-    public set show(p: boolean){
+    public set show(p: boolean) {
         this._show = p;
     }
 
@@ -118,11 +115,11 @@ export class ItemDetail {
         data.projectId = this.prjs.current.getValue()['id'];
         if (!data['id']) {
             this.http.post('/api/work-items/', JSON.stringify(data))
-              .subscribe(resp => this.saved.emit(resp));
+                .subscribe(resp => this.saved.emit(resp));
         }
         else {
             this.http.put('/api/work-items/' + data['id'], JSON.stringify(data))
-              .subscribe(resp => this.saved.emit(resp));
+                .subscribe(resp => this.saved.emit(resp));
         }
 
         this._show = false;

@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {Http} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import {UserService} from './user-service';
@@ -9,7 +8,7 @@ import {UserService} from './user-service';
 export class PreferenceService {
     private _currentUser = null;
 
-    private _values :BehaviorSubject<any> = new BehaviorSubject<any>([]);
+    private _values: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
     constructor(private http: Http, private us: UserService) {
         us.currentUser

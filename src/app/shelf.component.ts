@@ -77,8 +77,8 @@ export class ShelfAppComponent {
     private app = {};
     private ui;
 
-    constructor(private router:Router,
-                private location:Location,
+    constructor(private router: Router,
+                private location: Location,
                 private prjs: ProjectService,
                 private notify: NotifyService,
                 private apps: AppService) {
@@ -86,13 +86,13 @@ export class ShelfAppComponent {
         prjs.current.subscribe(p => this.project = p);
         apps.info.subscribe(app => this.app = app);
         prjs.load();
-        this.ui = {"nav" : {"projectList" : {"show": false}}};
+        this.ui = {"nav": {"projectList": {"show": false}}};
 
         Observable.interval(1000 * 60)
-          .map(() => new Date())
-          .filter(now => now.getMinutes() == 0)
-          .filter(now => now.getHours() == 10 || now.getHours() == 17)
-          .subscribe(() => this.notify.notify('Update task status', 'Please update task status.'));
+            .map(() => new Date())
+            .filter(now => now.getMinutes() == 0)
+            .filter(now => now.getHours() == 10 || now.getHours() == 17)
+            .subscribe(() => this.notify.notify('Update task status', 'Please update task status.'));
     }
 
     getLinkStyle(path) {

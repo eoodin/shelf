@@ -1,17 +1,14 @@
 import {Component, ElementRef} from '@angular/core';
 import {Http} from '@angular/http';
-import {FormBuilder, Validators, ControlGroup, FORM_DIRECTIVES} from '@angular/common'
 
 import {DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 
-import {PlanList} from '../components/plan-list';
 import {ProjectService} from '../services/project-service';
 import {PreferenceService} from '../services/preference-service';
-import {ItemDetail} from '../components/item-detail';
 
 @Component({
     selector: 'plans',
-    directives: [PlanList, ItemDetail, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
+    directives: [DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     template: `
     <div class="plan-page" *ngIf="project">
         <div class="project-info">
@@ -125,7 +122,6 @@ import {ItemDetail} from '../components/item-detail';
     .plan-page {padding-bottom: 15px;}
     .work-items-heading > div{float:right;}
     .work-items-heading { height: 38px; }
-    .right{ padding: 0 15px; }
     .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
     [ngcontrol='title'] { width: 100%; }
@@ -134,11 +130,7 @@ import {ItemDetail} from '../components/item-detail';
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
     .plan-head ul li span {font-weight: normal}
     .item-table{position:relative;}
-    .checkbox{margin:0; width: 22px; height: 22px;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
-    .us.glyphicon{color: #050;}
-    .defect.glyphicon{color: #500;}
-    .task.glyphicon{color: #333;}
     .type-and-id input { display: inline-block; }
     `]
 })
@@ -154,7 +146,7 @@ export class Backlog {
     constructor(private ele: ElementRef,
                 private http: Http,
                 private prs: ProjectService,
-                private pref : PreferenceService) {
+                private pref: PreferenceService) {
         this.showTasks = false; // TODO: save to preference
         this.hideFinished = false; // TODO: save to preference
         this.ui = {
@@ -173,10 +165,14 @@ export class Backlog {
     loadItems() {
         let q = 'projectId=' + this.project.id;
         let types = 'UserStory,Defect';
-        if (this.showTasks) { types += ',Task'}
+        if (this.showTasks) {
+            types += ',Task'
+        }
         q += '&types=' + types;
-        if (this.showTasks && this.hideFinished) { q += '&status=New,InProgress,Pending,Dropped' }
-        
+        if (this.showTasks && this.hideFinished) {
+            q += '&status=New,InProgress,Pending,Dropped'
+        }
+
         this.http.get('/api/work-items/?' + q)
             .subscribe(b => this.items = b.json());
     }
@@ -199,7 +195,9 @@ export class Backlog {
             .finally(() => this.requesting = false)
             .subscribe(
                 () => this.loadItems(),
-                (resp) => {window.alert('Error occurred: ' + resp.json()['error'])}
+                (resp) => {
+                    window.alert('Error occurred: ' + resp.json()['error'])
+                }
             );
     }
 
@@ -225,10 +223,9 @@ export class Backlog {
 
     removeItem(item) {
         this.http.delete('/api/work-items/' + item.id)
-            .subscribe(resp =>
-            {
+            .subscribe(resp => {
                 this.loadItems();
-                this.ui.rwd.show =false;
+                this.ui.rwd.show = false;
             });
     }
 

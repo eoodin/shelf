@@ -6,7 +6,7 @@ import 'rxjs/Rx';
 
 @Injectable()
 export class UserService {
-    private _currentUser :BehaviorSubject<any> = new BehaviorSubject<any>(null);
+    private _currentUser: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
     constructor(private http: Http) {
         this.http.get('/api/users/me')

@@ -1,10 +1,9 @@
 import {Component} from '@angular/core';
 import {FORM_DIRECTIVES} from '@angular/common';
-import { Http } from '@angular/http';
+import {Http} from '@angular/http';
 import {ProjectService} from '../services/project-service';
 import {TeamService} from '../services/team-service';
 import {UserService} from "../services/user-service";
-import {ModalDialog} from "../components/modal-dialog";
 
 class Project {
     public id;
@@ -13,7 +12,7 @@ class Project {
 
 @Component({
     selector: 'projects',
-    directives: [ModalDialog, FORM_DIRECTIVES],
+    directives: [FORM_DIRECTIVES],
     template: `
     <div class="row">
      <div class="col-sm-3">
@@ -133,8 +132,6 @@ class Project {
     .sidebar-item-list li { list-style: none; margin: 5px 0;}
     .sidebar-item-list li button {float: right; }
     .main-title { font-size: 1.6em; }
-    .sidebar-item-description {height: 120px;}
-    .sidebar-item-plans {height: 120px;}
     `]
 })
 export class Projects {
@@ -162,7 +159,7 @@ export class Projects {
             });
     }
 
-    deleteProject(p:Project) {
+    deleteProject(p: Project) {
         this.http.delete('/api/projects/' + p.id)
             .subscribe(() => this.prjs.reload());
     }

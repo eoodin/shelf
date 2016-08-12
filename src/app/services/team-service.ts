@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Http, Response} from '@angular/http';
+import {Http} from '@angular/http';
 
 @Injectable()
 export class TeamService {
@@ -8,11 +8,11 @@ export class TeamService {
     constructor(private http: Http) {
     }
 
-    get teams():Object[] {
+    get teams(): Object[] {
         return this._teams;
     }
 
-    set teams(projects:Object[]) {
+    set teams(projects: Object[]) {
         this._teams = projects;
     }
 

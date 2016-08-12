@@ -4,19 +4,16 @@ import {Http} from '@angular/http';
 import {DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 import * as moment from 'moment';
 
-import {PlanList} from '../components/plan-list';
 import {ProjectService} from '../services/project-service';
 import {PreferenceService} from '../services/preference-service';
-import {ItemDetail} from '../components/item-detail';
-import {ModalDialog} from '../components/modal-dialog';
 
 @Component({
     selector: 'plans',
-    directives: [PlanList, ItemDetail, ModalDialog, DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
+    directives: [DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     template: `
     <div class="row plan-page" *ngIf="project">
         <div class="col-sm-2">
-            <plan-list [project]="project" (select)="onSelect($event)"></plan-list>
+            <plan-list (select)="onSelect($event)"></plan-list>
         </div>
     
         <div class="col-sm-offset-2 col-md-offset-2 right">
@@ -243,14 +240,15 @@ export class Plans {
     private members;
     private ui;
     private hideFinished = false;
-    private project = null;
+
+    project = null;
 
     @ViewChild('downloader') downloader;
 
     constructor(private ele: ElementRef,
                 private http: Http,
                 private prjs: ProjectService,
-                private pref : PreferenceService) {
+                private pref: PreferenceService) {
         this.ui = {
             'loading': {'show': false},
             'awd': {'show': false, 'loading': false, 'item': {}},
@@ -279,18 +277,18 @@ export class Plans {
 
     onHideFinishedCheck() {
         this.loadWorkItems();
-        this.pref.setPreference('hideFinished',  !this.hideFinished);
+        this.pref.setPreference('hideFinished', !this.hideFinished);
     }
 
     moveItemsToPlan(planId) {
         var ids = this.getSelectedWorkItemIds();
-        if ( ! ids.length) {
+        if (!ids.length) {
             alert("No selected work item.");
             return;
         }
 
         this.http.patch('/api/work-item/bunch', JSON.stringify({'ids': ids, 'changes': {'planId': planId}}))
-          .subscribe(resp => this.onMoveToPlanResponse(resp));
+            .subscribe(resp => this.onMoveToPlanResponse(resp));
     }
 
     onMoveToPlanResponse(response) {
@@ -303,7 +301,7 @@ export class Plans {
         this.ui.awd.type = type;
         if (type) {
             this.ui.awd.item.type = type;
-            this.ui.awd.item.severity =  'Major';
+            this.ui.awd.item.severity = 'Major';
         }
 
         this.ui.awd.show = true;
@@ -329,10 +327,9 @@ export class Plans {
 
     removeItem(item) {
         this.http.delete('/api/work-items/' + item.id)
-            .subscribe(resp =>
-            {
+            .subscribe(resp => {
                 this.loadWorkItems();
-                this.ui.rwd.show =false;
+                this.ui.rwd.show = false;
             });
     }
 
@@ -399,26 +396,29 @@ export class Plans {
 
     sumHours() {
         var total = 0;
-        this.workItems.forEach(i=>{ total += i.estimation; });
+        this.workItems.forEach(i=> {
+            total += i.estimation;
+        });
         return total;
     }
 
     onAllCheck(checked) {
-        this.workItems.forEach( item => item.checked = checked);
+        this.workItems.forEach(item => item.checked = checked);
     }
 
-    allChecked():boolean {
-        return this.workItems.every( item => item.checked );
+    allChecked(): boolean {
+        return this.workItems.every(item => item.checked);
     }
 
     exportCsv() {
         this.downloader.nativeElement.src = '/api/work-items/?format=csv&planId=' + this.current['id']
         console.log('downloader', this.downloader);
     }
+
     private getSelectedWorkItemIds() {
         var selected = [];
-        this.workItems.forEach( wi=> {
-            if(wi.checked) {
+        this.workItems.forEach(wi=> {
+            if (wi.checked) {
                 selected.push(wi.id);
             }
         });

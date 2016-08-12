@@ -9,22 +9,11 @@ declare var CKEDITOR: any;
     directives: [FileSelectDirective],
     template: `
     <div class="rich-editor">
-        <!--div>
-            <label class="toolbar-toggle" [style.background]="showToolbar?'gray':'white'">
-                <input type="file" ng2FileSelect [uploader]="uploader" style="display:none;"/>
-                P
-            </label>
-            <label class="toolbar-toggle" [style.background]="showToolbar?'gray':'white'">
-                <input type="checkbox" [(ngModel)]="showToolbar" style="display:none;">
-                T
-            </label>
-        </div -->
         <div class="editor-placeholder"></div>
     </div>
     `,
     styles: [`
     .rich-editor {border: 1px solid #aaa;}
-    .description-editor { width: 100%; border: 1px solid #ccc; height: 18em; }
     `]
 })
 export class RichEditor {
@@ -32,7 +21,7 @@ export class RichEditor {
     private contentCache: string;
     private showToolbar;
     private textChange;
-    public uploader:FileUploader = new FileUploader({url: '/api/file/', autoUpload: true});
+    public uploader: FileUploader = new FileUploader({url: '/api/file/', autoUpload: true});
 
     @Output() update = new EventEmitter();
 
@@ -63,27 +52,34 @@ export class RichEditor {
         if (!this.editor) {
             var el = this.ele.nativeElement;
             var editorEle = el.getElementsByClassName("editor-placeholder")[0];
-            CKEDITOR.editorConfig =  function(config) {
+            CKEDITOR.editorConfig = function (config) {
                 config.toolbar = [
-                    { name: 'insert', items: ['Table', 'HorizontalRule', 'SpecialChar'] },
-                    { name: 'tools', items: ['Maximize'] },
-                    { name: 'basicstyles', items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format'] },
-                    { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] }
+                    {name: 'insert', items: ['Table', 'HorizontalRule', 'SpecialChar']},
+                    {name: 'tools', items: ['Maximize']},
+                    {
+                        name: 'basicstyles',
+                        items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format']
+                    },
+                    {
+                        name: 'paragraph',
+                        items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']
+                    }
                 ];
             };
             this.editor = CKEDITOR.replace(editorEle, {
-                //filebrowserUploadUrl: '/api/file',
-                //filebrowserImageUploadUrl: '/api/file?type=image&api=ckeditor-filebrowser',
                 extraPlugins: 'uploadimage',
                 imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
                 toolbar: [
-                    { name: 'styles', items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
-                    { name: 'insert', items: ['Image','Table', 'HorizontalRule', 'SpecialChar'] },
-                    { name: 'tools', items: ['Maximize'] }
+                    {
+                        name: 'styles',
+                        items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']
+                    },
+                    {name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar']},
+                    {name: 'tools', items: ['Maximize']}
                 ]
             });
             var that = this;
-            this.editor.on('change', function() {
+            this.editor.on('change', function () {
                 that.textChange.next(that.editor.getData());
             });
         }

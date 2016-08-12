@@ -1,15 +1,15 @@
 import {
-  Component,
-  OnInit, OnDestroy, Input, Output,
-  ElementRef, ViewChild, EventEmitter
+    Component,
+    OnInit, OnDestroy, Input, Output,
+    ElementRef, ViewChild, EventEmitter
 } from '@angular/core';
-import { NgIf, NgClass } from '@angular/common';
+import {NgIf, NgClass} from '@angular/common';
 import {Observable} from 'rxjs/Rx';
 
 @Component({
-  selector: 'modal-dialog',
-  directives: [NgIf, NgClass],
-  template: `
+    selector: 'modal-dialog',
+    directives: [NgIf, NgClass],
+    template: `
   <div class="modal fade in awd" [style.display]="_show ? 'block' : 'none'"
      role="dialog">
     <div class="modal-dialog" [style.width]="'720px'">
@@ -27,45 +27,45 @@ import {Observable} from 'rxjs/Rx';
         </div>
     </div>
   </div>`,
-  styles: ['']
+    styles: ['']
 })
 export class ModalDialog implements OnInit, OnDestroy {
-  private _show: boolean = false;
-  private keySubscription;
+    private _show: boolean = false;
+    private keySubscription;
 
-  @Output()
-  public showChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Output()
+    public showChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  @Input()
-  public title: string;
+    @Input()
+    public title: string;
 
-  @ViewChild("closeBtn") closeBtn;
+    @ViewChild("closeBtn") closeBtn;
 
-  constructor(private el:ElementRef) {
+    constructor(private el: ElementRef) {
 
-  }
-
-  @Input()
-  public set show(isShow: boolean) {
-    this._show = isShow;
-    if (isShow) {
-      // TODO: remove ungly focus?
-      setTimeout(() => this.closeBtn.nativeElement.focus(), 0);
     }
-  }
 
-  ngOnInit() {
-    this.keySubscription = Observable.fromEvent(this.el.nativeElement, 'keyup')
-        .filter(k => k['keyCode'] == 27)
-        .subscribe(esc => this._close(esc));
-  }
+    @Input()
+    public set show(isShow: boolean) {
+        this._show = isShow;
+        if (isShow) {
+            // TODO: remove ungly focus?
+            setTimeout(() => this.closeBtn.nativeElement.focus(), 0);
+        }
+    }
 
-  ngOnDestroy() {
-    this.keySubscription && this.keySubscription.unsubscribe();
-  }
+    ngOnInit() {
+        this.keySubscription = Observable.fromEvent(this.el.nativeElement, 'keyup')
+            .filter(k => k['keyCode'] == 27)
+            .subscribe(esc => this._close(esc));
+    }
 
-  _close(event) {
-    this._show  = false;
-    this.showChange.next(this._show);
-  }
+    ngOnDestroy() {
+        this.keySubscription && this.keySubscription.unsubscribe();
+    }
+
+    _close(event) {
+        this._show = false;
+        this.showChange.next(this._show);
+    }
 }
