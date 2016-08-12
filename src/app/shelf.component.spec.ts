@@ -3,21 +3,28 @@ import {
   describe,
   expect,
   it,
-  inject
+  inject,
+  async,
+  TestComponentBuilder
 } from '@angular/core/testing';
+import {provide} from '@angular/core';
+import {SpyLocation} from '@angular/common/testing';
+import {Location} from '@angular/common';
+import { Router } from '@angular/router';
 import { ShelfAppComponent } from '../app/shelf.component';
 
-beforeEachProviders(() => [ShelfAppComponent]);
+beforeEachProviders(() => [
+  ShelfAppComponent,
+  provide(Location, {useClass: SpyLocation}) 
+]);
 
 describe('App: ShelfServer', () => {
-  it('should create the app',
-      inject([ShelfAppComponent], (app: ShelfAppComponent) => {
-    expect(app).toBeTruthy();
-  }));
+  it('should be able to test', inject([TestComponentBuilder], (tcb: TestComponentBuilder) => {
 
-  it('should have as title \'shelf-server works!\'',
-      inject([ShelfAppComponent], (app: ShelfAppComponent) => {
-    //expect(app.title).toEqual('shelf-server works!');
-        expect(true).toBeTrue();
+    return tcb.createAsync(ShelfAppComponent).then((componentFixture) => {
+      componentFixture.detectChanges();
+      console.log('info', componentFixture);
+      expect(true).toBe(true);
+    });
   }));
 });
