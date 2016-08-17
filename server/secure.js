@@ -66,6 +66,20 @@ module.exports = function(app) {
                 if (err) { return next(err); }
                 if (!user) { return res.redirect('/login.html'); }
                 user['id'] = user['uid'];
+                models.user.findById(user['id']).then(function(user) {
+                    if (!user) {
+                        models.user.create({
+                            id: user['id'],
+                            name: user['displayName'],
+                            email: user['mail']
+                        }).then(function(u) {
+                            console.log('Successful login new user, created.');
+                        });
+                    }
+                }).catch(function(errors) {
+                    console.log('Error', errors);
+                });
+
                 req.logIn(user, function(err) {
                     if (err) { return next(err); }
                     return res.redirect('/');
@@ -80,7 +94,6 @@ module.exports = function(app) {
             {failureRedirect: '/login.html'});
             auth(req, res, next);
         }, function(req, res) {
-
             res.redirect('/');
         });
     }
