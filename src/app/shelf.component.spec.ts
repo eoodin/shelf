@@ -4,6 +4,8 @@ import {SpyLocation} from '@angular/common/testing';
 import {Location} from '@angular/common';
 import {ShelfAppComponent} from '../app/shelf.component';
 
+declare var describe, it, expect, beforeEach;
+
 describe('App: ShelfServer', () => {
     beforeEach(() => {
         addProviders([ShelfAppComponent, provide(Location, {useClass: SpyLocation})]);
@@ -14,7 +16,6 @@ describe('App: ShelfServer', () => {
         return tcb.createAsync(ShelfAppComponent).then((componentFixture) => {
             componentFixture.detectChanges();
             console.log('info', componentFixture);
-            expect(true).toBe(true);
         });
     }));
 });
