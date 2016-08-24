@@ -1,8 +1,6 @@
 import {Component} from '@angular/core';
 import {Http} from '@angular/http';
 
-import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
-
 import {ProjectService} from '../services/project-service';
 
 @Component({

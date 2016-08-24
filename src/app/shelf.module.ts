@@ -17,6 +17,7 @@ import {Plans} from './pages/plans';
 import {WorkItems} from './pages/workitems';
 import {SettingsPageComponent} from './settings-page';
 import {LocationStrategy, HashLocationStrategy} from "@angular/common";
+import {Ng2BSModule} from "./ng2bs.module";
 
 let routes = [
     {path: '', terminal: true, redirectTo: 'plans'},
@@ -51,7 +52,8 @@ class DefaultHttpOptions extends RequestOptions {
     imports: [
         BrowserModule,
         HttpModule,
-        RouterModule.forRoot(routes)
+        RouterModule.forRoot(routes),
+        Ng2BSModule
     ],
     bootstrap: [ShelfAppComponent],
 })

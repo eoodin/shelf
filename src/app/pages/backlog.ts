@@ -1,14 +1,11 @@
 import {Component, ElementRef} from '@angular/core';
 import {Http} from '@angular/http';
 
-import {DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
-
 import {ProjectService} from '../services/project-service';
 import {PreferenceService} from '../services/preference-service';
 
 @Component({
     selector: 'plans',
-    directives: [DROPDOWN_DIRECTIVES, BUTTON_DIRECTIVES],
     template: `
     <div class="plan-page" *ngIf="project">
         <div class="project-info">

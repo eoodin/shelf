@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
-import {ROUTER_DIRECTIVES, Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {Location} from '@angular/common';
-import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 
 import {ProjectService} from './services/project-service';
 import {PreferenceService} from './services/preference-service';
@@ -68,7 +67,6 @@ import {Observable} from 'rxjs/Rx';
     .app-page { padding-top: 70px; }
     .nav-logo {width: 32px; height:32px;}
     `],
-    directives: [ROUTER_DIRECTIVES, DROPDOWN_DIRECTIVES],
     providers: [ProjectService, PreferenceService, TeamService, AppService, UserService]
 })
 export class ShelfAppComponent {

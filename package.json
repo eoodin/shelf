@@ -49,6 +49,7 @@
     "zone.js": "^0.6.12"
   },
   "devDependencies": {
+    "@angular/tsc-wrapped": "^0.2.2",
     "angular-cli": "^1.0.0-beta.10",
     "codelyzer": "0.0.19",
     "ember-cli-inject-live-reload": "^1.4.0",

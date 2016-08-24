@@ -5,7 +5,7 @@
 const map: any = {
     'moment': 'vendor/moment/moment.js',
     'ng2-bootstrap': 'vendor/ng2-bootstrap',
-    'ng2-file-upload': 'vendor/ng2-file-upload',
+    'ng2-file-upload': 'vendor/ng2-file-upload'
 };
 
 /** User packages configuration. */
