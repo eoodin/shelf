@@ -5,7 +5,7 @@ module.exports = function(app) {
     var passport = require('passport');
     var LocalStrategy = require('passport-local').Strategy;
     var models = require('../models');
-    
+
     app.use(cookieParser());
     app.use(session({secret: 'supernova', saveUninitialized: true, resave: true}));
     app.use(passport.initialize());
@@ -36,13 +36,13 @@ module.exports = function(app) {
     passport.deserializeUser(function(obj, done){
         done(null, obj);
     });
-    
+
     app.all('/api/*', function(req, res, next) {
         if (req.isAuthenticated()) { return next(); }
         console.log('Unauthenticated access to ' + req.originalUrl);
         res.status(403).send({error: 'Unauthenticated'});
     });
-    
+
     app.all('/', function(req, res, next) {
             //Automatic login
             if (!usingLdap && !req.isAuthenticated()) {
@@ -55,13 +55,13 @@ module.exports = function(app) {
             if (req.isAuthenticated()) {
                 // check and create user in database
                 // fields fetched from ldap: user.mail, user.displayName, user.employeeNumber
-                return next(); 
+                return next();
             }
             res.redirect('/login.html');
         });
 
     if (usingLdap) {
-        app.post('/login', function(req, res, next) {
+        app.post('/passport/login', function(req, res, next) {
             passport.authenticate('ldapauth', function(err, user, info) {
                 if (err) { return next(err); }
                 if (!user) { return res.redirect('/login.html'); }
@@ -89,17 +89,17 @@ module.exports = function(app) {
         });
     }
     else {
-        app.post('/login', function(req, res, next) {
-            let auth = passport.authenticate('local', 
+        app.post('/passport/login', function(req, res, next) {
+            let auth = passport.authenticate('local',
             {failureRedirect: '/login.html'});
             auth(req, res, next);
         }, function(req, res) {
             res.redirect('/');
         });
     }
-    
-    app.get('/logout', function(req, res) {
+
+    app.get('/passport/logout', function(req, res) {
         req.logout();
         res.redirect('/login.html');
     });
-}
+};

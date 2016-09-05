@@ -1,5 +1,4 @@
 import {Component} from '@angular/core';
-import {FORM_DIRECTIVES} from '@angular/common';
 import {Http} from '@angular/http';
 import {ProjectService} from '../services/project-service';
 import {TeamService} from '../services/team-service';
@@ -12,7 +11,6 @@ class Project {
 
 @Component({
     selector: 'projects',
-    directives: [FORM_DIRECTIVES],
     template: `
     <div class="row">
      <div class="col-sm-3">

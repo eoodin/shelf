@@ -1,7 +1,6 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {Http} from '@angular/http';
 
-import {RichEditor} from './rich-editor';
 import {ProjectService} from '../services/project-service';
 
 @Component({
@@ -13,7 +12,7 @@ import {ProjectService} from '../services/project-service';
                 <div class="row" >
                     <div class="col-sm-12">
                         Type:
-                        <select *ngIf="!_item.id" [(ngModel)]="_item.type" [disabled]="_type">
+                        <select *ngIf="!_item.id" [(ngModel)]="_item.type" [ngModelOptions]="{standalone: true}" [disabled]="_type">
                             <option value="UserStory" selected="selected">User Story</option>
                             <option value="Task">Task</option>
                             <option value="Defect">Defect</option>
@@ -32,12 +31,12 @@ import {ProjectService} from '../services/project-service';
                 <div *ngIf="_item.type == 'Defect'" class="row">
                     <div class="col-sm-12 field-row">
                         <span class="field-label">Found in:</span>
-                        <input [(ngModel)]="_item.version">
+                        <input [(ngModel)]="_item.version" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-12 field-row">
-                        <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="_item.title">
+                        <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="_item.title" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="row">
@@ -45,14 +44,14 @@ import {ProjectService} from '../services/project-service';
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <rich-editor [content]="_item.description" (update)="_item.description = $event"></rich-editor>
+                        <ckeditor [(ngModel)]="_item.description" [config]="editorConfig" [ngModelOptions]="{standalone: true}" debounce="400"></ckeditor>
                     </div>
                 </div>
                 <div *ngIf="_item.type == 'Task'" class="row">
-                    <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="_item.estimation" ></div>
+                    <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="_item.estimation" [ngModelOptions]="{standalone: true}"></div>
                 </div>
                 <div class="row" *ngIf="_item.type == 'UserStory'">
-                    <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="_item.points" value="0"></div>
+                    <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="_item.points" [ngModelOptions]="{standalone: true}" value="0"></div>
                 </div>
             </form>
         </div>
@@ -61,7 +60,6 @@ import {ProjectService} from '../services/project-service';
         </div>
     </modal-dialog>
     `,
-    directives: [RichEditor],
     styles: [`
     .item-details { padding-left: 0;}
     .item-details li { list-style:none; margin-bottom: 10px;}
@@ -79,6 +77,18 @@ export class ItemDetail {
     private _show: boolean = false;
     private _item: Object = {};
     private _type: string = 'Task';
+    private editorConfig = {
+        extraPlugins: 'uploadimage',
+        imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
+        toolbar: [
+            {
+                name: 'styles',
+                items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']
+            },
+            {name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar']},
+            {name: 'tools', items: ['Maximize']}
+            ]
+    };
 
     @Output()
     public showChange: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -97,7 +107,7 @@ export class ItemDetail {
 
     @Input()
     public set item(i: Object) {
-        this._item = i;
+        this._item = i || {};
     }
 
     @Input()

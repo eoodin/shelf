@@ -90,7 +90,7 @@ export class ShelfAppComponent {
             .map(() => new Date())
             .filter(now => now.getMinutes() == 0)
             .filter(now => now.getHours() == 10 || now.getHours() == 17)
-            .subscribe(() => this.notify.notify('Update task status', 'Please update task status.'));
+            .subscribe(() => this.notify.notify('Update task status', 'Please contentChange task status.'));
     }
 
     getLinkStyle(path) {

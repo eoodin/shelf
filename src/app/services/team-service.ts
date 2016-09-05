@@ -22,7 +22,7 @@ export class TeamService {
     }
 
     public reload() {
-        //TODO: update only changed/added/removed.
+        //TODO: contentChange only changed/added/removed.
         this.load();
     }
 

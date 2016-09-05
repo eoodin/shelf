@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Sign In to Shelf</title>
-    <link href="/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
         body {
             padding-top: 40px;
@@ -48,7 +48,7 @@
 </head>
 <body>
     <div class="container">
-        <form class="form-signin" action='/login' method='POST'>
+        <form class="form-signin" action='/passport/login' method='POST'>
             <h2 class="form-signin-heading">Please sign in</h2>
             <label for="inputUserName" class="sr-only">User Name</label>
             <input type="text" id="inputUserName" name="username"  class="form-control" placeholder="Your ID" required autofocus>

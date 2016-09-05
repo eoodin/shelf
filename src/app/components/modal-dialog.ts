@@ -8,7 +8,6 @@ import {Observable} from 'rxjs/Rx';
 
 @Component({
     selector: 'modal-dialog',
-    directives: [NgIf, NgClass],
     template: `
   <div class="modal fade in awd" [style.display]="_show ? 'block' : 'none'"
      role="dialog">
