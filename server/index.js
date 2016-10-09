@@ -20,6 +20,5 @@ app.use(bodyParser.json({ type: 'application/json' }));
 app.use(methodOverride('X-HTTP-Method-Override'));
 require('./secure')(app);
 require('./route')(app);
-app.use('/vendor/ckeditor', express.static(__dirname + '/../node_modules/ckeditor'));
 
 app.listen(PORT);

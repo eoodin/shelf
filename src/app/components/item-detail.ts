@@ -3,6 +3,8 @@ import {Http} from '@angular/http';
 
 import {ProjectService} from '../services/project-service';
 
+declare var CKEDITOR;
+
 @Component({
     selector: 'item-detail',
     template: `
