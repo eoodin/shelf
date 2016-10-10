@@ -38,7 +38,7 @@ import {ProjectService} from '../services/project-service';
                             <div class="col-sm-3">Developer hours:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="devHours" name="devHours"></div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Tester hours:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="tstHours" name="devHours"></div>
+                            <div class="col-sm-3">Tester hours:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="tstHours" name="tstHours"></div>
                         </div>
                     </div>
                     <div class="modal-footer">
