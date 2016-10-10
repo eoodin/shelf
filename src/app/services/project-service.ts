@@ -1,5 +1,5 @@
 import {Injectable, EventEmitter} from '@angular/core';
-import {Http} from '@angular/http';
+import {HttpService} from "../http.service";
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
@@ -13,7 +13,7 @@ export class ProjectService {
     private _projects = new BehaviorSubject<any>([]);
     private _plans = new BehaviorSubject<any>([]);
 
-    constructor(private http: Http, private prf: PreferenceService) {
+    constructor(private http: HttpService, private prf: PreferenceService) {
         this._current
             .filter(p => p != null)
             .map(p => p.id)
@@ -60,17 +60,20 @@ export class ProjectService {
     }
 
     public load() {
-        this.loading = true;
-        this.http.get('/api/projects')
-            .share()
-            .map(resp => resp.json())
-            .subscribe(
-                (projects) => {
-                    this._projects.next(projects);
-                    this.loading = false;
-                },
-                () => this.loading = false,
-                () => this.loading = false);
+        Observable.timer(200).subscribe( _ => {
+            this.loading = true;
+            this.http.get('/api/projects')
+                .share()
+                .map(resp => resp.json())
+                .subscribe(
+                    (projects) => {
+                        this._projects.next(projects);
+                        this.loading = false;
+                    },
+                    () => this.loading = false,
+                    () => this.loading = false);
+        });
+
     }
 
     private loadPlans(pid) {

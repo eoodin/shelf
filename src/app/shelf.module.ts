@@ -16,6 +16,8 @@ import {LocationStrategy, HashLocationStrategy} from "@angular/common";
 import {Ng2BootstrapModule} from "ng2-bootstrap";
 import {FormsModule} from "@angular/forms";
 import {CKEditorModule} from "ng2-ckeditor";
+import {MaterialModule} from '@angular/material';
+import {HttpService} from "./http.service";
 
 let routes = [
     {path: '', pathMatch: 'full', redirectTo: 'plans'},
@@ -49,6 +51,7 @@ class DefaultHttpOptions extends RequestOptions {
     ],
     providers: [
         NotifyService,
+        HttpService,
         {provide: RequestOptions, useClass: DefaultHttpOptions},
         {provide: LocationStrategy, useClass: HashLocationStrategy}
     ],
@@ -57,6 +60,7 @@ class DefaultHttpOptions extends RequestOptions {
         HttpModule,
         FormsModule,
         CKEditorModule,
+        MaterialModule.forRoot(),
         RouterModule.forRoot(routes),
         Ng2BootstrapModule
     ],

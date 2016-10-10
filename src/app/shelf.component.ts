@@ -10,6 +10,7 @@ import {UserService} from "./services/user-service";
 import {NotifyService} from "./notify.service";
 
 import {Observable} from 'rxjs/Rx';
+import {HttpService} from "./http.service";
 
 @Component({
     selector: '[shelf-app]',
@@ -60,6 +61,8 @@ import {Observable} from 'rxjs/Rx';
         <div class="container-fluid">
             <router-outlet></router-outlet>
         </div>
+        
+        <div class="login-pannel" *ngIf="ui.login"><h1>Please login!</h1></div>
     </div>
 `,
     styles: [`
@@ -79,7 +82,13 @@ export class ShelfAppComponent {
                 private location: Location,
                 private prjs: ProjectService,
                 private notify: NotifyService,
+                private http: HttpService,
                 private apps: AppService) {
+        http.authFail()
+            .debounceTime(50)
+            .filter(failed => failed)
+            .subscribe(() => this.requestAuth());
+
         prjs.projects.subscribe(ps => this.projects = ps);
         prjs.current.subscribe(p => this.project = p);
         apps.info.subscribe(app => this.app = app);
@@ -104,6 +113,11 @@ export class ShelfAppComponent {
 
     switchProject(p) {
         this.prjs.setCurrent(p);
+    }
+
+    requestAuth() {
+        console.log("Authenticate required");
+        this.ui.login = true;
     }
 }
 
