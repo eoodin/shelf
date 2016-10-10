@@ -8,5 +8,10 @@
         "target": "http://localhost:4201",
         "secure": false,
         "changeOrigin": true
+    },
+    "/ckeditor/*": {
+        "target": "http://localhost:4201",
+        "secure": false,
+        "changeOrigin": true
     }
 }

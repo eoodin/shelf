@@ -15,4 +15,5 @@ module.exports = function(app) {
         });
 
     app.use("/api", router);
+    app.use("/ckeditor", express.static(__dirname + '/../node_modules/ckeditor'));
 };
