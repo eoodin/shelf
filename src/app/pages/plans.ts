@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, ViewChild, OnInit, OnDestroy} from '@angular/core';
 import {Http} from '@angular/http';
 
 import * as moment from 'moment';

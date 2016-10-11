@@ -31,11 +31,11 @@ export class HttpService {
     }
 
     go(operation) {
+        let shared = operation.share();
         if (this.unauth.getValue()) {
             return Observable.empty<Response>();
         }
 
-        let shared = operation.share();
         shared.subscribe(() => {}, err => this.error(err));
         return shared;
     }
@@ -48,5 +48,9 @@ export class HttpService {
 
     public authFail() {
         return this.unauth;
+    }
+
+    resume() {
+        this.unauth.next(false);
     }
 }

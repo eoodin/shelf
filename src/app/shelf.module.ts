@@ -18,6 +18,7 @@ import {FormsModule} from "@angular/forms";
 import {CKEditorModule} from "ng2-ckeditor";
 import {MaterialModule} from '@angular/material';
 import {HttpService} from "./http.service";
+import { LoginComponent } from './login.component';
 
 let routes = [
     {path: '', pathMatch: 'full', redirectTo: 'plans'},
@@ -25,6 +26,7 @@ let routes = [
     {path: 'backlog', component: Backlog},
     {path: 'plans', component: Plans},
     {path: 'items', component: WorkItems},
+    {path: 'login', component: LoginComponent},
     {path: 'settings', component: SettingsPageComponent}
 ];
 
@@ -39,6 +41,7 @@ class DefaultHttpOptions extends RequestOptions {
 
 @NgModule({
     declarations: [
+        LoginComponent,
         ModalDialog,
         PlanList,
         ItemDetail,
