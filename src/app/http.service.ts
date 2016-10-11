@@ -35,9 +35,9 @@ export class HttpService {
             return Observable.empty<Response>();
         }
 
-        operation.share();
-        operation.subscribe(() => {}, err => this.error(err));
-        return operation;
+        let shared = operation.share();
+        shared.subscribe(() => {}, err => this.error(err));
+        return shared;
     }
 
     error(err) {

@@ -57,15 +57,13 @@ module.exports = function(app) {
                 // fields fetched from ldap: user.mail, user.displayName, user.employeeNumber
                 return next();
             }
-
-            res.redirect('/login.html');
         });
 
     if (usingLdap) {
         app.post('/passport/login', function(req, res, next) {
             passport.authenticate('ldapauth', function(err, user, info) {
                 if (err) { return next(err); }
-                if (!user) { return res.redirect('/login.html'); }
+                if (!user) { return res.json({"result": "failed"}); }
                 user['id'] = user['uid'];
                 models.user.findById(user['id']).then(function(user) {
                     if (!user) {
@@ -86,13 +84,11 @@ module.exports = function(app) {
                     return res.redirect('/');
                 });
             })(req, res, next);
-            // passport.authenticate('ldapauth', { successRedirect: '/', failureRedirect: '/login.html' })(req, res, next);
         });
     }
     else {
         app.post('/passport/login', function(req, res, next) {
-            let auth = passport.authenticate('local',
-            {failureRedirect: '/login.html'});
+            let auth = passport.authenticate('local');
             auth(req, res, next);
         }, function(req, res) {
             res.redirect('/');
@@ -101,6 +97,6 @@ module.exports = function(app) {
 
     app.get('/passport/logout', function(req, res) {
         req.logout();
-        res.redirect('/login.html');
+        res.json({"result": "loggedout"});
     });
 };
