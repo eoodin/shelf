@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
+import {Http} from '@angular/http';
 import {Location} from '@angular/common';
 
 import {ProjectService} from './services/project-service';
@@ -47,6 +48,7 @@ import {HttpService} from "./http.service";
               <ul class="nav navbar-nav navbar-right">
                 <li [class.active]="getLinkStyle('/settings')"><a [routerLink]="['/settings']">Settings</a></li>
                 <li><a href="javascript:void(0);" title="{{app.version}}({{app.commit}} at {{app.update}})">About</a></li>
+                <li><a (click)="logoutApp()" >Logout</a></li>
               </ul>
             </div><!--/.nav-collapse -->
           </div>
@@ -74,6 +76,7 @@ export class ShelfAppComponent {
                 private location: Location,
                 private prjs: ProjectService,
                 private notify: NotifyService,
+                private rawHttp: Http,
                 private http: HttpService,
                 private apps: AppService) {
         this.ui = {"nav": {"projectList": {"show": false}}};
@@ -109,5 +112,13 @@ export class ShelfAppComponent {
     switchProject(p) {
         this.prjs.setCurrent(p);
     }
-}
 
+    logoutApp() {
+        this.rawHttp.get('/passport/logout')
+            .map(resp => resp.json())
+            .subscribe(
+                status => this.router.navigate(['/login']),
+                err => {alert("Logout error!")}
+            );
+    }
+}
