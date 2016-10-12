@@ -54,7 +54,7 @@ export class LoginComponent implements OnInit {
         this.rawHttp.post('/passport/login', JSON.stringify(data))
             .subscribe(resp => {
                 this.http.resume();
-                this.router.navigate([this.goto]);
+                this.router.navigate([this.goto ? this.goto : '/']);
             });
     }
 }
