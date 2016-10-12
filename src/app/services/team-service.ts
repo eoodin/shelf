@@ -20,10 +20,4 @@ export class TeamService {
         this.http.get('/api/teams/')
             .subscribe(resp => this.teams = resp.json());
     }
-
-    public reload() {
-        //TODO: contentChange only changed/added/removed.
-        this.load();
-    }
-
 }

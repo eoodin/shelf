@@ -8,11 +8,9 @@ export class AppService {
     private _info: BehaviorSubject<any> = new BehaviorSubject<any>({});
 
     constructor(private http: HttpService) {
-        Observable.timer(200).subscribe(
-            () => http.get('api/app/info')
+        http.get('api/app/info')
                 .map(resp => resp.json())
-                .subscribe(info => this._info.next(info))
-        );
+                .subscribe(info => this._info.next(info));
     }
 
     public get info() {

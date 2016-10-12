@@ -81,8 +81,4 @@ export class ProjectService {
             .map(resp => resp.json())
             .subscribe(plans => this._plans.next(plans));
     }
-
-    public reload() {
-        return this.load();
-    }
 }

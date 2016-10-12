@@ -146,7 +146,7 @@ export class Projects {
             createTeamDialog: {show: false}
         };
 
-        this.teamService.reload();
+        this.teamService.load();
         this.prjs.projects.subscribe((ps) => {
             this.projects = ps;
         });
@@ -159,12 +159,12 @@ export class Projects {
 
     deleteProject(p: Project) {
         this.http.delete('/api/projects/' + p.id)
-            .subscribe(() => this.prjs.reload());
+            .subscribe(() => this.prjs.load());
     }
 
     onCreateProjectSubmit(data) {
         this.http.post('/api/projects/', JSON.stringify(data))
-            .subscribe(() => this.prjs.reload());
+            .subscribe(() => this.prjs.load());
 
         this.ui.createProjectDialog.show = false;
     }
@@ -173,13 +173,13 @@ export class Projects {
         data.users = data.users.split(',');
 
         this.http.post('/api/teams/', JSON.stringify(data))
-            .subscribe(resp => this.teamService.reload());
+            .subscribe(resp => this.teamService.load());
 
         this.ui.createTeamDialog.show = false;
     }
 
     deleteTeam(team) {
         this.http.delete('/api/teams/' + team.id)
-            .subscribe(response => this.teamService.reload());
+            .subscribe(response => this.teamService.load());
     }
 }
