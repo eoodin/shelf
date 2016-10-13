@@ -8,34 +8,35 @@ import {Router, ActivatedRoute} from "@angular/router";
     selector: 'app-login',
     template: `
     <div class="login-pannel">
-        <md-card class="login-form">
-            <form #loginForm="ngForm" (ngSubmit)="login(loginForm.value)">
-                <div>
-                    <md-input #username name="username" ngModel placeholder="ID"></md-input>
-                </div>
-                <div>
-                    <md-input name="password" ngModel type="password" placeholder="Password"></md-input>
-                </div>
-                <div class="buttons">
-                    <button md-button>Login</button>
-                </div>
-            </form>
-        </md-card>
+        <form class="form-signin" #f="ngForm" (ngSubmit)="login(f.value)">
+            <h2 class="form-signin-heading">Please sign in</h2>
+            <div class="row">
+                <input  name="username"  ngModel class="form-control" placeholder="ID" required autofocus>
+            </div>
+            <div class="row">
+                <input type="password" name="password" ngModel class="form-control" placeholder="Password" required>
+            </div>
+            <!--
+            <div class="checkbox">
+                <label> <input type="checkbox" value="remember-me" name="remember"> Remember me </label>
+            </div>
+            -->
+            <div class="row">
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            </div>
+        </form>
     </div>
   `,
     styles: [`
-    .login-pannel {margin:0; padding:0;position: absolute; top:0; left:0;z-index:9999;width:100%;height:100%;background:#88B;}
-    .login-form {width: 420px; margin: 100px auto; background-color: white;}
-    .login-form md-input {width: 100%;}
-    .login-form .buttons { text-align: right; }
+    .login-pannel {margin:0; padding:0;position: absolute; top:0; left:0;z-index:9999;width:100%;height:100%;background: white;}
+    .form-signin { max-width: 330px;padding: 15px; margin: 0 auto;}
+    .form-signin .form-control {width: 100%; font-size: 16px;}
+    .form-signin .row {margin: 5px auto;}
     `]
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
 
     private goto;
-
-    @ViewChild("username")
-    private userNameInput;
 
     constructor(private http: HttpService,
                 private router: Router,
@@ -43,11 +44,7 @@ export class LoginComponent implements OnInit {
                 private rawHttp: Http) {
         route.params
             .filter(params => params['goto'])
-            .subscribe(params => {console.log('Login page', params['goto']); this.goto = params['goto']; });
-    }
-
-    ngOnInit() {
-        this.userNameInput.focus();
+            .subscribe(params => this.goto = params['goto']);
     }
 
     login(data) {
