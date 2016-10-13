@@ -18,6 +18,7 @@ import {FormsModule} from "@angular/forms";
 import {CKEditorModule} from "ng2-ckeditor";
 import {HttpService} from "./http.service";
 import { LoginComponent } from './login.component';
+import { UserComponent } from './user/user.component';
 
 let routes = [
     {path: '', pathMatch: 'full', redirectTo: 'plans'},
@@ -26,6 +27,7 @@ let routes = [
     {path: 'plans', component: Plans},
     {path: 'items', component: WorkItems},
     {path: 'login', component: LoginComponent},
+    {path: 'users', component: UserComponent},
     {path: 'settings', component: SettingsPageComponent}
 ];
 
@@ -49,7 +51,8 @@ class DefaultHttpOptions extends RequestOptions {
         Plans,
         WorkItems,
         SettingsPageComponent,
-        ShelfAppComponent
+        ShelfAppComponent,
+        UserComponent
     ],
     providers: [
         NotifyService,
