@@ -22,7 +22,7 @@ import {Router, ActivatedRoute} from "@angular/router";
             </div>
             -->
             <div class="row">
-                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                <button class="btn btn-lg btn-primary btn-block" type="submit" [disabled]="proceeding">Sign in</button>
             </div>
         </form>
     </div>
@@ -37,6 +37,7 @@ import {Router, ActivatedRoute} from "@angular/router";
 export class LoginComponent {
 
     private goto;
+    private proceeding;
 
     constructor(private http: HttpService,
                 private router: Router,
@@ -48,10 +49,14 @@ export class LoginComponent {
     }
 
     login(data) {
+        this.proceeding = true;
         this.rawHttp.post('/passport/login', JSON.stringify(data))
             .subscribe(resp => {
                 this.http.resume();
                 this.router.navigate([this.goto ? this.goto : '/']);
-            });
+            },
+            err => {},
+            () => {this.proceeding = false}
+            );
     }
 }
