@@ -1,6 +1,6 @@
-import {Component, Input, Output, EventEmitter} from '@angular/core';
+import {Component, Input, Output, EventEmitter, ViewChild, OnInit } from '@angular/core';
 import {Http} from '@angular/http';
-
+import {ModalDirective} from 'ng2-bootstrap';
 import {ProjectService} from '../services/project-service';
 
 declare var CKEDITOR;
@@ -8,8 +8,17 @@ declare var CKEDITOR;
 @Component({
     selector: 'item-detail',
     template: `
-    <modal-dialog [show]="_show" (showChange)="showChanged($event)" [title]="(_item.id ? 'Item Details' : 'Add Item')">
-        <div dialog-body class="item-details">
+    <div bsModal #detailDialog="bs-modal" (onHidden)="showChanged(false);" [config]="{backdrop: 'static'}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="itemModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" (click)="dialog.hide();" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Large modal</h4>
+        </div>
+        <div class="modal-body">
+          <div class="item-details">
             <form (ngSubmit)="saveItem()">
                 <div class="row" >
                     <div class="col-sm-12">
@@ -60,7 +69,10 @@ declare var CKEDITOR;
         <div dialog-footer>
             <button (click)="saveItem()" class="btn btn-default">{{(_item.id ? 'Save' : 'Add')}}</button>
         </div>
-    </modal-dialog>
+        </div>
+        </div>
+      </div>
+    </div>
     `,
     styles: [`
     .item-details { padding-left: 0;}
@@ -75,8 +87,8 @@ declare var CKEDITOR;
      `]
 
 })
-export class ItemDetail {
-    private _show: boolean = false;
+export class ItemDetail implements OnInit {
+    private initialized;
     private _item: Object = {};
     private _type: string = 'Task';
     private editorConfig = {
@@ -92,6 +104,9 @@ export class ItemDetail {
             ]
     };
 
+    @ViewChild('detailDialog')
+    public dialog: ModalDirective;
+
     @Output()
     public showChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -102,9 +117,16 @@ export class ItemDetail {
                 private prjs: ProjectService) {
     }
 
+    ngOnInit() {
+        this.initialized = true;
+    }
+    
     @Input()
     public set show(p: boolean) {
-        this._show = p;
+        if (this.initialized) {
+            if (p) this.dialog.show();
+            else this.dialog.hide();
+        }
     }
 
     @Input()
@@ -118,7 +140,6 @@ export class ItemDetail {
     }
 
     showChanged(e: boolean) {
-        this._show = e;
         this.showChange.emit(e);
     }
 
@@ -133,8 +154,8 @@ export class ItemDetail {
             this.http.put('/api/work-items/' + data['id'], JSON.stringify(data))
                 .subscribe(resp => this.saved.emit(resp));
         }
-
-        this._show = false;
+        
+        // close the dialog?
         this.showChange.emit(false);
     }
 }

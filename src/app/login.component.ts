@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {HttpService} from "./http.service";
 import {Http} from "@angular/http";
 import {Location} from '@angular/common';

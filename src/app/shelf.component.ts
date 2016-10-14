@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, ViewContainerRef} from '@angular/core';
 import {Router} from '@angular/router';
 import {Http} from '@angular/http';
 import {Location} from '@angular/common';
@@ -67,6 +67,7 @@ import {HttpService} from "./http.service";
     providers: [ProjectService, PreferenceService, TeamService, AppService, UserService]
 })
 export class ShelfAppComponent {
+    private viewContainerRef: ViewContainerRef;
     private projects: any[];
     private project = null;
     private app = {};
@@ -78,7 +79,9 @@ export class ShelfAppComponent {
                 private notify: NotifyService,
                 private rawHttp: Http,
                 private http: HttpService,
-                private apps: AppService) {
+                private apps: AppService,
+                rootView: ViewContainerRef) {
+        this.viewContainerRef = rootView;
         this.ui = {"nav": {"projectList": {"show": false}}};
         http.authFail()
             .filter(failed => failed)

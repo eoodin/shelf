@@ -410,7 +410,6 @@ export class Plans {
 
     exportCsv() {
         this.downloader.nativeElement.src = '/api/work-items/?format=csv&planId=' + this.current['id']
-        console.log('downloader', this.downloader);
     }
 
     private getSelectedWorkItemIds() {
