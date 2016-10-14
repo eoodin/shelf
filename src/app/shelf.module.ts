@@ -19,6 +19,9 @@ import {CKEditorModule} from "ng2-ckeditor";
 import {HttpService} from "./http.service";
 import { LoginComponent } from './login.component';
 import { UserComponent } from './user/user.component';
+import { TeamComponent } from './team/team.component';
+import { TeamDetailComponent } from './team-detail/team-detail.component';
+import { UserDetailComponent } from './user-detail/user-detail.component';
 
 let routes = [
     {path: '', pathMatch: 'full', redirectTo: 'plans'},
@@ -28,6 +31,7 @@ let routes = [
     {path: 'items', component: WorkItems},
     {path: 'login', component: LoginComponent},
     {path: 'users', component: UserComponent},
+    {path: 'teams', component: TeamComponent},
     {path: 'settings', component: SettingsPageComponent}
 ];
 
@@ -52,7 +56,10 @@ class DefaultHttpOptions extends RequestOptions {
         WorkItems,
         SettingsPageComponent,
         ShelfAppComponent,
-        UserComponent
+        UserComponent,
+        TeamComponent,
+        TeamDetailComponent,
+        UserDetailComponent
     ],
     providers: [
         NotifyService,
