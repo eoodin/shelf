@@ -7,7 +7,7 @@
             <th>
                 <label>
                     <input type="checkbox" [checked]="false" (click)="alert('not implemented')" class="checkbox" title="Select/unselect all" />
-                    <a href="javascript:void(0);" (click)="sortResult('id')">ID
+                    <a href="javascript:void(0);" (click)="sortResult('id')">User name
                         <span *ngIf="sort.field=='id'">
                             <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
                         </span>
@@ -15,26 +15,31 @@
                 </label>
             </th>
             <th class="header-title">
-                <a href="javascript:void(0);" (click)="sortResult('title')">Title
+                <a href="javascript:void(0);" (click)="sortResult('title')">Display name
                     <span *ngIf="sort.field=='title'">
                         <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
                     </span>
                 </a>
             </th>
             <th>
-                <a href="javascript:void(0);" (click)="sortResult('status')">Status
+                <a href="javascript:void(0);" (click)="sortResult('status')">Email
                     <span *ngIf="sort.field=='status'">
                         <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
                     </span>
                 </a>
             </th>
-            <th><a href="javascript:void(0);" (click)="sortResult('owner')">Owner
+            <th><a href="javascript:void(0);" (click)="sortResult('owner')">Creation time
                 <span *ngIf="sort.field=='owner'">
                     <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
                 </span>
             </a>
             </th>
-            <th>Remaining</th>
+            <th><a href="javascript:void(0);" (click)="sortResult('owner')">Last modified
+                <span *ngIf="sort.field=='owner'">
+                    <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                </span>
+                </a>
+            </th>
             <th>Operations</th>
         </tr>
         <tr *ngFor="let item of users">
@@ -45,22 +50,19 @@
                 </label>
             </td>
             <td>
-                <span *ngIf="item.type=='UserStory'" class="us glyphicon glyphicon-edit"></span>
-                <span *ngIf="item.type=='Defect'" class="defect glyphicon glyphicon-fire"></span>
-                <span *ngIf="item.type=='Task'" class="task glyphicon glyphicon-check"></span>
-                {{item.title}}
+                {{item.name}}
             </td>
             <td>
                 <div class="btn-group">
-                    <span>AAAA</span>
+                    <span>{{item.email}}</span>
                 </div>
             </td>
             <td>
                 <div class="btn-group">
-                    <span>AAAA</span>
+                    <span>{{item.createdAt}}</span>
                 </div>
             </td>
-            <td>{{item.estimation}}</td>
+            <td>{{item.updatedAt}}</td>
             <td>
                 <a title="Remove this work item" (click)="alert('no implmentation')"><span class="glyphicon glyphicon-remove"></span></a>
             </td>
