@@ -5,6 +5,7 @@ module.exports = function (sequelize, DataTypes) {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         title: DataTypes.STRING,
         originalEstimation: { type: DataTypes.INTEGER, defaultValue: 0 },
+        priority: { type:   DataTypes.INTEGER, defaultValue: 1 },
         estimation: { type: DataTypes.INTEGER, defaultValue: 0 },
         points: { type: DataTypes.INTEGER, defaultValue: 0 },
         description: { type: DataTypes.STRING, length: 'long' /*524288*/ },

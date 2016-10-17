@@ -66,6 +66,13 @@ import {PreferenceService} from '../services/preference-service';
                                     </span>
                                     </a>
                                 </th>
+                                <th class="header-title">
+                                    <a (click)="sortResult('priority')">Priority
+                                    <span *ngIf="sort.field=='priority'">
+                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                                    </span>
+                                    </a>
+                                </th>
                                 <th>
                                     <a href="javascript:void(0);" (click)="sortResult('status')">Status
                                     <span *ngIf="sort.field=='status'">
@@ -94,6 +101,21 @@ import {PreferenceService} from '../services/preference-service';
                                     <span *ngIf="item.type=='Defect'" class="defect glyphicon glyphicon-fire"></span>
                                     <span *ngIf="item.type=='Task'" class="task glyphicon glyphicon-check"></span>
                                     <a (click)="showItem(item)">{{item.title}}</a>
+                                </td>
+                                <td>
+                                    <div class="btn-group" dropdown keyboardNav>
+                                        <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            {{PRI[item.priority]}} <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li role="menuitem"
+                                                *ngFor="let pri of [0,1,2]"
+                                                [class.hidden]="pri == item.priority">
+                                                <a (click)="changePriority(item, pri)">{{PRI[pri]}}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
                                 <td>
                                     <div class="btn-group" dropdown keyboardNav>
@@ -238,6 +260,7 @@ export class Plans {
     private members;
     private ui;
     private hideFinished = false;
+    private PRI = ['High', 'Medium', 'Low'];
 
     project = null;
 
@@ -346,7 +369,16 @@ export class Plans {
             .finally(() => this.ui.loading.show = false)
             .subscribe(resp => this.loadWorkItems());
     }
+    
+    changePriority(item, priority) {
+        this.ui.loading.show = true;
 
+        var change = {'priority': priority};
+        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
+            .finally(() => this.ui.loading.show = false)
+            .subscribe(resp => this.loadWorkItems());
+    }
+    
     assignTo(item, member) {
         this.ui.loading.show = true;
         var change = {'ownerId': member ? member.id : null};
