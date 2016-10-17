@@ -3,8 +3,7 @@
 module.exports = function (sequelize, DataTypes) {
     var allocation = sequelize.define("allocation", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
-        developerHours: DataTypes.INTEGER,
-        testerHours: DataTypes.INTEGER,
+        effort: DataTypes.INTEGER
     }, {
             classMethods: {
                 associate: function (models) {

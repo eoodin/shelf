@@ -38,8 +38,7 @@ module.exports = function(router) {
             }).then(function(plan) {
                 models.allocation.create({
                     teamId: project.teamId,
-                    developerHours: req.body.devHours,
-                    testerHours: req.body.tstHours,
+                    effort: req.body.availableHours,
                     planId: plan.id
                 }).then(function(alloc) {
                     plan.save({allocation: alloc}).then(function() {

@@ -20,7 +20,7 @@ import {PreferenceService} from '../services/preference-service';
                 <ul class="summary">
                     <li *ngIf="current.start">Start: <span>{{date(current.start)}}</span></li>
                     <li *ngIf="current.end">Deadline: <span>{{date(current.end)}}</span></li>
-                    <li *ngIf="current.allocation">Time(remain/planned): <span>{{sumHours()}}/{{current.allocation.developerHours + current.allocation.testerHours}}</span></li>
+                    <li *ngIf="current.allocation">Time(remain/planned): <span>{{sumHours()}}/{{current.allocation.effort}}</span></li>
                     <li *ngIf="current.allocation">Progress: <span> x/x </span></li>
                 </ul>
             </div>

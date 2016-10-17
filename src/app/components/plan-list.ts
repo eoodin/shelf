@@ -25,20 +25,53 @@ import {ProjectService} from '../services/project-service';
                     </div>
                     <div class="modal-body">
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Sprint name:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="name" name="name"></div>
+                            <div class="col-sm-3">Sprint name:</div>
+                            <div class="col-sm-5"> 
+                                <input type="text" [(ngModel)]="name" name="name">
+                            </div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Start from:</div><div class="col-sm-5"> <input type="date" [(ngModel)]="start" name="start"></div>
+                            <div class="col-sm-3">Start from:</div>
+                            <div class="col-sm-5">
+                                <input type="date" [(ngModel)]="start" name="start">
+                            </div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Due date:</div><div class="col-sm-5"> <input type="date" [(ngModel)]="end" name="end"></div>
+                            <div class="col-sm-3">Due date:</div>
+                            <div class="col-sm-5">
+                                <input type="date" [(ngModel)]="end" name="end">
+                            </div>
+                        </div>
+                        <div class="row plan-field-row">
+                            <div class="col-sm-3">Holiday:</div>
+                            <div class="col-sm-5">
+                                <input type="number" [(ngModel)]="holiday" name="holiday">
+                            </div>
                         </div>
                         <div class="row"></div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Developer hours:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="devHours" name="devHours"></div>
+                            <div class="col-sm-3">Available effort:</div><div class="col-sm-5"> 
+                                <!-- <input type="text" [disabled]="true" [(ngModel)]="availableHours" name="availableHours"> -->
+                                <span>{{sumAvailableHours(f.value) | number: '1.0-0'}} hours</span>
+                            </div>
                         </div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Tester hours:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="tstHours" name="tstHours"></div>
+                            <div class="col-sm-12">
+                            <table style="width: 100%">
+                               <tr>
+                                   <th>Name</th>
+                                   <th>Allocation</th>
+                                   <th>Leave(days)</th>
+                                   <th>Available</th>
+                               </tr>
+                               <tr *ngFor="let member of members">
+                                   <td>{{member.name}}</td>
+                                   <td><input [(ngModel)]="member.alloc" type="number" [ngModelOptions]="{standalone:true}"/></td>
+                                   <td><input [(ngModel)]="member.leave" type="number" [ngModelOptions]="{standalone:true}"/></td>
+                                   <td>{{member.alloc * (calcWorkdays(f.value) - member.leave) | number: '1.0-1'}} hours</td>
+                               </tr>
+                            </table>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -58,22 +91,32 @@ export class PlanList {
     private project: Object = {};
     private _plans: Array<any> = [];
     private ui: any;
-
-    @Output() public select: EventEmitter<PlanList> = new EventEmitter<PlanList>();
+    private members: {}[] = [];
 
     private selected: any;
+    @Output() public select: EventEmitter<PlanList> = new EventEmitter<PlanList>();
 
     constructor(private http: Http,
                 private pref: PreferenceService,
                 private prjs: ProjectService) {
+
         this.ui = {cpd: {show: false}};
         prjs.current
             .filter((id) => id)
             .do((p) => this.project = p)
-            .map((p) => p.id)
-            .subscribe((id) => {
-                this.loadPlans(id)
+            .subscribe((p) => {
+                this.loadPlans(p.id);
+                this.http.get('/api/teams/' + p.team.id + '/members')
+                    .map(resp => resp.json())
+                    .subscribe(members => {
+                        this.members = members;
+                        for (let m of this.members) {
+                            m['alloc'] = 0.8;
+                            m['leave'] = 0;
+                        }
+                    });
             });
+       
     }
 
     private loadPlans(pid) {
@@ -81,7 +124,7 @@ export class PlanList {
             .map(resp => resp.json())
             .subscribe(data => this.setPlans(data));
     }
-
+    
     private setPlans(plans) {
         this._plans = plans;
         this.selected = null;
@@ -110,6 +153,39 @@ export class PlanList {
         this.ui.cpd.show = false;
     }
 
+    sumAvailableHours(data) {
+        let sum = 0;
+        let dayHours = 8;
+        let days = this.calcWorkdays(data);
+        if (days < 0)
+            return 0;
+            
+        for (let m of this.members) {
+            sum += m['alloc'] * (days - m['leave']) * dayHours;
+        }
+        
+        return sum;
+    }
+
+    calcWorkdays(data) {
+        var sd = new Date(data.start);
+        var ed = new Date(data.end);
+        
+        if (sd.getTime() > ed.getTime())
+            return -1;
+
+        var workDays = 0;
+        while (sd.getTime() <= ed.getTime()) {
+            sd.setHours(sd.getHours() + 24);
+            if (sd.getDay() != 0 && sd.getDay() != 6)
+                workDays++;
+        }
+        
+        // TODO: add option to include start/end days
+        let holidays  = data.holiday || 0;
+        return workDays - holidays;
+    }
+    
     clickedPlan(plan) {
         this.pref.values
             .filter(p => p['lastSelectedPlan'] != plan.id)
@@ -118,7 +194,9 @@ export class PlanList {
     }
 
     selectPlan(plan) {
-        this.selected = plan;
-        this.select.next(plan);
+        if (this.selected != plan) {
+            this.selected = plan;
+            this.select.next(plan);
+        }
     }
 }

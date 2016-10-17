@@ -18,7 +18,6 @@ module.exports = function(router) {
             where: {id: req.params.tid},
             include: [models.user]
         }).then(function(team) {
-            // TODO: rename team.users => team.members ?
             res.json(team.users);
         });
     });
