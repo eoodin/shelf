@@ -66,9 +66,9 @@ import {ProjectService} from '../services/project-service';
                                </tr>
                                <tr *ngFor="let member of members">
                                    <td>{{member.name}}</td>
-                                   <td><input [(ngModel)]="member.alloc" type="number" [ngModelOptions]="{standalone:true}"/></td>
-                                   <td><input [(ngModel)]="member.leave" type="number" [ngModelOptions]="{standalone:true}"/></td>
-                                   <td>{{member.alloc * (calcWorkdays(f.value) - member.leave) | number: '1.0-1'}} hours</td>
+                                   <td><input [(ngModel)]="member.alloc" [ngModelOptions]="{standalone:true}"/></td>
+                                   <td><input [(ngModel)]="member.leave" [ngModelOptions]="{standalone:true}"/></td>
+                                   <td>{{member.alloc * (calcWorkdays(f.value) - member.leave) * 8 | number: '1.0-1'}} hours</td>
                                </tr>
                             </table>
                             </div>
@@ -147,6 +147,7 @@ export class PlanList {
 
     createPlan(data) {
         data['projectId'] = this.project['id'];
+        data['availableHours'] = this.sumAvailableHours(data);
         this.http.post('/api/plans/', JSON.stringify(data))
             .subscribe(resp => this.loadPlans(this.project['id']));
 
@@ -176,14 +177,15 @@ export class PlanList {
 
         var workDays = 0;
         while (sd.getTime() <= ed.getTime()) {
+            let weekend = (sd.getDay() == 0 || sd.getDay() == 6);
             sd.setHours(sd.getHours() + 24);
-            if (sd.getDay() != 0 && sd.getDay() != 6)
-                workDays++;
+            if (weekend) continue;
+            workDays++;
         }
         
         // TODO: add option to include start/end days
         let holidays  = data.holiday || 0;
-        return workDays - holidays;
+        return workDays - holidays - 2;
     }
     
     clickedPlan(plan) {
