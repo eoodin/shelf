@@ -150,8 +150,8 @@ module.exports = function(router) {
                     models.change.create({
                         originalData: JSON.stringify(origin),
                         changedData: JSON.stringify(changes),
-                        actor_userId: req.user.id,
-                        item_id: item.id
+                        userId: req.user.id,
+                        itemId: item.id
                     }).then(function() {
                         res.json(item);
                     });
