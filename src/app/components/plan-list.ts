@@ -11,7 +11,8 @@ import {ProjectService} from '../services/project-service';
     selector: 'plan-list',
     template: `
     <div class="list-group">
-      <a class="list-group-item" *ngFor="let plan of _plans" [class.active]="plan == selected" (click)="clickedPlan(plan)"> {{plan.name}} </a>
+      <a class="list-group-item" *ngFor="let plan of visiblePlans()" [class.active]="plan == selected" (click)="clickedPlan(plan)"> {{plan.name}} </a>
+      <a class="list-group-item" *ngIf="_plans.length > 10" (click)="toggleAll();">{{showAll ? "Collapse" : "Show All"}}</a>
     </div>
 
     <button class="btn btn-primary" (click)="ui.cpd.show = true;">New Sprint...</button>
@@ -92,6 +93,7 @@ export class PlanList {
     private _plans: Array<any> = [];
     private ui: any;
     private members: {}[] = [];
+    private showAll: boolean;
 
     private selected: any;
     @Output() public select: EventEmitter<PlanList> = new EventEmitter<PlanList>();
@@ -125,10 +127,21 @@ export class PlanList {
             .subscribe(data => this.setPlans(data));
     }
     
+    private toggleAll() {
+        this.showAll = !this.showAll;
+    }
+    
+
+    private visiblePlans() {
+        return this.showAll ? this._plans : this._plans.slice(0, 10);
+    }
+
     private setPlans(plans) {
         this._plans = plans;
         this.selected = null;
         if (plans && plans.length) {
+            // Revert the order by end time.
+            this._plans.sort((a, b) => {return b.end.localeCompare(a.end);});
             var list = this;
             this.pref.values.subscribe(_ => {
                 var selectPlan = plans[0];
