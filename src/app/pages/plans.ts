@@ -20,8 +20,8 @@ import {PreferenceService} from '../services/preference-service';
                 <ul class="summary">
                     <li *ngIf="current.start">Start: <span>{{date(current.start)}}</span></li>
                     <li *ngIf="current.end">Deadline: <span>{{date(current.end)}}</span></li>
-                    <li *ngIf="current.allocation">Time(remain/planned): <span>{{sumHours()}}/{{current.allocation.effort}}</span></li>
-                    <li *ngIf="current.allocation">Progress: <span> x/x </span></li>
+                    <li *ngIf="current.allocation">Remains/Planed: <span>{{sumHours()}} H/{{current.allocation.effort}} H</span></li>
+                    <li *ngIf="current.allocation">Original estimation: <span>{{sumOriginalHours()}} H</span></li>
                 </ul>
             </div>
             <div class="project-info">
@@ -89,7 +89,7 @@ import {PreferenceService} from '../services/preference-service';
                                 <th>Remaining</th>
                                 <th>Operations</th>
                             </tr>
-                            <tr *ngFor="let item of getShowingItems()">
+                            <tr *ngFor="let item of visibleItems()">
                                 <td class="id">
                                     <label>
                                         <input class="checkbox" [(ngModel)]="item.checked" type="checkbox">
@@ -297,8 +297,11 @@ export class Plans {
     }
 
     onHideFinishedCheck() {
-        this.loadWorkItems();
-        this.pref.setPreference('hideFinished', !this.hideFinished);
+        let hidden = !this.hideFinished;
+        this.workItems
+            .filter(i => i.status == 'Finished')
+            .forEach(i => i.hidden = hidden);
+        this.pref.setPreference('hideFinished', hidden);
     }
 
     moveItemsToPlan(planId) {
@@ -354,11 +357,8 @@ export class Plans {
             });
     }
 
-    getShowingItems() {
-        if (this.hideFinished)
-            return this.workItems.filter(i=>i.status != 'Finished');
-        else
-            return this.workItems;
+    visibleItems() {
+        return this.workItems.filter(i => (!i.hidden));
     }
 
     changeStatus(item, status) {
@@ -414,7 +414,12 @@ export class Plans {
         }
 
         this.http.get(fetchUrl)
-            .subscribe(resp => this.workItems = resp.json());
+            .subscribe(resp => this.setWorkItems(resp.json()));
+    }
+
+    setWorkItems(items) {
+        items.filter(i => i.status == 'Finished').forEach(i => i.hidden = this.hideFinished);
+        this.workItems = items;
     }
 
     date(epoch) {
@@ -425,19 +430,19 @@ export class Plans {
     }
 
     sumHours() {
-        var total = 0;
-        this.workItems.forEach(i=> {
-            total += i.estimation;
-        });
-        return total;
+        return this.workItems.reduce((a, b) => a + b.estimation, 0);
+    }
+    
+    sumOriginalHours() {
+        return this.workItems.reduce((a, b) => a + b.originalEstimation, 0);
     }
 
     onAllCheck(checked) {
-        this.workItems.forEach(item => item.checked = checked);
+        this.visibleItems().forEach(item => item.checked = checked);
     }
 
     allChecked(): boolean {
-        return this.workItems.every(item => item.checked);
+        return this.visibleItems().every(item => item.checked);
     }
 
     exportCsv() {
@@ -445,13 +450,6 @@ export class Plans {
     }
 
     private getSelectedWorkItemIds() {
-        var selected = [];
-        this.workItems.forEach(wi=> {
-            if (wi.checked) {
-                selected.push(wi.id);
-            }
-        });
-
-        return selected;
+        return this.visibleItems().filter(i => i.checked).map(i => i.id);
     }
 }
