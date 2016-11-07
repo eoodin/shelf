@@ -15,7 +15,7 @@ declare var CKEDITOR;
             <button type="button" class="close" (click)="dialog.hide();" aria-label="Close">
             <span aria-hidden="true">&times;</span>
             </button>
-            <h4 class="modal-title">Large modal</h4>
+            <h4 class="modal-title">Item details</h4>
         </div>
         <div class="modal-body">
           <div class="item-details">
