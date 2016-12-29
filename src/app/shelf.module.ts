@@ -11,7 +11,6 @@ import {Projects} from "./pages/projects";
 import {Backlog} from "./pages/backlog";
 import {Plans} from "./pages/plans";
 import {WorkItems} from "./pages/workitems";
-import {SettingsPageComponent} from "./settings-page";
 import {LocationStrategy, HashLocationStrategy} from "@angular/common";
 import {Ng2BootstrapModule} from "ng2-bootstrap";
 import {FormsModule} from "@angular/forms";
@@ -31,11 +30,10 @@ let routes = [
     {path: 'items', component: WorkItems},
     {path: 'login', component: LoginComponent},
     {path: 'users', component: UserComponent},
-    {path: 'teams', component: TeamComponent},
-    {path: 'settings', component: SettingsPageComponent}
+    {path: 'teams', component: TeamComponent}
 ];
 
-class DefaultHttpOptions extends RequestOptions {
+export class ShelfRequestOptions extends RequestOptions {
     constructor() {
         super({
             headers: new Headers({'Content-Type': 'application/json'}),
@@ -54,7 +52,6 @@ class DefaultHttpOptions extends RequestOptions {
         Backlog,
         Plans,
         WorkItems,
-        SettingsPageComponent,
         ShelfAppComponent,
         UserComponent,
         TeamComponent,
@@ -64,7 +61,7 @@ class DefaultHttpOptions extends RequestOptions {
     providers: [
         NotifyService,
         HttpService,
-        {provide: RequestOptions, useClass: DefaultHttpOptions},
+        {provide: RequestOptions, useClass: ShelfRequestOptions},
         {provide: LocationStrategy, useClass: HashLocationStrategy}
     ],
     imports: [
