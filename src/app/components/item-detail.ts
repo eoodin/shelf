@@ -120,11 +120,14 @@ export class ItemDetail implements OnInit {
     ngOnInit() {
         this.initialized = true;
     }
-    
+
     @Input()
     public set show(p: boolean) {
         if (this.initialized) {
-            if (p) this.dialog.show();
+            if (p) {
+                this.dialog.config.backdrop = false; // Workaround of modal bug
+                this.dialog.show();
+            }
             else this.dialog.hide();
         }
     }
@@ -154,7 +157,7 @@ export class ItemDetail implements OnInit {
             this.http.put('/api/work-items/' + data['id'], JSON.stringify(data))
                 .subscribe(resp => this.saved.emit(resp));
         }
-        
+
         // close the dialog?
         this.showChange.emit(false);
     }

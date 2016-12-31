@@ -108,6 +108,8 @@ export class PlanList {
             .do((p) => this.project = p)
             .subscribe((p) => {
                 this.loadPlans(p.id);
+                if (!p.team) return;
+
                 this.http.get('/api/teams/' + p.team.id + '/members')
                     .map(resp => resp.json())
                     .subscribe(members => {
@@ -118,7 +120,7 @@ export class PlanList {
                         }
                     });
             });
-       
+
     }
 
     private loadPlans(pid) {
@@ -126,11 +128,11 @@ export class PlanList {
             .map(resp => resp.json())
             .subscribe(data => this.setPlans(data));
     }
-    
+
     private toggleAll() {
         this.showAll = !this.showAll;
     }
-    
+
 
     private visiblePlans() {
         return this.showAll ? this._plans : this._plans.slice(0, 10);
@@ -173,18 +175,18 @@ export class PlanList {
         let days = this.calcWorkdays(data);
         if (days < 0)
             return 0;
-            
+
         for (let m of this.members) {
             sum += m['alloc'] * (days - m['leave']) * dayHours;
         }
-        
+
         return sum;
     }
 
     calcWorkdays(data) {
         var sd = new Date(data.start);
         var ed = new Date(data.end);
-        
+
         if (sd.getTime() > ed.getTime())
             return -1;
 
@@ -195,12 +197,12 @@ export class PlanList {
             if (weekend) continue;
             workDays++;
         }
-        
+
         // TODO: add option to include start/end days
         let holidays  = data.holiday || 0;
         return workDays - holidays - 2;
     }
-    
+
     clickedPlan(plan) {
         this.pref.values
             .filter(p => p['lastSelectedPlan'] != plan.id)

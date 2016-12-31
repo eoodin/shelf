@@ -5,7 +5,7 @@ import {ProjectService} from '../services/project-service';
 import {PreferenceService} from '../services/preference-service';
 
 @Component({
-    selector: 'plans',
+    selector: 'backlog',
     template: `
     <div class="plan-page" *ngIf="project">
         <div class="project-info">

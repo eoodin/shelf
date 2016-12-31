@@ -6,7 +6,6 @@ import {HttpModule, RequestOptions, Headers} from "@angular/http";
 import {PlanList} from "./components/plan-list";
 import {ItemDetail} from "./components/item-detail";
 import {ModalDialog} from "./components/modal-dialog";
-import {NotifyService} from "./notify.service";
 import {Projects} from "./pages/projects";
 import {Backlog} from "./pages/backlog";
 import {Plans} from "./pages/plans";
@@ -17,10 +16,7 @@ import {FormsModule} from "@angular/forms";
 import {CKEditorModule} from "ng2-ckeditor";
 import {HttpService} from "./http.service";
 import { LoginComponent } from './login.component';
-import { UserComponent } from './user/user.component';
-import { TeamComponent } from './team/team.component';
-import { TeamDetailComponent } from './team-detail/team-detail.component';
-import { UserDetailComponent } from './user-detail/user-detail.component';
+import {NotifyService} from "./notify.service";
 
 let routes = [
     {path: '', pathMatch: 'full', redirectTo: 'plans'},
@@ -29,8 +25,6 @@ let routes = [
     {path: 'plans', component: Plans},
     {path: 'items', component: WorkItems},
     {path: 'login', component: LoginComponent},
-    {path: 'users', component: UserComponent},
-    {path: 'teams', component: TeamComponent}
 ];
 
 export class ShelfRequestOptions extends RequestOptions {
@@ -53,10 +47,6 @@ export class ShelfRequestOptions extends RequestOptions {
         Plans,
         WorkItems,
         ShelfAppComponent,
-        UserComponent,
-        TeamComponent,
-        TeamDetailComponent,
-        UserDetailComponent
     ],
     providers: [
         NotifyService,
