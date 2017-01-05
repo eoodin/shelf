@@ -134,7 +134,7 @@ import {PreferenceService} from '../services/preference-service';
                                             </li>
                                         </ul>
                                     </div>
-                                </td><button class="btn btn-primary" (click)="ui.cpd.show = true;">New Sprint...</button>
+                                </td>
                                 <td>
                                     <div class="btn-group" dropdown keyboardNav>
                                         <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
