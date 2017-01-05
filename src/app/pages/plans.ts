@@ -9,14 +9,17 @@ import {PreferenceService} from '../services/preference-service';
 @Component({
     selector: 'plans',
     template: `
-    <div class="row plan-page" *ngIf="project">
-        <div class="col-sm-2">
-            <plan-list (select)="onSelect($event)"></plan-list>
-        </div>
-    
-        <div class="col-sm-offset-2 col-md-offset-2 right">
+    <md-sidenav-container class="workspace">
+       <md-sidenav #sidenav class="sidenav">
+          <plan-list (select)="onSelect($event);sidenav.close()"></plan-list>
+       </md-sidenav>
+       <div>
+       <h3>
+        <a (click)="sidenav.open()">{{current.name}}</a>
+        <a class="add-sprint-button" (click)="ui.cpd.show = true;"><span class="glyphicon glyphicon-plus"></span></a>
+       </h3>
+       <div >
             <div class="plan-head" *ngIf="current.id">
-                <h1>{{current.name}} <a href="javascript: void(0);" (click)="ui.calendar.show = true;"><span class="glyphicon glyphicon-calendar"></span></a></h1>
                 <ul class="summary">
                     <li *ngIf="current.start">Start: <span>{{date(current.start)}}</span></li>
                     <li *ngIf="current.end">Deadline: <span>{{date(current.end)}}</span></li>
@@ -131,7 +134,7 @@ import {PreferenceService} from '../services/preference-service';
                                             </li>
                                         </ul>
                                     </div>
-                                </td>
+                                </td><button class="btn btn-primary" (click)="ui.cpd.show = true;">New Sprint...</button>
                                 <td>
                                     <div class="btn-group" dropdown keyboardNav>
                                         <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
@@ -168,7 +171,73 @@ import {PreferenceService} from '../services/preference-service';
             </div>
         </div>
     </div>
-    
+</md-sidenav-container>    
+    <div class="modal fade in" [style.display]="ui.cpd.show ? 'block' : 'none'" role="dialog">
+        <div class="modal-dialog">
+            <form #f="ngForm" (ngSubmit)="createPlan(f.value)">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" (click)="ui.cpd.show = false" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">New Sprint</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row plan-field-row">
+                            <div class="col-sm-3">Sprint name:</div>
+                            <div class="col-sm-5"> 
+                                <input type="text" [(ngModel)]="name" name="name">
+                            </div>
+                        </div>
+                        <div class="row plan-field-row">
+                            <div class="col-sm-3">Start from:</div>
+                            <div class="col-sm-5">
+                                <input type="date" [(ngModel)]="start" name="start">
+                            </div>
+                        </div>
+                        <div class="row plan-field-row">
+                            <div class="col-sm-3">Due date:</div>
+                            <div class="col-sm-5">
+                                <input type="date" [(ngModel)]="end" name="end">
+                            </div>
+                        </div>
+                        <div class="row plan-field-row">
+                            <div class="col-sm-3">Holiday:</div>
+                            <div class="col-sm-5">
+                                <input type="number" [(ngModel)]="holiday" name="holiday">
+                            </div>
+                        </div>
+                        <div class="row"></div>
+                        <div class="row plan-field-row">
+                            <div class="col-sm-3">Available effort:</div><div class="col-sm-5"> 
+                                <!-- <input type="text" [disabled]="true" [(ngModel)]="availableHours" name="availableHours"> -->
+                                <span>{{sumAvailableHours(f.value) | number: '1.0-0'}} hours</span>
+                            </div>
+                        </div>
+                        <div class="row plan-field-row">
+                            <div class="col-sm-12">
+                            <table style="width: 100%">
+                               <tr>
+                                   <th>Name</th>
+                                   <th>Allocation</th>
+                                   <th>Leave(days)</th>
+                                   <th>Available</th>
+                               </tr>
+                               <tr *ngFor="let member of members">
+                                   <td>{{member.name}}</td>
+                                   <td><input [(ngModel)]="member.alloc" [ngModelOptions]="{standalone:true}"/></td>
+                                   <td><input [(ngModel)]="member.leave" [ngModelOptions]="{standalone:true}"/></td>
+                                   <td>{{member.alloc * (calcWorkdays(f.value) - member.leave) * 8 | number: '1.0-1'}} hours</td>
+                               </tr>
+                            </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default" data-dismiss="modal">Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="row" *ngIf="project == null">
         <h1 class="no-content-notice">No project.</h1>
     </div>
@@ -201,32 +270,11 @@ import {PreferenceService} from '../services/preference-service';
         </div>
     </modal-dialog>
     
-    <modal-dialog [(show)]="ui.calendar.show" [title]="'Clendar'">
-        <div dialog-body>
-            <table class="month">
-                <tr>
-                    <th>Sun</th><th>Mon</th><th>Tue</th><th>Wen</th><th>Thu</th><th>Fri</th><th>Sat</th>
-                </tr>
-                <tr>
-                    <td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td>
-                </tr>
-                <tr>
-                    <td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td>
-                </tr>
-                <tr>
-                    <td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td>
-                </tr>
-                <tr>
-                    <td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td>
-                </tr>
-                <tr>
-                    <td>28</td><td>29</td><td>30</td><td>31</td><td></td><td></td><td></td>
-                </tr>
-            </table>
-        </div>
-    </modal-dialog>
     `,
     styles: [`
+    .workspace{height: 100%; padding-top: 10px;}
+    .sidenav {background: #fff; padding: 10px;}
+    .add-sprint-button{font-size: 14px;}
     .project-info { height:40px; padding: 2px 0;}
     .project-operations { float: right;}
     .plan-page {padding-bottom: 15px;}
@@ -274,8 +322,8 @@ export class Plans {
             'loading': {'show': false},
             'awd': {'show': false, 'loading': false, 'item': {}},
             'mtd': {'show': false},
-            'rwd': {'show': false},
-            'calendar': {'show': false}
+            'cpd': {'show': false},
+            'rwd': {'show': false}
         };
 
         prjs.current.subscribe(p => this.project = p);
@@ -447,6 +495,49 @@ export class Plans {
 
     exportCsv() {
         this.downloader.nativeElement.src = '/api/work-items/?format=csv&planId=' + this.current['id']
+    }
+
+
+
+    createPlan(data) {
+        data['projectId'] = this.project['id'];
+        data['availableHours'] = this.sumAvailableHours(data);
+        this.ui.cpd.show = false;
+        this.prjs.reloadPlans();
+    }
+
+    sumAvailableHours(data) {
+        let sum = 0;
+        let dayHours = 8;
+        let days = this.calcWorkdays(data);
+        if (days < 0)
+            return 0;
+
+        for (let m of this.members) {
+            sum += m['alloc'] * (days - m['leave']) * dayHours;
+        }
+
+        return sum;
+    }
+
+    calcWorkdays(data) {
+        var sd = new Date(data.start);
+        var ed = new Date(data.end);
+
+        if (sd.getTime() > ed.getTime())
+            return -1;
+
+        var workDays = 0;
+        while (sd.getTime() <= ed.getTime()) {
+            let weekend = (sd.getDay() == 0 || sd.getDay() == 6);
+            sd.setHours(sd.getHours() + 24);
+            if (weekend) continue;
+            workDays++;
+        }
+
+        // TODO: add option to include start/end days
+        let holidays  = data.holiday || 0;
+        return workDays - holidays - 2;
     }
 
     private getSelectedWorkItemIds() {

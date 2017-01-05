@@ -18,7 +18,7 @@ import {HttpService} from "./http.service";
     template: `
     <div class="app-page">
         <nav class="navbar navbar-default navbar-fixed-top">
-          <div class="container-fluid">
+          <div class="container-fluid ">
             <div class="navbar-header">
               <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
@@ -33,17 +33,6 @@ import {HttpService} from "./http.service";
                 <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/projects']" class="link">Dashboard</a></li>
                 <li [class.active]="getLinkStyle('/backlog')"><a [routerLink]="['/backlog']" class="link">Backlog</a></li>
                 <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/plans']" class="link">Plans</a></li>
-                <li *ngIf="!projects.length"><a href="javascript:void(0);">No Project</a></li>
-                <li *ngIf="projects.length" class="dropdown" dropdown keyboard-nav>
-                    <a href="javascript:void(0);" class="dropdown-toggle" dropdownToggle>
-                        <span *ngIf="project">{{project.name}}</span><span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
-                      <li *ngFor="let p of projects" role="menuitem">
-                        <a (click)="switchProject(p)">{{p.name}}</a>
-                      </li>
-                    </ul>
-                 </li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
                 <li [class.active]="getLinkStyle('/settings')"><a [routerLink]="['/settings']">Settings</a></li>
@@ -54,22 +43,21 @@ import {HttpService} from "./http.service";
           </div>
         </nav>
 
-        <div class="container-fluid">
+        <div class="container-fluid workspace">
             <router-outlet></router-outlet>
         </div>
     </div>
 `,
     styles: [`
     a:hover {cursor: pointer;}
-    .app-page { padding-top: 70px; }
+    .app-page {padding-top: 50px; height: 100%;}
+    .workspace {height: 100%; margin: 0;}
     .nav-logo {width: 32px; height:32px;}
     `],
     providers: [ProjectService, PreferenceService, TeamService, AppService, UserService]
 })
 export class ShelfAppComponent {
     private viewContainerRef: ViewContainerRef;
-    private projects: any[];
-    private project = null;
     private app = {};
     private ui;
 
@@ -82,7 +70,6 @@ export class ShelfAppComponent {
                 private apps: AppService,
                 rootView: ViewContainerRef) {
         this.viewContainerRef = rootView;
-        this.ui = {"nav": {"projectList": {"show": false}}};
         http.authFail()
             .filter(failed => failed)
             .subscribe(() => {
@@ -92,8 +79,6 @@ export class ShelfAppComponent {
             .filter(failed => !failed)
             .subscribe( _ => prjs.load());
 
-        prjs.projects.subscribe(ps => this.projects = ps);
-        prjs.current.subscribe(p => this.project = p);
         apps.info.subscribe(app => this.app = app);
 
         Observable.interval(1000 * 60)
@@ -110,10 +95,6 @@ export class ShelfAppComponent {
         else if (path.length > 0) {
             return this.location.path().indexOf(path) > -1;
         }
-    }
-
-    switchProject(p) {
-        this.prjs.setCurrent(p);
     }
 
     logoutApp() {

@@ -76,6 +76,12 @@ export class ProjectService {
 
     }
 
+    public reloadPlans() {
+        if (this._current.value.id){ 
+            this.loadPlans(this._current.value.id);
+        }
+    }
+
     private loadPlans(pid) {
         this.http.get('/api/plans/?project=' + pid)
             .map(resp => resp.json())

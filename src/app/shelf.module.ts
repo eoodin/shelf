@@ -11,6 +11,7 @@ import {Backlog} from "./pages/backlog";
 import {Plans} from "./pages/plans";
 import {WorkItems} from "./pages/workitems";
 import {LocationStrategy, HashLocationStrategy} from "@angular/common";
+import {MaterialModule} from "@angular/material";
 import {Ng2BootstrapModule} from "ng2-bootstrap";
 import {FormsModule} from "@angular/forms";
 import {CKEditorModule} from "ng2-ckeditor";
@@ -59,6 +60,7 @@ export class ShelfRequestOptions extends RequestOptions {
         HttpModule,
         FormsModule,
         CKEditorModule,
+        MaterialModule.forRoot(),
         RouterModule.forRoot(routes),
         Ng2BootstrapModule
     ],

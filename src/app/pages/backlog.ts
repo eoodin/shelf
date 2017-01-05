@@ -7,8 +7,18 @@ import {PreferenceService} from '../services/preference-service';
 @Component({
     selector: 'backlog',
     template: `
-    <div class="plan-page" *ngIf="project">
+    <div class="backlog-page" *ngIf="project">
         <div class="project-info">
+           <div class="dropdown project-select" dropdown keyboard-nav>
+               <a href="javascript:void(0);" class="dropdown-toggle" dropdownToggle>
+                   <h5 style="display:inline-block;" *ngIf="project">{{project.name}}</h5><span class="caret"></span>
+               </a>
+               <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
+                 <li *ngFor="let p of projects" role="menuitem">
+                   <a (click)="prs.setCurrent(p)">{{p.name}}</a>
+                 </li>
+               </ul>
+            </div>
             <div class="project-operations">
                 <button class="btn btn-primary" (click)="showAddItem('UserStory')">Write User Story...</button>
                 <button class="btn btn-warning" (click)="showAddItem('Defect')">Report Problem...</button>
@@ -114,9 +124,10 @@ import {PreferenceService} from '../services/preference-service';
     </div>
     `,
     styles: [`
+    .backlog-page {padding: 15px 0;}
     .project-info { height:40px; padding: 2px 0;}
+    .project-info .project-select{ display: inline-block;}
     .project-operations { float: right;}
-    .plan-page {padding-bottom: 15px;}
     .work-items-heading > div{float:right;}
     .work-items-heading { height: 38px; }
     .awd .modal-body .row {padding: 5px 0;}
@@ -133,6 +144,7 @@ import {PreferenceService} from '../services/preference-service';
 })
 export class Backlog {
     private project = null;
+    private projects = [];
     private items = [];
     private ui;
     private sort: any;
@@ -153,6 +165,7 @@ export class Backlog {
             'rwd': {'show': false}
         };
 
+        prs.projects.subscribe(ps => this.projects = ps);
         prs.current
             .filter(p => p != this.project)
             .do(p => this.project = p)
