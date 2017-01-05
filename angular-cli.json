@@ -40,9 +40,11 @@
   "defaults": {
     "styleExt": "css",
     "prefixInterfaces": false,
+    "viewEncapsulation": "Emulated",
+    "changeDetection": "Default",
     "inline": {
-      "style": false,
-      "template": false
+      "style": true,
+      "template": true
     },
     "spec": {
       "class": false,

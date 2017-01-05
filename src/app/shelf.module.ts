@@ -18,12 +18,17 @@ import {CKEditorModule} from "ng2-ckeditor";
 import {HttpService} from "./http.service";
 import { LoginComponent } from './login.component';
 import {NotifyService} from "./notify.service";
+import { PlanContentComponent } from './plan-content.component';
 
 let routes = [
     {path: '', pathMatch: 'full', redirectTo: 'plans'},
     {path: 'projects', component: Projects},
     {path: 'backlog', component: Backlog},
-    {path: 'plans', component: Plans},
+    {path: 'plans', component: Plans, 
+     children: [
+       {path: '', redirectTo: 'contents', pathMatch: 'full'},
+       {path: 'contents', component: PlanContentComponent}
+     ]},
     {path: 'items', component: WorkItems},
     {path: 'login', component: LoginComponent},
 ];
@@ -48,6 +53,7 @@ export class ShelfRequestOptions extends RequestOptions {
         Plans,
         WorkItems,
         ShelfAppComponent,
+        PlanContentComponent,
     ],
     providers: [
         NotifyService,

@@ -13,165 +13,13 @@ import {PreferenceService} from '../services/preference-service';
        <md-sidenav #sidenav class="sidenav">
           <plan-list (select)="onSelect($event);sidenav.close()"></plan-list>
        </md-sidenav>
-       <div>
-       <h3>
-        <a (click)="sidenav.open()">{{current.name}}</a>
-        <a class="add-sprint-button" (click)="ui.cpd.show = true;"><span class="glyphicon glyphicon-plus"></span></a>
-       </h3>
-       <div >
-            <div class="plan-head" *ngIf="current.id">
-                <ul class="summary">
-                    <li *ngIf="current.start">Start: <span>{{date(current.start)}}</span></li>
-                    <li *ngIf="current.end">Deadline: <span>{{date(current.end)}}</span></li>
-                    <li *ngIf="current.allocation">Remains/Capacity: <span>{{sumHours()}} H/{{current.allocation.effort}} H</span></li>
-                    <li *ngIf="current.allocation">Total estimation: <span>{{sumOriginalHours()}} H</span></li>
-                </ul>
-            </div>
-            <div class="project-info">
-                <div class="project-operations">
-                    <iframe #downloader style="display:none;"></iframe>
-                    <button (click)="exportCsv()" class="btn btn-primary">
-                        <i class="glyphicon glyphicon-export" aria-hidden="true"></i> Export as CSV
-                    </button>
-                    <button class="btn btn-warning" (click)="showAddItem('Defect')">Report Problem</button>
-                </div>
-            </div>
-            <div class="plan-body">
-                <div class="item-table">
-                    <div class="loading-mask" *ngIf="ui.loading.show">
-                        <div class="spinner-loader"></div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading work-items-heading">
-                            <div>
-                                <label>
-                                    <input type="checkbox" [(ngModel)]="hideFinished"  (click)="onHideFinishedCheck()"/>
-                                    Hide Finished
-                                </label>
-                            </div>
-                        </div>
-                        <table *ngIf="workItems" class="table">
-                            <tr>
-                                <th>
-                                    <label>
-                                        <input type="checkbox" [checked]="allChecked()" (click)="onAllCheck($event.target.checked)" class="checkbox" title="Select/unselect all" />
-                                        <a href="javascript:void(0);" (click)="sortResult('id')">ID
-                                        <span *ngIf="sort.field=='id'">
-                                            <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                                        </span>
-                                        </a>
-                                    </label>
-                                </th>
-                                <th class="header-title">
-                                    <a href="javascript:void(0);" (click)="sortResult('title')">Title
-                                    <span *ngIf="sort.field=='title'">
-                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                                    </span>
-                                    </a>
-                                </th>
-                                <th class="header-title">
-                                    <a (click)="sortResult('priority')">Priority
-                                    <span *ngIf="sort.field=='priority'">
-                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                                    </span>
-                                    </a>
-                                </th>
-                                <th>
-                                    <a href="javascript:void(0);" (click)="sortResult('status')">Status
-                                    <span *ngIf="sort.field=='status'">
-                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                                    </span>
-                                    </a>
-                                </th>
-                                <th><a href="javascript:void(0);" (click)="sortResult('owner')">Owner
-                                    <span *ngIf="sort.field=='owner'">
-                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                                    </span>
-                                </a>
-                                </th>
-                                <th>Remaining</th>
-                                <th>Operations</th>
-                            </tr>
-                            <tr *ngFor="let item of visibleItems()">
-                                <td class="id">
-                                    <label>
-                                        <input class="checkbox" [(ngModel)]="item.checked" type="checkbox">
-                                        {{item.id}}
-                                    </label>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.type=='UserStory'" class="us glyphicon glyphicon-edit"></span>
-                                    <span *ngIf="item.type=='Defect'" class="defect glyphicon glyphicon-fire"></span>
-                                    <span *ngIf="item.type=='Task'" class="task glyphicon glyphicon-check"></span>
-                                    <a (click)="showItem(item)">{{item.title}}</a>
-                                </td>
-                                <td>
-                                    <div class="btn-group" dropdown keyboardNav>
-                                        <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            {{PRI[item.priority]}} <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li role="menuitem"
-                                                *ngFor="let pri of [0,1,2]"
-                                                [class.hidden]="pri == item.priority">
-                                                <a (click)="changePriority(item, pri)">{{PRI[pri]}}</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="btn-group" dropdown keyboardNav>
-                                        <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            {{item.status}} <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li role="menuitem"
-                                                *ngFor="let st of ['New','InProgress','','Finished','Pending','Dropped']"
-                                                [class.hidden]="st == item.status">
-                                                <a (click)="changeStatus(item, st)">{{st}}</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="btn-group" dropdown keyboardNav>
-                                        <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <span *ngIf="item.owner">{{item.owner.name}}</span> 
-                                            <span *ngIf="!item.owner">Unassigned</span> <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li role="menuitem"><a (click)="assignTo(item, null)">Unassigned</a></li>
-                                            <li role="menuitem"
-                                                *ngFor="let member of members"
-                                                [class.hidden]="member == item.owner"><a
-                                                    (click)="assignTo(item, member)">{{member.name}}</a></li>
-                                        </ul>
-                                    </div>
-                                </td>
-                                <td>{{item.estimation}}</td>
-                                <td>
-                                    <a title="Remove this work item" (click)="removingItem(item)"><span class="glyphicon glyphicon-remove"></span></a>
-                                    <a title="Put back to backlog" (click)="moveToBacklog(item)"><span class="glyphicon glyphicon-level-up"></span></a>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div>
-                    <div class="col-sm-2">
-                        <button class="btn btn-primary" (click)="showAddItem()">Add Work Item...</button>
-                    </div>
-                    <div class="col-sm-6">
-                        <button class="btn btn-primary" (click)="ui.mtd.show = true">Move To...</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</md-sidenav-container>    
+        <h3>
+            <a (click)="sidenav.open()">{{current.name}}</a>
+            <a class="add-sprint-button" (click)="ui.cpd.show = true;"><span class="glyphicon glyphicon-plus"></span></a>
+        </h3>
+        <router-outlet></router-outlet>
+    </md-sidenav-container>
+
     <div class="modal fade in" [style.display]="ui.cpd.show ? 'block' : 'none'" role="dialog">
         <div class="modal-dialog">
             <form #f="ngForm" (ngSubmit)="createPlan(f.value)">
@@ -268,9 +116,7 @@ import {PreferenceService} from '../services/preference-service';
             <button (click)="ui.rwd.show =false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
             <button (click)="removeItem(ui.rwd.item)" class="btn btn-default" data-dismiss="modal">Remove</button>
         </div>
-    </modal-dialog>
-    
-    `,
+    </modal-dialog>`,
     styles: [`
     .workspace{height: 100%; padding-top: 10px;}
     .sidenav {background: #fff; padding: 10px;}
@@ -417,7 +263,7 @@ export class Plans {
             .finally(() => this.ui.loading.show = false)
             .subscribe(resp => this.loadWorkItems());
     }
-    
+
     changePriority(item, priority) {
         this.ui.loading.show = true;
 
@@ -426,7 +272,7 @@ export class Plans {
             .finally(() => this.ui.loading.show = false)
             .subscribe(resp => this.loadWorkItems());
     }
-    
+
     assignTo(item, member) {
         this.ui.loading.show = true;
         var change = {'ownerId': member ? member.id : null};
@@ -480,7 +326,7 @@ export class Plans {
     sumHours() {
         return this.workItems.reduce((a, b) => a + b.estimation, 0);
     }
-    
+
     sumOriginalHours() {
         return this.workItems.reduce((a, b) => a + b.originalEstimation, 0);
     }
@@ -496,8 +342,6 @@ export class Plans {
     exportCsv() {
         this.downloader.nativeElement.src = '/api/work-items/?format=csv&planId=' + this.current['id']
     }
-
-
 
     createPlan(data) {
         data['projectId'] = this.project['id'];
