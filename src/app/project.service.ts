@@ -1,9 +1,8 @@
-import {Injectable, EventEmitter} from '@angular/core';
-import {HttpService} from "../http.service";
+import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-
-import {PreferenceService} from './preference-service';
+import {HttpService} from "./http.service";
+import {PreferenceService} from "./preference.service";
 
 @Injectable()
 export class ProjectService {
@@ -17,7 +16,6 @@ export class ProjectService {
         this._current
             .filter(p => p != null)
             .map(p => p.id)
-            .do(pid => this.loadPlans(pid))
             .filter(p => !this.loading)
             .subscribe(id => this.prf.setPreference("lastProjectId", id));
 
@@ -74,17 +72,5 @@ export class ProjectService {
                     () => this.loading = false);
         });
 
-    }
-
-    public reloadPlans() {
-        if (this._current.value.id){ 
-            this.loadPlans(this._current.value.id);
-        }
-    }
-
-    private loadPlans(pid) {
-        this.http.get('/api/plans/?project=' + pid)
-            .map(resp => resp.json())
-            .subscribe(plans => this._plans.next(plans));
     }
 }

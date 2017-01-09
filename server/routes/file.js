@@ -1,5 +1,5 @@
 module.exports = function(router) {
-    var models = require('../../models');
+    var models = require('../models');
     var multer  = require('multer');
 
     router.route('/file').post(function(req, res, next) {
@@ -44,4 +44,4 @@ module.exports = function(router) {
             res.sendStatus(500);
         });
     });
-}
+};

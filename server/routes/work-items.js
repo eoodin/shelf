@@ -1,5 +1,5 @@
 module.exports = function(router) {
-    var models = require('../../models');
+    var models = require('../models');
     var csv = require('../modules/csv');
     router.route('/work-items')
         .get(function(req, res) {

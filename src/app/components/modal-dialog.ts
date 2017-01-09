@@ -3,7 +3,6 @@ import {
     OnInit, OnDestroy, Input, Output,
     ElementRef, ViewChild, EventEmitter
 } from '@angular/core';
-import {NgIf, NgClass} from '@angular/common';
 import {Observable} from 'rxjs/Rx';
 
 @Component({

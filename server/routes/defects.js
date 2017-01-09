@@ -1,5 +1,5 @@
 module.exports = function(router) {
-    var models = require('../../models');
+    var models = require('../models');
 
     function currentPlan(pid) {
         // TODO: the timezone difference between db and node could cause query failure.
@@ -41,14 +41,14 @@ module.exports = function(router) {
                                 return defect.update({status: 'InProgress', state: 'Fixing'});
                                 res.json(task)
                             });
-                        }); 
+                        });
                     });
             }).then(function() {
                 res.end();
             }).catch(function(errors) {
                 console.log('Error caught: ', errors);
                 res.sendStatus(500);
-            });  
+            });
         });
 
     router.route('/defects/:id/test')
@@ -59,7 +59,7 @@ module.exports = function(router) {
                         if (!plan) {
                             return res.status(501).json({error: 'Cannot locate current plan.'})
                         }
-                        
+
                         return models.item.create({
                             type:'Task',
                             catalog:  'Testing',
@@ -86,4 +86,4 @@ module.exports = function(router) {
                 res.sendStatus(500);
             });
         });
-}
+};

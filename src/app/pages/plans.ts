@@ -1,10 +1,7 @@
 import {Component, ElementRef, ViewChild, OnInit, OnDestroy} from '@angular/core';
 import {Http} from '@angular/http';
-
-import * as moment from 'moment';
-
-import {ProjectService} from '../services/project-service';
-import {PreferenceService} from '../services/preference-service';
+import {ProjectService} from "../project.service";
+import {PreferenceService} from "../preference.service";
 
 @Component({
     selector: 'plans',
@@ -89,34 +86,14 @@ import {PreferenceService} from '../services/preference-service';
     <div class="row" *ngIf="project == null">
         <h1 class="no-content-notice">No project.</h1>
     </div>
+    <!---->
+    <!--<item-detail [item]="ui.awd.item"-->
+                 <!--[(show)]="ui.awd.show"-->
+                 <!--[type]="ui.awd.type"-->
+                 <!--(saved)="onWorkSaved();">-->
+    <!--</item-detail>-->
     
-    <item-detail [item]="ui.awd.item"
-                 [(show)]="ui.awd.show"
-                 [type]="ui.awd.type"
-                 (saved)="onWorkSaved();">
-    </item-detail>
-    
-    <modal-dialog [(show)]="ui.mtd.show" [title]="'Move selected items to plan'">
-        <div dialog-body>
-            <select #moveTo class="form-control" required>
-                <option *ngFor="let p of plans" [value]="p.id">{{p.name}}</option>
-            </select>
-        </div>
-        <div dialog-footer class="modal-footer">
-            <button (click)="ui.mtd.show=false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button (click)="moveItemsToPlan(moveTo.value)" class="btn btn-default" data-dismiss="modal">Move</button>
-        </div>
-    </modal-dialog>
-
-    <modal-dialog [(show)]="ui.rwd.show" [title]="'Confirm to remove work item'">
-        <div dialog-body>
-            You are about to remove work item <span *ngIf="ui.rwd.item">{{ui.rwd.item.id}}</span>. Are you sure?
-        </div>
-        <div dialog-footer class="modal-footer">
-            <button (click)="ui.rwd.show =false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button (click)="removeItem(ui.rwd.item)" class="btn btn-default" data-dismiss="modal">Remove</button>
-        </div>
-    </modal-dialog>`,
+    `,
     styles: [`
     .workspace{height: 100%; padding-top: 10px;}
     .sidenav {background: #fff; padding: 10px;}
@@ -148,17 +125,12 @@ import {PreferenceService} from '../services/preference-service';
 })
 export class Plans {
     private current = {};
-    private workItems = [];
     private plans = [];
-    private sort = {};
     private members;
     private ui;
     private hideFinished = false;
-    private PRI = ['High', 'Medium', 'Low'];
 
     project = null;
-
-    @ViewChild('downloader') downloader;
 
     constructor(private ele: ElementRef,
                 private http: Http,
@@ -180,8 +152,6 @@ export class Plans {
     public onSelect(plan): void {
         if (this.current != plan) {
             this.current = plan;
-            this.loadWorkItems();
-
             var current = this.project;
             if (!this.members && current && current.team) {
                 this.http.get('/api/teams/' + current.team['id'] + '/members')
@@ -190,158 +160,6 @@ export class Plans {
         }
     }
 
-    onHideFinishedCheck() {
-        let hidden = !this.hideFinished;
-        this.workItems
-            .filter(i => i.status == 'Finished')
-            .forEach(i => i.hidden = hidden);
-        this.pref.setPreference('hideFinished', hidden);
-    }
-
-    moveItemsToPlan(planId) {
-        var ids = this.getSelectedWorkItemIds();
-        if (!ids.length) {
-            alert("No selected work item.");
-            return;
-        }
-
-        this.http.patch('/api/work-item/bunch', JSON.stringify({'ids': ids, 'changes': {'planId': planId}}))
-            .subscribe(resp => this.onMoveToPlanResponse(resp));
-    }
-
-    onMoveToPlanResponse(response) {
-        this.ui.mtd.show = false;
-        this.loadWorkItems();
-    }
-
-    showAddItem(type) {
-        this.ui.awd.item = {'planId': this.current['id']};
-        this.ui.awd.type = type;
-        if (type) {
-            this.ui.awd.item.type = type;
-            this.ui.awd.item.severity = 'Major';
-        }
-
-        this.ui.awd.show = true;
-    }
-
-    showItem(item) {
-        this.ui.awd.item = JSON.parse(JSON.stringify(item));
-        this.ui.awd.show = true;
-    }
-
-    removingItem(item) {
-        this.ui.rwd.item = item;
-        this.ui.rwd.show = true;
-    }
-
-    moveToBacklog(item) {
-        this.ui.loading.show = true;
-        var change = {'planId': null};
-        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
-            .finally(() => this.ui.loading.show = false)
-            .subscribe(resp => this.loadWorkItems());
-    }
-
-    removeItem(item) {
-        this.http.delete('/api/work-items/' + item.id)
-            .subscribe(resp => {
-                this.loadWorkItems();
-                this.ui.rwd.show = false;
-            });
-    }
-
-    visibleItems() {
-        return this.workItems.filter(i => (!i.hidden));
-    }
-
-    changeStatus(item, status) {
-        this.ui.loading.show = true;
-
-        var change = {'status': status};
-        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
-            .finally(() => this.ui.loading.show = false)
-            .subscribe(resp => this.loadWorkItems());
-    }
-
-    changePriority(item, priority) {
-        this.ui.loading.show = true;
-
-        var change = {'priority': priority};
-        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
-            .finally(() => this.ui.loading.show = false)
-            .subscribe(resp => this.loadWorkItems());
-    }
-
-    assignTo(item, member) {
-        this.ui.loading.show = true;
-        var change = {'ownerId': member ? member.id : null};
-        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
-            .finally(() => this.ui.loading.show = false)
-            .subscribe(resp => this.loadWorkItems());
-    }
-
-    onWorkSaved(resp) {
-        this.ui.awd.show = false;
-        this.loadWorkItems();
-    }
-
-    sortResult(field) {
-        if (field == this.sort['field'])
-            this.sort['order'] = this.sort['order'] == 'desc' ? 'asc' : 'desc';
-        else
-            this.sort['order'] = 'asc';
-
-        this.sort['field'] = field;
-        this.loadWorkItems();
-    }
-
-    detailClosed() {
-        this.ui.awd.show = false;
-    }
-
-    loadWorkItems() {
-        var fetchUrl = '/api/work-items/?planId=' + this.current['id'];
-        if (this.sort['field']) {
-            fetchUrl += '&sortBy=' + this.sort['field'];
-            this.sort['order'] == 'desc' && (fetchUrl += '&desc=true');
-        }
-
-        this.http.get(fetchUrl)
-            .subscribe(resp => this.setWorkItems(resp.json()));
-    }
-
-    setWorkItems(items) {
-        items.filter(i => i.status == 'Finished').forEach(i => i.hidden = this.hideFinished);
-        this.workItems = items;
-    }
-
-    date(epoch) {
-        if (!epoch && epoch !== 0)
-            return '----------';
-
-        return moment(epoch).format("YYYY-MM-DD");
-    }
-
-    sumHours() {
-        return this.workItems.reduce((a, b) => a + b.estimation, 0);
-    }
-
-    sumOriginalHours() {
-        return this.workItems.reduce((a, b) => a + b.originalEstimation, 0);
-    }
-
-    onAllCheck(checked) {
-        this.visibleItems().forEach(item => item.checked = checked);
-    }
-
-    allChecked(): boolean {
-        return this.visibleItems().every(item => item.checked);
-    }
-
-    exportCsv() {
-        this.downloader.nativeElement.src = '/api/work-items/?format=csv&planId=' + this.current['id']
-    }
 
     createPlan(data) {
         data['projectId'] = this.project['id'];
@@ -382,9 +200,5 @@ export class Plans {
         // TODO: add option to include start/end days
         let holidays  = data.holiday || 0;
         return workDays - holidays - 2;
-    }
-
-    private getSelectedWorkItemIds() {
-        return this.visibleItems().filter(i => i.checked).map(i => i.id);
     }
 }

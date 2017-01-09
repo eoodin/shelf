@@ -1,5 +1,5 @@
 module.exports = function(router) {
-    var models = require('../../models');
+    var models = require('../models');
 
     router.route('/preferences').get(function(req, res){
         models.preference.findAll({
@@ -14,15 +14,15 @@ module.exports = function(router) {
             });
 
             res.json(root);
-        });        
+        });
     });
-    
+
     router.route('/preferences/:name').put(function(req, res) {
         models.sequelize.transaction(function(t) {
             return models.preference.findOne({
-                where: { 
+                where: {
                     name: req.params.name,
-                    userId: req.user.id 
+                    userId: req.user.id
                 }
             }).then(function(exist) {
                 if (!exist) {
@@ -52,4 +52,4 @@ module.exports = function(router) {
             res.sendStatus(500);
         });
     });
-}
+};

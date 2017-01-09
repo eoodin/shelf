@@ -1,8 +1,7 @@
 import {Component, ElementRef} from '@angular/core';
 import {Http} from '@angular/http';
-
-import {ProjectService} from '../services/project-service';
-import {PreferenceService} from '../services/preference-service';
+import {ProjectService} from "../project.service";
+import {PreferenceService} from "../preference.service";
 
 @Component({
     selector: 'backlog',

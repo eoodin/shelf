@@ -1,17 +1,17 @@
 module.exports = function(router) {
-    var models = require('../../models');
+    var models = require('../models');
     var route = router.route('/plans');
     route.get(function(req, res){
-        let id = req.query.project;
-        if (!id) {
+        let tid = req.query.team;
+        if (!tid) {
             res.sendStatus(404);
             return;
         }
-        
+
         models.plan.findAll({
             include: [models.allocation],
             where: {
-                projectId: id,
+                teamId: tid,
                 type: 'sprint'
                 }})
             .then(function(plans) {
@@ -27,7 +27,7 @@ module.exports = function(router) {
             res.sendStatus(500);
             return;
         }
-        
+
         models.project.findById(req.body.projectId).then(function(project) {
             models.plan.create({
                 type: 'sprint',
@@ -50,4 +50,4 @@ module.exports = function(router) {
             res.sendStatus(500);
         });
     });
-}
+};

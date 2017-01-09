@@ -1,11 +1,12 @@
-import {Component, Input, Output, EventEmitter} from '@angular/core';
+import {Component, Output, EventEmitter} from '@angular/core';
 import {Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
+import {PreferenceService} from "../preference.service";
+import {ProjectService} from "../project.service";
+import {PlanService} from "../plan.service";
 
-import {PreferenceService} from '../services/preference-service';
-import {ProjectService} from '../services/project-service';
 
 @Component({
     selector: 'plan-list',
@@ -31,14 +32,17 @@ export class PlanList {
 
     constructor(private http: Http,
                 private pref: PreferenceService,
+                private plans: PlanService,
                 private prjs: ProjectService) {
 
         this.ui = {cpd: {show: false}};
+        this.plans.all().filter(plans => plans).subscribe(plans => this._plans = plans);
+        this.plans.current().subscribe(p => this.selectPlan(p));
+
         prjs.current
             .filter((id) => id)
             .do((p) => this.project = p)
             .subscribe((p) => {
-                this.loadPlans(p.id);
                 if (!p.team) return;
 
                 this.http.get('/api/teams/' + p.team.id + '/members')
@@ -54,12 +58,6 @@ export class PlanList {
 
     }
 
-    private loadPlans(pid) {
-        this.http.get('/api/plans/?project=' + pid)
-            .map(resp => resp.json())
-            .subscribe(data => this.setPlans(data));
-    }
-
     private toggleAll() {
         this.showAll = !this.showAll;
     }
@@ -68,33 +66,11 @@ export class PlanList {
         return this.showAll ? this._plans : this._plans.slice(0, 10);
     }
 
-    private setPlans(plans) {
-        this._plans = plans;
-        this.selected = null;
-        if (plans && plans.length) {
-            // Revert the order by end time.
-            this._plans.sort((a, b) => {return b.end.localeCompare(a.end);});
-            var list = this;
-            this.pref.values.subscribe(_ => {
-                var selectPlan = plans[0];
-                if (_['lastSelectedPlan']) {
-                    for (var p of plans) {
-                        if (p.id == _['lastSelectedPlan']) {
-                            selectPlan = p;
-                            break;
-                        }
-                    }
-                }
-                list.selectPlan(selectPlan);
-            });
-        }
-    }
-
     clickedPlan(plan) {
         this.pref.values
             .filter(p => p['lastSelectedPlan'] != plan.id)
             .subscribe(() => this.pref.setPreference('lastSelectedPlan', plan.id));
-        this.selectPlan(plan);
+        this.plans.setCurrent(plan);
     }
 
     selectPlan(plan) {

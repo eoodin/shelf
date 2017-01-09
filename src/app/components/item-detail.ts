@@ -1,7 +1,7 @@
 import {Component, Input, Output, EventEmitter, ViewChild, OnInit } from '@angular/core';
 import {Http} from '@angular/http';
 import {ModalDirective} from 'ng2-bootstrap';
-import {ProjectService} from '../services/project-service';
+import {ProjectService} from "../project.service";
 
 declare var CKEDITOR;
 

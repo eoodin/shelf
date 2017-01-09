@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
 import {Http} from '@angular/http';
-
-import {ProjectService} from '../services/project-service';
+import {ProjectService} from "../project.service";
 
 @Component({
     selector: 'work-items',

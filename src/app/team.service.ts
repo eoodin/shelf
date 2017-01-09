@@ -1,5 +1,5 @@
-import {Injectable} from '@angular/core';
-import {Http} from '@angular/http';
+import {Injectable} from "@angular/core";
+import {Http} from "@angular/http";
 
 @Injectable()
 export class TeamService {
@@ -20,4 +20,5 @@ export class TeamService {
         this.http.get('/api/teams/')
             .subscribe(resp => this.teams = resp.json());
     }
+
 }

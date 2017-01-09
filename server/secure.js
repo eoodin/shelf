@@ -4,7 +4,7 @@ module.exports = function(app) {
     var session = require('express-session');
     var passport = require('passport');
     var LocalStrategy = require('passport-local').Strategy;
-    var models = require('../models');
+    var models = require('./models');
 
     app.use(cookieParser());
     app.use(session({secret: 'supernova', saveUninitialized: true, resave: true}));

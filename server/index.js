@@ -8,7 +8,7 @@ app.set('IP', '0.0.0.0');
 var fs = require("fs"),
     bodyParser = require('body-parser'),
     methodOverride = require('method-override');
-var models = require('../models');
+var models = require('./models');
 models.sequelize.authenticate().then(function() {
     console.log('Db connected.')
 }).catch(function(err){

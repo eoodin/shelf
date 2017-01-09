@@ -1,13 +1,11 @@
-import { Component, ViewEncapsulation, ChangeDetectionStrategy, ElementRef, ViewChild, OnDestroy} from '@angular/core';
-import {Http} from '@angular/http';
-
-import * as moment from 'moment';
-
-import {ProjectService} from './services/project-service';
-import {PreferenceService} from './services/preference-service';
+import {Component, ViewChild} from "@angular/core";
+import {Http} from "@angular/http";
+import {PreferenceService} from "./preference.service";
+import * as moment from "moment";
+import {PlanService} from "./plan.service";
 
 @Component({
-  selector: 'app-plan-content',
+  selector: 'plan-content',
   template: `
        <div >
             <div class="plan-head" *ngIf="current.id">
@@ -161,13 +159,57 @@ import {PreferenceService} from './services/preference-service';
                 </div>
             </div>
         </div>
-  `,
-  styles: []
+  
+  <modal-dialog [(show)]="ui.mtd.show" [title]="'Move selected items to plan'">
+        <div dialog-body>
+            <select #moveTo class="form-control" required>
+                <option *ngFor="let p of _plans" [value]="p.id">{{p.name}}</option>
+            </select>
+        </div>
+        <div dialog-footer class="modal-footer">
+            <button (click)="ui.mtd.show=false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button (click)="moveItemsToPlan(moveTo.value)" class="btn btn-default" data-dismiss="modal">Move</button>
+        </div>
+    </modal-dialog>
+
+    <modal-dialog [(show)]="ui.rwd.show" [title]="'Confirm to remove work item'">
+        <div dialog-body>
+            You are about to remove work item <span *ngIf="ui.rwd.item">{{ui.rwd.item.id}}</span>. Are you sure?
+        </div>
+        <div dialog-footer class="modal-footer">
+            <button (click)="ui.rwd.show =false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button (click)="removeItem(ui.rwd.item)" class="btn btn-default" data-dismiss="modal">Remove</button>
+        </div>
+    </modal-dialog>
+
+    `,
+    styles: [`
+    .project-info { height:40px; padding: 2px 0;}
+    .project-operations { float: right;}
+    .work-items-heading > div{float:right;}
+    .work-items-heading { height: 38px; }
+    .header-title {padding-left: 24px;}
+    .awd .modal-body .row {padding: 5px 0;}
+    a:hover {cursor: pointer;}
+    [ngcontrol='title'] { width: 100%; }
+    .plan-head h1 {font-size: 18px; margin: 0;}
+    .plan-head ul {padding-left: 0;}
+    .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
+    .plan-head ul li span {font-weight: normal}
+    .item-table label { margin: 0;}
+    .item-table label input[type="checkbox"] { vertical-align: bottom;}
+    .item-table table .checkbox{ display: inline-block; margin:0; width: 22px; height: 22px;}
+    .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
+    .id .glyphicon {margin-right: 8px;}
+    .us.glyphicon{color: #050;}
+    .defect.glyphicon{color: #500;}
+    .task.glyphicon{color: #333;}
+    `]
 })
 export class PlanContentComponent {
     private current = {};
     private workItems = [];
-    private plans = [];
+    private _plans = [];
     private sort = {};
     private members;
     private ui;
@@ -179,7 +221,7 @@ export class PlanContentComponent {
     @ViewChild('downloader') downloader;
 
     constructor(private http: Http,
-                private prjs: ProjectService,
+                private plans: PlanService,
                 private pref: PreferenceService) {
         this.ui = {
             'loading': {'show': false},
@@ -189,22 +231,12 @@ export class PlanContentComponent {
             'rwd': {'show': false}
         };
 
-        prjs.current.subscribe(p => this.project = p);
-        prjs.plans.subscribe(plans => this.plans = plans);
-        pref.values.subscribe(ps => this.hideFinished = ps.hideFinished);
-    }
-
-    public onSelect(plan): void {
-        if (this.current != plan) {
-            this.current = plan;
-            this.loadWorkItems();
-
-            var current = this.project;
-            if (!this.members && current && current.team) {
-                this.http.get('/api/teams/' + current.team['id'] + '/members')
-                    .subscribe(resp => this.members = resp.json());
-            }
-        }
+        this.plans.current()
+            .filter(plan => plan)
+            .subscribe(plan => this.switchPlan(plan));
+        pref.values
+            .filter(prefs => typeof(prefs['hideFinished']) != 'undefined')
+            .subscribe(ps => this.hideFinished = ps.hideFinished);
     }
 
     onHideFinishedCheck() {
@@ -360,50 +392,12 @@ export class PlanContentComponent {
         this.downloader.nativeElement.src = '/api/work-items/?format=csv&planId=' + this.current['id']
     }
 
-
-
-    createPlan(data) {
-        data['projectId'] = this.project['id'];
-        data['availableHours'] = this.sumAvailableHours(data);
-        this.ui.cpd.show = false;
-        this.prjs.reloadPlans();
-    }
-
-    sumAvailableHours(data) {
-        let sum = 0;
-        let dayHours = 8;
-        let days = this.calcWorkdays(data);
-        if (days < 0)
-            return 0;
-
-        for (let m of this.members) {
-            sum += m['alloc'] * (days - m['leave']) * dayHours;
-        }
-
-        return sum;
-    }
-
-    calcWorkdays(data) {
-        var sd = new Date(data.start);
-        var ed = new Date(data.end);
-
-        if (sd.getTime() > ed.getTime())
-            return -1;
-
-        var workDays = 0;
-        while (sd.getTime() <= ed.getTime()) {
-            let weekend = (sd.getDay() == 0 || sd.getDay() == 6);
-            sd.setHours(sd.getHours() + 24);
-            if (weekend) continue;
-            workDays++;
-        }
-
-        // TODO: add option to include start/end days
-        let holidays  = data.holiday || 0;
-        return workDays - holidays - 2;
-    }
-
     private getSelectedWorkItemIds() {
         return this.visibleItems().filter(i => i.checked).map(i => i.id);
+    }
+
+    private switchPlan(plan) {
+        this.current = plan;
+        this.loadWorkItems();
     }
 }

@@ -1,8 +1,8 @@
 import {Component} from '@angular/core';
 import {Http} from '@angular/http';
-import {ProjectService} from '../services/project-service';
-import {TeamService} from '../services/team-service';
-import {UserService} from "../services/user-service";
+import {ProjectService} from "../project.service";
+import {TeamService} from "../team.service";
+import {UserService} from "../user.service";
 
 class Project {
     public id;

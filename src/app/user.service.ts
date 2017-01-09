@@ -1,11 +1,6 @@
-import {Injectable} from '@angular/core';
-import {Location} from '@angular/common';
-import {Observable} from 'rxjs/Observable';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import 'rxjs/Rx';
-import {HttpService} from "../http.service";
-
-declare var window;
+import { Injectable } from '@angular/core';
+import {BehaviorSubject, Observable} from "rxjs";
+import {HttpService} from "./http.service";
 
 @Injectable()
 export class UserService {
@@ -20,4 +15,5 @@ export class UserService {
     public get currentUser(): Observable<any> {
         return this._currentUser.filter(u => u);
     }
+
 }

@@ -1,17 +1,12 @@
-import {Component, ViewContainerRef} from '@angular/core';
-import {Router} from '@angular/router';
-import {Http} from '@angular/http';
-import {Location} from '@angular/common';
-
-import {ProjectService} from './services/project-service';
-import {PreferenceService} from './services/preference-service';
-import {TeamService} from './services/team-service';
-import {AppService} from "./services/app-service";
-import {UserService} from "./services/user-service";
+import {Component, ViewContainerRef} from "@angular/core";
+import {Router} from "@angular/router";
+import {Http} from "@angular/http";
+import {Location} from "@angular/common";
 import {NotifyService} from "./notify.service";
-
-import {Observable} from 'rxjs/Rx';
+import {Observable} from "rxjs/Rx";
 import {HttpService} from "./http.service";
+import {ProjectService} from "./project.service";
+import {AppService} from "./app.service";
 
 @Component({
     selector: '[shelf-app]',
@@ -53,8 +48,7 @@ import {HttpService} from "./http.service";
     .app-page {padding-top: 50px; height: 100%;}
     .workspace {height: 100%; margin: 0;}
     .nav-logo {width: 32px; height:32px;}
-    `],
-    providers: [ProjectService, PreferenceService, TeamService, AppService, UserService]
+    `]
 })
 export class ShelfAppComponent {
     private viewContainerRef: ViewContainerRef;
