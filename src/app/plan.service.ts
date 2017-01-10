@@ -19,7 +19,6 @@ export class PlanService {
         this._plans
             .filter(plans => plans && plans.length)
             .subscribe(plans => this.planUpdated(plans));
-
         this._team
             .filter(team => team )
             .subscribe(team => this.loadPlans(team));
@@ -40,6 +39,12 @@ export class PlanService {
 
     public setCurrent(plan) {
         this._current.next(plan);
+    }
+
+    public load() {
+        if (this._team) {
+            this.loadPlans(this._team);
+        }
     }
 
     private loadPlans(team: any) {

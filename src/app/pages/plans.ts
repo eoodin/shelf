@@ -125,7 +125,6 @@ import {PreferenceService} from "../preference.service";
 })
 export class Plans {
     private current = {};
-    private plans = [];
     private members;
     private ui;
     private hideFinished = false;
@@ -143,9 +142,7 @@ export class Plans {
             'cpd': {'show': false},
             'rwd': {'show': false}
         };
-
         prjs.current.subscribe(p => this.project = p);
-        prjs.plans.subscribe(plans => this.plans = plans);
         pref.values.subscribe(ps => this.hideFinished = ps.hideFinished);
     }
 
@@ -165,7 +162,6 @@ export class Plans {
         data['projectId'] = this.project['id'];
         data['availableHours'] = this.sumAvailableHours(data);
         this.ui.cpd.show = false;
-        this.prjs.reloadPlans();
     }
 
     sumAvailableHours(data) {

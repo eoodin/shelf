@@ -65,13 +65,10 @@ export class ShelfAppComponent {
                 rootView: ViewContainerRef) {
         this.viewContainerRef = rootView;
         http.authFail()
-            .filter(failed => failed)
+            .filter(failed => failed && !router.url.includes('/login'))
             .subscribe(() => {
                 this.router.navigate(['/login', {goto: router.url}]);
             });
-        http.authFail()
-            .filter(failed => !failed)
-            .subscribe( _ => prjs.load());
 
         apps.info.subscribe(app => this.app = app);
 
