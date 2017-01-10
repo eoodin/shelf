@@ -1,7 +1,8 @@
-import {Component, ElementRef, ViewChild, OnInit, OnDestroy} from '@angular/core';
+import {Component} from '@angular/core';
 import {Http} from '@angular/http';
 import {ProjectService} from "../project.service";
 import {PreferenceService} from "../preference.service";
+import {TeamService} from "../team.service";
 
 @Component({
     selector: 'plans',
@@ -29,7 +30,7 @@ import {PreferenceService} from "../preference.service";
                         <div class="row plan-field-row">
                             <div class="col-sm-3">Sprint name:</div>
                             <div class="col-sm-5"> 
-                                <input type="text" [(ngModel)]="name" name="name">
+                                <input type="text" [(ngModel)]="name" name="name" >
                             </div>
                         </div>
                         <div class="row plan-field-row">
@@ -42,6 +43,7 @@ import {PreferenceService} from "../preference.service";
                             <div class="col-sm-3">Due date:</div>
                             <div class="col-sm-5">
                                 <input type="date" [(ngModel)]="end" name="end">
+                                <input type="hidden" [ngModel]="calcWorkdays(start, end)" name="workdays">
                             </div>
                         </div>
                         <div class="row plan-field-row">
@@ -52,27 +54,27 @@ import {PreferenceService} from "../preference.service";
                         </div>
                         <div class="row"></div>
                         <div class="row plan-field-row">
-                            <div class="col-sm-3">Available effort:</div><div class="col-sm-5"> 
-                                <!-- <input type="text" [disabled]="true" [(ngModel)]="availableHours" name="availableHours"> -->
-                                <span>{{sumAvailableHours(f.value) | number: '1.0-0'}} hours</span>
+                            <div class="col-sm-3">Available effort:</div>
+                            <div class="col-sm-5"> 
+                                <span>{{sumAvailableHours(f.value.workdays, members)}}</span>
                             </div>
                         </div>
                         <div class="row plan-field-row">
                             <div class="col-sm-12">
-                            <table style="width: 100%">
-                               <tr>
-                                   <th>Name</th>
-                                   <th>Allocation</th>
-                                   <th>Leave(days)</th>
-                                   <th>Available</th>
-                               </tr>
-                               <tr *ngFor="let member of members">
-                                   <td>{{member.name}}</td>
-                                   <td><input [(ngModel)]="member.alloc" [ngModelOptions]="{standalone:true}"/></td>
-                                   <td><input [(ngModel)]="member.leave" [ngModelOptions]="{standalone:true}"/></td>
-                                   <td>{{member.alloc * (calcWorkdays(f.value) - member.leave) * 8 | number: '1.0-1'}} hours</td>
-                               </tr>
-                            </table>
+                                <table class="alloc-table">
+                                   <tr>
+                                       <th>Name</th>
+                                       <th>Allocation</th>
+                                       <th>Leave(days)</th>
+                                       <th>Available</th>
+                                   </tr>
+                                   <tr *ngFor="let member of members">
+                                       <td>{{member.name}}</td>
+                                       <td><input [ngModel]="member.alloc ? member.alloc : 1" (ngModelChange)="calcHours(member, f.value.workdays, $event, member.leave)" [ngModelOptions]="{standalone:true}" /></td>
+                                       <td><input [ngModel]="member.leave ? member.leave : 0" (ngModelChange)="calcHours(member, f.value.workdays, member.alloc, $event)" [ngModelOptions]="{standalone:true}" /></td>
+                                       <td><input disabled [ngModel]="calcHours(member, f.value.workdays, member.alloc, member.leave)" [ngModelOptions]="{standalone:true}" /></td>
+                                   </tr>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -83,52 +85,33 @@ import {PreferenceService} from "../preference.service";
             </form>
         </div>
     </div>
-    <!---->
-    <!--<item-detail [item]="ui.awd.item"-->
-                 <!--[(show)]="ui.awd.show"-->
-                 <!--[type]="ui.awd.type"-->
-                 <!--(saved)="onWorkSaved();">-->
-    <!--</item-detail>-->
-    
     `,
     styles: [`
     .workspace{height: 100%; padding-top: 10px;}
     .sidenav {background: #fff; padding: 10px;}
     .add-sprint-button{font-size: 14px;}
-    .plan-page {padding-bottom: 15px;}
     .work-items-heading > div{float:right;}
-    .work-items-heading { height: 38px; }
-    .right{ padding: 0 15px; }
-    .header-title {padding-left: 24px;}
-    .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
     [ngcontrol='title'] { width: 100%; }
     .plan-head h1 {font-size: 18px; margin: 0;}
     .plan-head ul {padding-left: 0;}
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
     .plan-head ul li span {font-weight: normal}
-    .item-table label { margin: 0;}
-    .item-table label input[type="checkbox"] { vertical-align: bottom;}
-    .item-table table .checkbox{ display: inline-block; margin:0; width: 22px; height: 22px;}
-    .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
-    .id .glyphicon {margin-right: 8px;}
-    .us.glyphicon{color: #050;}
-    .defect.glyphicon{color: #500;}
-    .task.glyphicon{color: #333;}
-    .month{width: 100%;}
+    .alloc-table {width: 100%;}
+    .alloc-table td {padding: 5px 0;}
+    .alloc-table td input {width: 80px;}
     `]
 })
 export class Plans {
     private current = {};
-    private members;
+    private members = [];
     private ui;
     private hideFinished = false;
-
     project = null;
 
-    constructor(private ele: ElementRef,
-                private http: Http,
+    constructor(private http: Http,
                 private prjs: ProjectService,
+                private teams: TeamService,
                 private pref: PreferenceService) {
         this.ui = {
             'loading': {'show': false},
@@ -137,6 +120,8 @@ export class Plans {
             'cpd': {'show': false},
             'rwd': {'show': false}
         };
+
+        this.teams.ownTeam.subscribe(team => this.updateMembers(team));
         prjs.current.subscribe(p => this.project = p);
         pref.values.subscribe(ps => this.hideFinished = ps.hideFinished);
     }
@@ -149,27 +134,39 @@ export class Plans {
 
     createPlan(data) {
         data['projectId'] = this.project['id'];
-        data['availableHours'] = this.sumAvailableHours(data);
+        data['availableHours'] = data.totalHours;
         this.ui.cpd.show = false;
     }
 
-    sumAvailableHours(data) {
+    sumAvailableHours(workdays, members) {
         let sum = 0;
-        let dayHours = 8;
-        let days = this.calcWorkdays(data);
+        let days = workdays | 0;
         if (days < 0)
             return 0;
 
-        for (let m of this.members) {
-            sum += m['alloc'] * (days - m['leave']) * dayHours;
+        for (let m of members) {
+            sum += m.hours;
         }
 
         return sum;
     }
 
-    calcWorkdays(data) {
-        var sd = new Date(data.start);
-        var ed = new Date(data.end);
+    calcHours(member, workdays, alloc, leave) {
+        workdays = workdays | 0;
+        if (workdays <= 0)
+            return 0;
+
+        alloc = alloc | 1;
+        leave = leave | 0;
+        member.alloc =  alloc;
+        member.leave = leave;
+        member.hours = alloc * (workdays - leave) * 8;
+        return member.hours;
+    }
+
+    calcWorkdays(start, end) {
+        var sd = new Date(start);
+        var ed = new Date(end);
 
         if (sd.getTime() > ed.getTime())
             return -1;
@@ -183,7 +180,15 @@ export class Plans {
         }
 
         // TODO: add option to include start/end days
-        let holidays  = data.holiday || 0;
-        return workDays - holidays - 2;
+        return workDays - 2;
+    }
+
+
+    private updateMembers(team) {
+        if (team) {
+            this.http.get('/api/team/' + team.id + '/members')
+                .map(resp => resp.json())
+                .subscribe(members => this.members = members);
+        }
     }
 }

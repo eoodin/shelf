@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject} from "rxjs";
 import {PreferenceService} from "./preference.service";
 import {TeamService} from "./team.service";
-import {UserService} from "./user.service";
 import {HttpService} from "./http.service";
 
 @Injectable()
@@ -10,23 +9,17 @@ export class PlanService {
 
     private _plans: BehaviorSubject<any> = new BehaviorSubject<any>(null);
     private _current: BehaviorSubject<any> = new BehaviorSubject<any>(null);
-    private _team: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
     constructor(private pref: PreferenceService,
                 private http: HttpService,
-                private users: UserService,
                 private teams: TeamService) {
         this._plans
             .filter(plans => plans && plans.length)
             .subscribe(plans => this.planUpdated(plans));
-        this._team
-            .filter(team => team )
-            .subscribe(team => this.loadPlans(team));
 
-        users.currentUser
-            .map(user => user.teams)
-            .filter(teams => teams.length)
-            .subscribe(teams => this._team.next(teams[0])); // TODO: read prefered team from preference?
+        this.teams.ownTeam
+            .filter(team => team)
+            .subscribe(team => this.loadPlans(team));
     }
 
     public all(): BehaviorSubject<any> {
@@ -39,12 +32,6 @@ export class PlanService {
 
     public setCurrent(plan) {
         this._current.next(plan);
-    }
-
-    public load() {
-        if (this._team.value) {
-            this.loadPlans(this._team.value);
-        }
     }
 
     private loadPlans(team: any) {

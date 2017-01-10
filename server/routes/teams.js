@@ -7,10 +7,9 @@ module.exports = function(router) {
         });
     });
 
-
-    router.route('/teams/:tid/members').get(function(req, res){
+    router.route('/team/:tid/members').get(function(req, res){
         if (!req.params.tid) {
-            res.sendStatus(404);
+            res.sendStatus(500);
             return;
         }
 
