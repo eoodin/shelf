@@ -83,9 +83,6 @@ import {PreferenceService} from "../preference.service";
             </form>
         </div>
     </div>
-    <div class="row" *ngIf="project == null">
-        <h1 class="no-content-notice">No project.</h1>
-    </div>
     <!---->
     <!--<item-detail [item]="ui.awd.item"-->
                  <!--[(show)]="ui.awd.show"-->
@@ -98,8 +95,6 @@ import {PreferenceService} from "../preference.service";
     .workspace{height: 100%; padding-top: 10px;}
     .sidenav {background: #fff; padding: 10px;}
     .add-sprint-button{font-size: 14px;}
-    .project-info { height:40px; padding: 2px 0;}
-    .project-operations { float: right;}
     .plan-page {padding-bottom: 15px;}
     .work-items-heading > div{float:right;}
     .work-items-heading { height: 38px; }
@@ -149,14 +144,8 @@ export class Plans {
     public onSelect(plan): void {
         if (this.current != plan) {
             this.current = plan;
-            var current = this.project;
-            if (!this.members && current && current.team) {
-                this.http.get('/api/teams/' + current.team['id'] + '/members')
-                    .subscribe(resp => this.members = resp.json());
-            }
         }
     }
-
 
     createPlan(data) {
         data['projectId'] = this.project['id'];

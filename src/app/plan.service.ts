@@ -42,8 +42,8 @@ export class PlanService {
     }
 
     public load() {
-        if (this._team) {
-            this.loadPlans(this._team);
+        if (this._team.value) {
+            this.loadPlans(this._team.value);
         }
     }
 
