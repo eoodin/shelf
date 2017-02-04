@@ -26,6 +26,7 @@ import {ProjectService} from "./project.service";
 import {PlanService} from "./plan.service";
 import {UserService} from "./user.service";
 import {AppService} from "./app.service";
+import { PlanCreatorComponent } from './plan-creator.component';
 
 let routes = [
     {path: '', pathMatch: 'full', redirectTo: 'plans'},
@@ -63,6 +64,7 @@ export class ShelfRequestOptions extends RequestOptions {
         ShelfAppComponent,
         PlanContentComponent,
         ItemDetailComponent,
+        PlanCreatorComponent,
     ],
     providers: [
         NotifyService,
