@@ -39,6 +39,7 @@ export class ProjectService {
                 }
                 this._current.next(select);
             });
+        this.load();
     }
 
     setCurrent(p) {

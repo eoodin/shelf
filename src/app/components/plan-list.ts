@@ -32,20 +32,21 @@ export class PlanList {
 
     constructor(private http: Http,
                 private pref: PreferenceService,
-                private plans: PlanService,
-                private prjs: ProjectService) {
+                private plans: PlanService) {
 
         this.ui = {cpd: {show: false}};
         this.plans.all().filter(plans => plans).subscribe(plans => this._plans = plans);
         this.plans.current().subscribe(p => this.selectPlan(p));
 
+        // TODO: change this
+        /*
         prjs.current
             .filter((id) => id)
             .do((p) => this.project = p)
             .subscribe((p) => {
                 if (!p.team) return;
 
-                this.http.get('/api/teams/' + p.team.id + '/members')
+                this.http.get('/api/team/' + p.team.id + '/members')
                     .map(resp => resp.json())
                     .subscribe(members => {
                         this.members = members;
@@ -55,7 +56,7 @@ export class PlanList {
                         }
                     });
             });
-
+        */
     }
 
     private toggleAll() {

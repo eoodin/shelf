@@ -1,6 +1,5 @@
 import {Component} from '@angular/core';
 import {Http} from '@angular/http';
-import {ProjectService} from "../project.service";
 import {PreferenceService} from "../preference.service";
 import {TeamService} from "../team.service";
 
@@ -56,10 +55,10 @@ import {TeamService} from "../team.service";
                         <div class="row plan-field-row">
                             <div class="col-sm-3">Available effort:</div>
                             <div class="col-sm-5"> 
-                                <span>{{sumAvailableHours(f.value.workdays, members)}}</span>
+                                <span>{{sumAvailableHours(f.value.workdays)}}</span>
                             </div>
                         </div>
-                        <div class="row plan-field-row">
+                        <div class="row plan-field-row" *ngIf="team">
                             <div class="col-sm-12">
                                 <table class="alloc-table">
                                    <tr>
@@ -68,7 +67,7 @@ import {TeamService} from "../team.service";
                                        <th>Leave(days)</th>
                                        <th>Available</th>
                                    </tr>
-                                   <tr *ngFor="let member of members">
+                                   <tr *ngFor="let member of team.members">
                                        <td>{{member.name}}</td>
                                        <td><input [ngModel]="member.alloc ? member.alloc : 1" (ngModelChange)="calcHours(member, f.value.workdays, $event, member.leave)" [ngModelOptions]="{standalone:true}" /></td>
                                        <td><input [ngModel]="member.leave ? member.leave : 0" (ngModelChange)="calcHours(member, f.value.workdays, member.alloc, $event)" [ngModelOptions]="{standalone:true}" /></td>
@@ -104,13 +103,11 @@ import {TeamService} from "../team.service";
 })
 export class Plans {
     private current = {};
-    private members = [];
+    private team;
     private ui;
     private hideFinished = false;
-    project = null;
 
     constructor(private http: Http,
-                private prjs: ProjectService,
                 private teams: TeamService,
                 private pref: PreferenceService) {
         this.ui = {
@@ -121,8 +118,9 @@ export class Plans {
             'rwd': {'show': false}
         };
 
-        this.teams.ownTeam.subscribe(team => this.updateMembers(team));
-        prjs.current.subscribe(p => this.project = p);
+        this.teams.ownTeam
+            .filter(team => team)
+            .subscribe(team => this.team = team);
         pref.values.subscribe(ps => this.hideFinished = ps.hideFinished);
     }
 
@@ -133,18 +131,18 @@ export class Plans {
     }
 
     createPlan(data) {
-        data['projectId'] = this.project['id'];
+        data['teamId'] = this.team['id'];
         data['availableHours'] = data.totalHours;
         this.ui.cpd.show = false;
     }
 
-    sumAvailableHours(workdays, members) {
-        let sum = 0;
+    sumAvailableHours(workdays) {
         let days = workdays | 0;
-        if (days < 0)
+        if (days < 0 || !this.team || this.team.members)
             return 0;
 
-        for (let m of members) {
+        let sum = 0;
+        for (let m of this.team.members) {
             sum += m.hours;
         }
 
@@ -181,14 +179,5 @@ export class Plans {
 
         // TODO: add option to include start/end days
         return workDays - 2;
-    }
-
-
-    private updateMembers(team) {
-        if (team) {
-            this.http.get('/api/team/' + team.id + '/members')
-                .map(resp => resp.json())
-                .subscribe(members => this.members = members);
-        }
     }
 }

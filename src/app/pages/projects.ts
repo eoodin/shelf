@@ -37,7 +37,7 @@ class Project {
        </div>
        <div class="panel-body">
         <ul class="sidebar-item-list">
-            <li *ngFor="let team of teamService.teams" >
+            <li *ngFor="let team of teams" >
                 <span class="main-title">{{team.name}}</span>
                 <button *ngIf="permitSA" class="btn btn-danger btn-sm" (click)="deleteTeam(team)">Delete</button>
             </li>
@@ -75,7 +75,7 @@ class Project {
                         <div class="col-sm-3">Team:</div>
                         <div class="col-sm-5">
                            <select class="form-control" required ngControl="teamId">
-                              <option *ngFor="let t of teamService.teams" [value]="t.id">{{t.name}}</option>
+                              <option *ngFor="let t of teams" [value]="t.id">{{t.name}}</option>
                            </select>
                         </div>
                     </div>
@@ -136,6 +136,7 @@ export class Projects {
     private ui;
     private permitSA: boolean = false;
     private projects: any[];
+    private teams = [];
 
     constructor(private http: Http,
                 private prjs: ProjectService,
@@ -146,14 +147,15 @@ export class Projects {
             createTeamDialog: {show: false}
         };
 
-        this.teamService.load();
+        teamService.teams.subscribe(teams => this.teams = teams);
+
         this.prjs.projects.subscribe((ps) => {
             this.projects = ps;
         });
 
         us.currentUser
             .subscribe(user => {
-                this.permitSA = user.roles.map(i => i.id).includes(1);
+                this.permitSA = user.roles && user.roles.map(i => i.id).includes(1);
             });
     }
 
@@ -171,15 +173,11 @@ export class Projects {
 
     onCreateTeamSubmit(data) {
         data.users = data.users.split(',');
-
-        this.http.post('/api/teams/', JSON.stringify(data))
-            .subscribe(resp => this.teamService.load());
-
+        this.teamService.createTeam(data.name, data.scrumMaster, data.users);
         this.ui.createTeamDialog.show = false;
     }
 
     deleteTeam(team) {
-        this.http.delete('/api/teams/' + team.id)
-            .subscribe(response => this.teamService.load());
+        this.teamService.deleteTeam(team.id);
     }
 }

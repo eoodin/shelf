@@ -3,6 +3,7 @@ import {Http} from "@angular/http";
 import {PreferenceService} from "./preference.service";
 import * as moment from "moment";
 import {PlanService} from "./plan.service";
+import {TeamService} from "./team.service";
 
 @Component({
   selector: 'plan-content',
@@ -134,7 +135,7 @@ import {PlanService} from "./plan.service";
                                         <ul class="dropdown-menu">
                                             <li role="menuitem"><a (click)="assignTo(item, null)">Unassigned</a></li>
                                             <li role="menuitem"
-                                                *ngFor="let member of members"
+                                                *ngFor="let member of team.members"
                                                 [class.hidden]="member == item.owner"><a
                                                     (click)="assignTo(item, member)">{{member.name}}</a></li>
                                         </ul>
@@ -160,7 +161,7 @@ import {PlanService} from "./plan.service";
             </div>
         </div>
   
-  <modal-dialog [(show)]="ui.mtd.show" [title]="'Move selected items to plan'">
+    <modal-dialog [(show)]="ui.mtd.show" [title]="'Move selected items to plan'">
         <div dialog-body>
             <select #moveTo class="form-control" required>
                 <option *ngFor="let p of _plans" [value]="p.id">{{p.name}}</option>
@@ -181,7 +182,11 @@ import {PlanService} from "./plan.service";
             <button (click)="removeItem(ui.rwd.item)" class="btn btn-default" data-dismiss="modal">Remove</button>
         </div>
     </modal-dialog>
-
+    <item-detail [item]="ui.awd.item"
+                 [(show)]="ui.awd.show"
+                 [type]="ui.awd.type"
+                 (saved)="onWorkSaved();">
+    </item-detail>
     `,
     styles: [`
     .project-info { height:40px; padding: 2px 0;}
@@ -211,7 +216,7 @@ export class PlanContentComponent {
     private workItems = [];
     private _plans = [];
     private sort = {};
-    private members;
+    private team;
     private ui;
     private hideFinished = false;
     private PRI = ['High', 'Medium', 'Low'];
@@ -222,6 +227,7 @@ export class PlanContentComponent {
 
     constructor(private http: Http,
                 private plans: PlanService,
+                private teams: TeamService,
                 private pref: PreferenceService) {
         this.ui = {
             'loading': {'show': false},
@@ -230,6 +236,10 @@ export class PlanContentComponent {
             'cpd': {'show': false},
             'rwd': {'show': false}
         };
+
+        this.teams.ownTeam
+            .filter(team => team)
+            .subscribe(team => this.team = team);
 
         this.plans.current()
             .filter(plan => plan)

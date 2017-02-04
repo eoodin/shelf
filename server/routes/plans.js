@@ -23,28 +23,23 @@ module.exports = function(router) {
     });
 
     route.post(function(req, res){
-        if (!req.body.projectId) {
-            res.sendStatus(500);
-            return;
-        }
-
-        models.project.findById(req.body.projectId).then(function(project) {
+        models.team.findById(req.body.teamId).then(function(t) {
             models.plan.create({
                 type: 'sprint',
                 name: req.body.name,
                 start: req.body.start,
                 end: req.body.end,
-                projectId: project.id
+                teamId: t.id
             }).then(function(plan) {
                 models.allocation.create({
-                    teamId: project.teamId,
+                    teamId: t.teamId,
                     effort: req.body.availableHours,
                     planId: plan.id
                 }).then(function(alloc) {
                     plan.save({allocation: alloc}).then(function() {
                         res.json(plan);
-                    })
-                })
+                    });
+                });
             });
         }).catch(function(err) {
             res.sendStatus(500);

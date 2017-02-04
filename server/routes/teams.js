@@ -7,17 +7,21 @@ module.exports = function(router) {
         });
     });
 
-    router.route('/team/:tid/members').get(function(req, res){
+    router.route('/team/:tid').get(function(req, res){
         if (!req.params.tid) {
             res.sendStatus(500);
             return;
         }
+        let incs = [];
+        if (req.query.members) {
+            incs.push({model: models.user, as: 'members'});
+        }
 
         models.team.findOne({
             where: {id: req.params.tid},
-            include: [models.user]
+            include: incs
         }).then(function(team) {
-            res.json(team.users);
+            res.json(team);
         });
     });
 };

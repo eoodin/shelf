@@ -13,8 +13,9 @@ export class TeamService {
         ) {
         this.users.currentUser
             .filter(user => user && user.teams)
+            // TODO: there should be a good way to identify current team.
             .map(user => user.teams[0])
-            .subscribe(team => this._ownTeam.next(team));
+            .subscribe(team => this.updateTeam(team));
         this.load();
     }
 
@@ -33,5 +34,22 @@ export class TeamService {
     public load() {
         this.http.get('/api/teams/')
             .subscribe(resp => this._teams.next(resp.json()));
+    }
+
+    public createTeam(name:string, scrumMaster:string, users:string) {
+        let data = {name: name, scrumMaster: scrumMaster, users: users};
+        this.http.post('/api/teams/', JSON.stringify(data))
+            .subscribe(resp => this.load());
+    }
+
+    public deleteTeam(id:string) {
+        this.http.delete('/api/teams/' + id)
+            .subscribe(response => this.load());
+    }
+    
+    private updateTeam(team) {
+        this.http.get('/api/team/' + team['id'] +'?members=1')
+            .map(response => response.json())
+            .subscribe(team => this._ownTeam.next(team));
     }
 }
