@@ -1,10 +1,8 @@
 import {Component, Output, EventEmitter} from '@angular/core';
-import {Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
 import {PreferenceService} from "../preference.service";
-import {ProjectService} from "../project.service";
 import {PlanService} from "../plan.service";
 
 
@@ -21,42 +19,21 @@ import {PlanService} from "../plan.service";
     `]
 })
 export class PlanList {
-    private project: Object = {};
     private _plans: Array<any> = [];
-    private ui: any;
-    private members: {}[] = [];
     private showAll: boolean;
 
     private selected: any;
     @Output() public select: EventEmitter<PlanList> = new EventEmitter<PlanList>();
 
-    constructor(private http: Http,
-                private pref: PreferenceService,
+    constructor(private pref: PreferenceService,
                 private plans: PlanService) {
+        
+        this.plans.all()
+            .filter(plans => plans)
+            .subscribe(plans => this._plans = plans);
 
-        this.ui = {cpd: {show: false}};
-        this.plans.all().filter(plans => plans).subscribe(plans => this._plans = plans);
-        this.plans.current().subscribe(p => this.selectPlan(p));
-
-        // TODO: change this
-        /*
-        prjs.current
-            .filter((id) => id)
-            .do((p) => this.project = p)
-            .subscribe((p) => {
-                if (!p.team) return;
-
-                this.http.get('/api/team/' + p.team.id + '/members')
-                    .map(resp => resp.json())
-                    .subscribe(members => {
-                        this.members = members;
-                        for (let m of this.members) {
-                            m['alloc'] = 0.8;
-                            m['leave'] = 0;
-                        }
-                    });
-            });
-        */
+        this.plans.current()
+            .subscribe(p => this.selectPlan(p));
     }
 
     private toggleAll() {

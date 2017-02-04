@@ -34,6 +34,14 @@ export class PlanService {
         this._current.next(plan);
     }
 
+    public createPlan(data) {
+        console.log('creating plan', data);
+        this.http.post('/api/plans', JSON.stringify(data))
+            .subscribe(resp => {
+                this.teams.ownTeam.subscribe(team => this.loadPlans(team));
+            });
+    }
+
     private loadPlans(team: any) {
         this.http.get('/api/plans/?team=' + team.id)
             .map(resp => resp.json())

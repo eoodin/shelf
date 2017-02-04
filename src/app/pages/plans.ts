@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {Http} from '@angular/http';
 import {PreferenceService} from "../preference.service";
 import {TeamService} from "../team.service";
+import {PlanService} from "../plan.service";
 
 @Component({
     selector: 'plans',
@@ -109,6 +110,7 @@ export class Plans {
 
     constructor(private http: Http,
                 private teams: TeamService,
+                private planService: PlanService,
                 private pref: PreferenceService) {
         this.ui = {
             'loading': {'show': false},
@@ -122,6 +124,24 @@ export class Plans {
             .filter(team => team)
             .subscribe(team => this.team = team);
         pref.values.subscribe(ps => this.hideFinished = ps.hideFinished);
+        /*
+         prjs.current
+         .filter((id) => id)
+         .do((p) => this.project = p)
+         .subscribe((p) => {
+         if (!p.team) return;
+
+         this.http.get('/api/team/' + p.team.id + '/members')
+         .map(resp => resp.json())
+         .subscribe(members => {
+         this.members = members;
+         for (let m of this.members) {
+         m['alloc'] = 0.8;
+         m['leave'] = 0;
+         }
+         });
+         });
+         */
     }
 
     public onSelect(plan): void {
@@ -133,6 +153,7 @@ export class Plans {
     createPlan(data) {
         data['teamId'] = this.team['id'];
         data['availableHours'] = data.totalHours;
+        this.planService.createPlan(data);
         this.ui.cpd.show = false;
     }
 
