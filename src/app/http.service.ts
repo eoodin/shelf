@@ -15,11 +15,11 @@ export class HttpService {
     }
 
     post(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
-        return this.go(this.http.post(url, options));
+        return this.go(this.http.post(url, body, options));
     }
 
     put(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
-        return this.go(this.http.put(url, options));
+        return this.go(this.http.put(url, body, options));
     }
 
     delete(url: string, options?: RequestOptionsArgs): Observable<Response> {
@@ -27,7 +27,7 @@ export class HttpService {
     }
 
     patch(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
-        return this.go(this.http.patch(url, options));
+        return this.go(this.http.patch(url, body, options));
     }
 
     go(operation) {

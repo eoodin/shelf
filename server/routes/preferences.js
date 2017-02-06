@@ -26,7 +26,6 @@ module.exports = function(router) {
                 }
             }).then(function(exist) {
                 if (!exist) {
-                    console.log('Saving ' + req.params.name +' ' + req.body.value);
                     return models.preference.create({
                         name: req.params.name,
                         value: req.body.value,
@@ -36,7 +35,6 @@ module.exports = function(router) {
                     });
                 }
                 else if (exist.value != req.body.value) {
-                    console.log('Updating ' + req.params.name +' from ' + exist.value + ' to ' + req.body.value);
                     return exist.update({
                         value: req.body.value
                     }).then(function(i){

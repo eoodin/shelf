@@ -29,13 +29,15 @@ module.exports = function(router) {
                 name: req.body.name,
                 start: req.body.start,
                 end: req.body.end,
-                teamId: t.id
+                teamId: req.body.teamId
             }).then(function(plan) {
+                console.log('plan created, add allocation');
                 models.allocation.create({
-                    teamId: t.teamId,
+                    teamId: req.body.teamId,
                     effort: req.body.availableHours,
                     planId: plan.id
                 }).then(function(alloc) {
+                    console.log('update plan for allocation');
                     plan.save({allocation: alloc}).then(function() {
                         res.json(plan);
                     });

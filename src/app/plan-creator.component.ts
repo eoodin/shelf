@@ -7,7 +7,7 @@ import {PlanService} from "./plan.service";
     template: `
     <div class="modal fade in" [style.display]="_visible ? 'block' : 'none'" role="dialog">
         <div class="modal-dialog">
-            <form #f="ngForm" (ngSubmit)="createPlan(f.value)">
+            <form>
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" (click)="close()" data-dismiss="modal">&times;</button>
@@ -23,27 +23,26 @@ import {PlanService} from "./plan.service";
                         <div class="row plan-field-row">
                             <div class="col-sm-3">Start from:</div>
                             <div class="col-sm-5">
-                                <input type="date" [(ngModel)]="start" name="start">
+                                <input type="date" [(ngModel)]="start" (change)="calcWorkdays()" name="start">
                             </div>
                         </div>
                         <div class="row plan-field-row">
                             <div class="col-sm-3">Due date:</div>
                             <div class="col-sm-5">
-                                <input type="date" [(ngModel)]="end" name="end">
-                                <input type="hidden" [ngModel]="calcWorkdays(start, end)" name="workdays">
+                                <input type="date" [(ngModel)]="end" (change)="calcWorkdays()" name="end">
                             </div>
                         </div>
                         <div class="row plan-field-row">
                             <div class="col-sm-3">Holiday:</div>
                             <div class="col-sm-5">
-                                <input type="number" [(ngModel)]="holiday" name="holiday">
+                                <input type="number" [(ngModel)]="holiday" (change)="calcWorkdays()" name="holiday">
                             </div>
                         </div>
                         <div class="row"></div>
                         <div class="row plan-field-row">
                             <div class="col-sm-3">Available effort:</div>
                             <div class="col-sm-5"> 
-                                <span>{{sumAvailableHours(f.value.workdays)}}</span>
+                                <span>{{sumAvailableHours() | number: '1.1-1'}} ({{ workdays - holiday }} workdays)</span>
                             </div>
                         </div>
                         <div class="row plan-field-row" *ngIf="team">
@@ -57,16 +56,16 @@ import {PlanService} from "./plan.service";
                                    </tr>
                                    <tr *ngFor="let member of team.members">
                                        <td>{{member.name}}</td>
-                                       <td><input [ngModel]="member.alloc ? member.alloc : 1" (ngModelChange)="calcHours(member, f.value.workdays, $event, member.leave)" [ngModelOptions]="{standalone:true}" /></td>
-                                       <td><input [ngModel]="member.leave ? member.leave : 0" (ngModelChange)="calcHours(member, f.value.workdays, member.alloc, $event)" [ngModelOptions]="{standalone:true}" /></td>
-                                       <td><input disabled [ngModel]="calcHours(member, f.value.workdays, member.alloc, member.leave)" [ngModelOptions]="{standalone:true}" /></td>
+                                       <td><input [(ngModel)]="member.alloc" [ngModelOptions]="{standalone:true}" /></td>
+                                       <td><input [(ngModel)]="member.leave" [ngModelOptions]="{standalone:true}" /></td>
+                                       <td><span >{{calcHours(member) | number: '1.1-1'}}</span></td>
                                    </tr>
                                 </table>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-default" data-dismiss="modal">Add</button>
+                        <button type="submit" class="btn btn-default" data-dismiss="modal" (click)="createPlan()" >Add</button>
                     </div>
                 </div>
             </form>
@@ -79,75 +78,79 @@ import {PlanService} from "./plan.service";
 })
 export class PlanCreatorComponent {
     private _visible = false;
+    private name = '11111';
+    private start;
+    private end;
+    private workdays = 0;
+    private holiday = 0;
+    private teamId = 0;
+    private availableHours = 0;
+    private team;
 
     @Input()
     public set show(p:boolean) {
+        if (p) {
+            this.calcWorkdays();
+            for (let m of this.team.members) {
+                this.calcHours(m);
+            }
+            this.sumAvailableHours();
+        }
+
         this._visible = p;
     }
 
     @Output()
     public showChange:EventEmitter<boolean> = new EventEmitter<boolean>();
 
-    private team;
     constructor(private teams:TeamService,
                 private planService:PlanService) {
-
         this.teams.ownTeam
             .filter(team => team)
-            .subscribe(team => this.team = team);
-        /*
-         prjs.current
-         .filter((id) => id)
-         .do((p) => this.project = p)
-         .subscribe((p) => {
-         if (!p.team) return;
+            .subscribe(team => this.updateTeam(team));
 
-         this.http.get('/api/team/' + p.team.id + '/members')
-         .map(resp => resp.json())
-         .subscribe(members => {
-         this.members = members;
-         for (let m of this.members) {
-         m['alloc'] = 0.8;
-         m['leave'] = 0;
-         }
-         });
-         });
-         */
+        let time = new Date();
+        this.start = time.toISOString().substr(0,10);
+        time.setDate(time.getDate() + 13); // 2 weeks per sprint.
+        let se = time.toISOString();
+        this.end = se.substr(0, 10);
+
+        // sprint naming
+        this.name = se.substr(2, 2) + se.substr(5, 2) + (time.getDate() < 15 ? '2' : '4');
     }
 
-
-    sumAvailableHours(workdays) {
-        let days = workdays | 0;
-        if (days < 0 || !this.team || this.team.members)
+    sumAvailableHours() {
+        if (this.workdays < 0 || !this.team || !this.team.members) {
+            this.availableHours = 0;
             return 0;
-
+        }
+        
         let sum = 0;
         for (let m of this.team.members) {
             sum += m.hours;
         }
 
-        return sum;
+        this.availableHours = (Math.round(sum * 10) / 10.0);
+
+        return this.availableHours;
     }
 
-    calcHours(member, workdays, alloc, leave) {
-        workdays = workdays | 0;
-        if (workdays <= 0)
+    calcHours(member) {
+        if (this.workdays <= 0)
             return 0;
 
-        alloc = alloc | 1;
-        leave = leave | 0;
-        member.alloc = alloc;
-        member.leave = leave;
-        member.hours = alloc * (workdays - leave) * 8;
+        member.hours = member.alloc * (this.workdays - this.holiday - member.leave) * 8;
         return member.hours;
     }
 
-    calcWorkdays(start, end) {
-        var sd = new Date(start);
-        var ed = new Date(end);
+    calcWorkdays() {
+        var sd = new Date(this.start);
+        var ed = new Date(this.end);
 
-        if (sd.getTime() > ed.getTime())
-            return -1;
+        if (sd.getTime() > ed.getTime()) {
+            this.workdays = 0;
+            return;
+        }
 
         var workDays = 0;
         while (sd.getTime() <= ed.getTime()) {
@@ -157,13 +160,19 @@ export class PlanCreatorComponent {
             workDays++;
         }
 
-        // TODO: add option to include start/end days
-        return workDays - 2;
+        this.workdays = workDays - 2;
     }
 
-    createPlan(data) {
-        data['teamId'] = this.team['id'];
-        data['availableHours'] = data.totalHours;
+    createPlan() {
+        let data = {
+            name: this.name,
+            start: this.start,
+            end: this.end,
+            workdays: this.workdays,
+            holiday:this.holiday,
+            teamId: this.team['id'],
+            availableHours: this.availableHours
+        };
         this.planService.createPlan(data);
         this.close();
     }
@@ -171,5 +180,14 @@ export class PlanCreatorComponent {
     private close() {
         this._visible = false;
         this.showChange.next(false);
+    }
+
+    private updateTeam(team) {
+        for (let m of team.members) {
+            m['alloc'] = 0.8;
+            m['leave'] = 0;
+        }
+
+        this.team = team;
     }
 }
