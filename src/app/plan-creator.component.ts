@@ -1,6 +1,7 @@
 import {Component, ViewEncapsulation, ChangeDetectionStrategy, Input, Output, EventEmitter} from '@angular/core';
 import {TeamService} from "./team.service";
 import {PlanService} from "./plan.service";
+import {PreferenceService} from "./preference.service";
 
 @Component({
     selector: 'plan-creator',
@@ -78,14 +79,15 @@ import {PlanService} from "./plan.service";
 })
 export class PlanCreatorComponent {
     private _visible = false;
-    private name = '11111';
+    private name;
     private start;
     private end;
     private workdays = 0;
     private holiday = 0;
-    private teamId = 0;
     private availableHours = 0;
     private team;
+
+    private allocs;
 
     @Input()
     public set show(p:boolean) {
@@ -103,11 +105,17 @@ export class PlanCreatorComponent {
     @Output()
     public showChange:EventEmitter<boolean> = new EventEmitter<boolean>();
 
-    constructor(private teams:TeamService,
+    constructor(private teams: TeamService,
+                private prefs: PreferenceService,
                 private planService:PlanService) {
         this.teams.ownTeam
             .filter(team => team)
             .subscribe(team => this.updateTeam(team));
+        this.prefs.values
+            .map(values => values['members.allocs'])
+            .filter(values => values)
+            .map(values => JSON.parse(values))
+            .subscribe(allocs => this.allocs = allocs);
 
         let time = new Date();
         this.start = time.toISOString().substr(0,10);
@@ -170,9 +178,10 @@ export class PlanCreatorComponent {
             end: this.end,
             workdays: this.workdays,
             holiday:this.holiday,
-            teamId: this.team['id'],
+            teamId: this.team.id,
             availableHours: this.availableHours
         };
+        this.saveMemberAllocations();
         this.planService.createPlan(data);
         this.close();
     }
@@ -184,10 +193,19 @@ export class PlanCreatorComponent {
 
     private updateTeam(team) {
         for (let m of team.members) {
-            m['alloc'] = 0.8;
+            m['alloc'] = this.allocs[m.id] || 1;
             m['leave'] = 0;
         }
 
         this.team = team;
+    }
+
+    private saveMemberAllocations() {
+        let allocs = {};
+        for (let m of this.team.members) {
+            allocs[m.id] = m['alloc'];
+        }
+
+        this.prefs.setPreference('members.allocs', JSON.stringify(allocs));
     }
 }
