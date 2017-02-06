@@ -87,7 +87,7 @@ export class PlanCreatorComponent {
     private availableHours = 0;
     private team;
 
-    private allocs;
+    private allocs = {};
 
     @Input()
     public set show(p:boolean) {
