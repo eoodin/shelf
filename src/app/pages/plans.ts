@@ -1,12 +1,12 @@
 import {Component} from '@angular/core';
-
+import {PlanService} from '../plan.service';
 
 @Component({
     selector: 'plans',
     template: `
     <md-sidenav-container class="workspace">
        <md-sidenav #sidenav class="sidenav">
-          <plan-list (select)="onSelect($event);sidenav.close()"></plan-list>
+          <plan-list (select)="sidenav.close()"></plan-list>
        </md-sidenav>
         <h3>
             <a (click)="sidenav.open()">{{current.name}}</a>
@@ -35,12 +35,9 @@ import {Component} from '@angular/core';
 export class Plans {
     private current = {};
     private showCreator = false;
-    constructor() {
-    }
-
-    public onSelect(plan): void {
-        if (this.current != plan) {
-            this.current = plan;
-        }
+    constructor(private planService: PlanService) {
+        planService.current()
+            .filter(plan => plan)
+            .subscribe(plan => this.current = plan);
     }
 }

@@ -35,7 +35,6 @@ export class PlanService {
     }
 
     public createPlan(data) {
-        console.log('creating plan', data);
         this.http.post('/api/plans', JSON.stringify(data))
             .subscribe(resp => {
                 this.teams.ownTeam.subscribe(team => this.loadPlans(team));
