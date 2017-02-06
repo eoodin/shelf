@@ -244,6 +244,9 @@ export class PlanContentComponent {
         this.plans.current()
             .filter(plan => plan)
             .subscribe(plan => this.switchPlan(plan));
+
+        this.plans.all().subscribe(plans => this._plans = plans);
+
         pref.values
             .filter(prefs => typeof(prefs['hideFinished']) != 'undefined')
             .subscribe(ps => this.hideFinished = ps.hideFinished);
