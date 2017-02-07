@@ -132,7 +132,7 @@ import {TeamService} from "./team.service";
                                             <span *ngIf="item.owner">{{item.owner.name}}</span> 
                                             <span *ngIf="!item.owner">Unassigned</span> <span class="caret"></span>
                                         </button>
-                                        <ul class="dropdown-menu">
+                                        <ul class="dropdown-menu" *ngIf="team && team.members">
                                             <li role="menuitem"><a (click)="assignTo(item, null)">Unassigned</a></li>
                                             <li role="menuitem"
                                                 *ngFor="let member of team.members"

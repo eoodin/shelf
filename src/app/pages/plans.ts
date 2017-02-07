@@ -54,7 +54,6 @@ export class Plans {
     }
 
     private switchTeam(team) {
-        console.log('switching team:', team);
         this.planService.loadPlans(team);
     }
 }

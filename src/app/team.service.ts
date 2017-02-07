@@ -12,7 +12,7 @@ export class TeamService {
                 private users: UserService
         ) {
         this.users.currentUser
-            .filter(user => user && user.teams)
+            .filter(user => user && user.teams && user.teams.length)
             // TODO: there should be a good way to identify current team.
             .map(user => user.teams[0])
             .subscribe(team => this.updateTeam(team));
@@ -48,8 +48,10 @@ export class TeamService {
     }
     
     private updateTeam(team) {
-        this.http.get('/api/team/' + team['id'] +'?members=1')
-            .map(response => response.json())
-            .subscribe(team => this._ownTeam.next(team));
+        if (team && team.id) {
+            this.http.get('/api/team/' + team.id +'?members=1')
+                .map(response => response.json())
+                .subscribe(team => this._ownTeam.next(team));
+        }
     }
 }
