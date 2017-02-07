@@ -70,7 +70,8 @@ import {PreferenceService} from "../preference.service";
                                     [disabled]="requesting"
                                     (click)="startTest(item)"
                                     class="btn btn-default btn-sm">Start Test</button>
-                                <!--
+                                <i *ngIf="item.type == 'UserStory'" (click)="addChild(item)" class="material-icons button">add</i>
+                                <!--                        
                                 <button 
                                     *ngIf="item.type == 'Defect' && item.state == 'Testing'"
                                     [disabled]="requesting"
@@ -137,6 +138,7 @@ import {PreferenceService} from "../preference.service";
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
     .plan-head ul li span {font-weight: normal}
     .item-table{position:relative;}
+    .material-icons.button {cursor: pointer;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
     .type-and-id input { display: inline-block; }
     `]
@@ -223,6 +225,10 @@ export class Backlog {
     showItem(item) {
         this.ui.awd.item = JSON.parse(JSON.stringify(item));
         this.ui.awd.show = true;
+    }
+
+    private addChild(us) {
+        console.log('adding child user story', us);
     }
 
     removingItem(item) {
