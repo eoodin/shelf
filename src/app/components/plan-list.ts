@@ -1,4 +1,4 @@
-import {Component, Output, EventEmitter} from '@angular/core';
+import {Component, Input, Output, EventEmitter} from '@angular/core';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
@@ -24,6 +24,13 @@ export class PlanList {
 
     private selected: any;
     @Output() public select: EventEmitter<PlanList> = new EventEmitter<PlanList>();
+
+    @Input()
+    set team(team) {
+        if (team && team.id) {
+            this.plans.loadPlans(team);
+        }
+    }
 
     constructor(private pref: PreferenceService,
                 private plans: PlanService) {

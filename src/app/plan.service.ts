@@ -41,7 +41,7 @@ export class PlanService {
             });
     }
 
-    private loadPlans(team: any) {
+    public loadPlans(team: any) {
         this.http.get('/api/plans/?team=' + team.id)
             .map(resp => resp.json())
             .subscribe(plans => this._plans.next(plans));
