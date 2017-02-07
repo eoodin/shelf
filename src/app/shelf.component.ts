@@ -46,7 +46,7 @@ import {AppService} from "./app.service";
     styles: [`
     a:hover {cursor: pointer;}
     .app-page {padding-top: 50px; height: 100%;}
-    .workspace {height: 100%; margin: 0;}
+    .workspace {height: 100%; margin: 0; padding: 0;}
     .nav-logo {width: 32px; height:32px;}
     `]
 })

@@ -150,7 +150,7 @@ import {TeamService} from "./team.service";
                         </table>
                     </div>
                 </div>
-                <div>
+                <div class="buttom-row">
                     <div class="col-sm-2">
                         <button class="btn btn-primary" (click)="showAddItem()">Add Work Item...</button>
                     </div>
@@ -209,6 +209,7 @@ import {TeamService} from "./team.service";
     .us.glyphicon{color: #050;}
     .defect.glyphicon{color: #500;}
     .task.glyphicon{color: #333;}
+    .buttom-row:after {content: ''; height: 0; display: block; clear:both;}
     `]
 })
 export class PlanContentComponent {
