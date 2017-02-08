@@ -91,6 +91,14 @@ module.exports = function(router) {
         });
 
     router.route('/work-items/:id')
+        .get(function(req, res) {
+            models.item.findById(req.params.id).then(function(item) {
+                res.json(item);
+            }).catch(function(errors){
+                console.log("Error: " + JSON.stringify(errors));
+                res.sendStatus(500);
+            });
+        })
         .put(function(req, res) {
             models.item.findById(req.params.id).then(function(item) {
                 var origin = {};

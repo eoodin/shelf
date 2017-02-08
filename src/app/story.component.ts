@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ViewChild, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import {ActivatedRoute, Params} from '@angular/router';
 import { HttpService } from './http.service';
 import { ModalDirective } from 'ng2-bootstrap';
 import { ProjectService } from "./project.service";
+import {StoryService} from './story.service';
 
 declare var CKEDITOR;
 
@@ -9,7 +11,7 @@ declare var CKEDITOR;
   selector: 'story',
   template: `
   <div class="item-details">
-    <form (ngSubmit)="saveItem()">
+    <form (ngSubmit)="save()">
         <div class="row" >
             <div class="col-sm-12">
                 Type:
@@ -44,7 +46,7 @@ declare var CKEDITOR;
         <div class="row" *ngIf="_item.type == 'UserStory'">
             <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="_item.points" [ngModelOptions]="{standalone: true}" value="0"></div>
         </div>
-        <button (click)="save()" class="btn btn-default">Save</button>
+        <button class="btn btn-default">Save</button>
     </form>
   </div>
   `,
@@ -78,8 +80,12 @@ export class StoryComponent implements OnDestroy {
   };
 
   constructor(private http: HttpService,
+    private route: ActivatedRoute,
+    private storyService: StoryService,
     private prjs: ProjectService) {
-
+         this.route.params
+    .switchMap((params: Params) => this.storyService.getStory(+params['id']))
+    .subscribe(item => this._item = item);
   }
 
   ngOnDestroy() {

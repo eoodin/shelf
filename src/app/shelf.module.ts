@@ -22,6 +22,7 @@ import { PlanContentComponent } from './plan-content.component';
 import { ItemDetailComponent } from './item-detail.component';
 import {PreferenceService} from "./preference.service";
 import {TeamService} from "./team.service";
+import {StoryService} from "./story.service";
 import {ProjectService} from "./project.service";
 import {PlanService} from "./plan.service";
 import {UserService} from "./user.service";
@@ -80,6 +81,7 @@ export class ShelfRequestOptions extends RequestOptions {
         HttpService,
         TeamService,
         ProjectService,
+        StoryService,
         PreferenceService,
         PlanService,
         UserService,
