@@ -85,7 +85,6 @@ declare var CKEDITOR;
     .field-row .field-label { margin-right: 20px;}
     .field-row input,select {flex-grow: 1;}
      `]
-
 })
 export class ItemDetail implements OnInit {
     private initialized;

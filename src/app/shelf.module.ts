@@ -27,11 +27,18 @@ import {PlanService} from "./plan.service";
 import {UserService} from "./user.service";
 import {AppService} from "./app.service";
 import { PlanCreatorComponent } from './plan-creator.component';
+import { StoryComponent } from './story.component';
+import { BacklogComponent } from './backlog.component';
 
 let routes = [
     {path: '', pathMatch: 'full', redirectTo: 'plans'},
     {path: 'projects', component: Projects},
-    {path: 'backlog', component: Backlog},
+    {path: 'backlog', component: Backlog,
+     children: [
+       {path: '', component: BacklogComponent},
+       {path: 'story/new', component: StoryComponent},
+       {path: 'story/:id', component: StoryComponent}
+     ]},
     {path: 'plans', component: Plans,
      children: [
        // {path: '', redirectTo: '/', pathMatch: 'full'},
@@ -65,6 +72,8 @@ export class ShelfRequestOptions extends RequestOptions {
         PlanContentComponent,
         ItemDetailComponent,
         PlanCreatorComponent,
+        StoryComponent,
+        BacklogComponent,
     ],
     providers: [
         NotifyService,
