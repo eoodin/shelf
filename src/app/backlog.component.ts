@@ -1,5 +1,6 @@
 import { Component, OnInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import {ProjectService} from "./project.service";
+import {Router} from '@angular/router';
 import {PreferenceService} from "./preference.service";
 import {HttpService} from "./http.service";
 
@@ -8,23 +9,13 @@ import {HttpService} from "./http.service";
   template: `
   <div class="plan-body">
       <div class="item-table">
-          <div class="loading-mask" *ngIf="ui.loading.show">
+          <div class="loading-mask" *ngIf="loading">
               <div class="spinner-loader"></div>
           </div>
           <div class="panel panel-default">
-              <div class="panel-heading work-items-heading">
-                  <div>
-                      <label>
-                          <input type="checkbox" [ngModel]="showTasks"  (ngModelChange)="showTasks = $event; loadItems();"/>
-                          Show tasks
-                      </label>
-
-                      <label>
-                          <input type="checkbox" [ngModel]="hideFinished" [disabled]="!showTasks" (ngModelChange)="hideFinished = $event; loadItems();"/>
-                          Hide finished
-                      </label>
-                  </div>
-              </div>
+              <!--div class="panel-heading work-items-heading">
+                  <span>Backlog</span>
+              </div-->
               <table *ngIf="items" class="table">
                   <tr>
                       <th> ID </th>
@@ -54,54 +45,9 @@ import {HttpService} from "./http.service";
                               (click)="startTest(item)"
                               class="btn btn-default btn-sm">Start Test</button>
                           <i *ngIf="item.type == 'UserStory'" (click)="addChild(item)" class="material-icons button">add</i>
-                          <!--                        
-                          <button 
-                              *ngIf="item.type == 'Defect' && item.state == 'Testing'"
-                              [disabled]="requesting"
-                              (click)="markTestResult(true)"
-                              class="btn btn-default btn-sm">Pass</button>
-                          <button 
-                              *ngIf="item.type == 'Defect' && item.state == 'Testing'"
-                              [disabled]="requesting"
-                              (click)="markTestResult(false)"
-                              class="btn btn-default btn-sm">Fail</button>
-                          -->
                       </td>
                   </tr>
               </table>
-          </div>
-      </div>
-      <div>
-          <div class="col-sm-2">
-              
-          </div>
-      </div>
-  </div>
-
-    
-  <item-detail [item]="ui.awd.item"
-                [(show)]="ui.awd.show"
-                [type]="ui.awd.type"
-                (saved)="loadItems();">
-  </item-detail>
-
-  <div class="modal fade in awd" *ngIf="ui.mtd.show" [style.display]="ui.mtd.show ? 'block' : 'block'" role="dialog">
-      <div class="modal-dialog">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <button type="button" class="close" (click)="ui.mtd.show = false"
-                          data-dismiss="modal">&times;</button>
-                  <h4 class="modal-title">Move selected items to plan</h4>
-              </div>
-              <div class="modal-body">
-                  <select #moveTo class="form-control" required>
-                      <option *ngFor="let p of plans" [value]="p.id">{{p.name}}</option>
-                  </select>
-              </div>
-              <div class="modal-footer">
-                  <button (click)="ui.mtd.show=false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                  <button (click)="moveItemsToPlan(moveTo.value)" class="btn btn-default" data-dismiss="modal">Move</button>
-              </div>
           </div>
       </div>
   </div>
@@ -128,27 +74,17 @@ export class BacklogComponent implements OnInit {
     private project = null;
     private projects = [];
     private items = [];
-    private ui;
     private sort: any;
     private requesting = false;
-    private showTasks: boolean;
-    private hideFinished: boolean;
+    private loading = false;
 
   ngOnInit() {
   }
   constructor(private ele: ElementRef,
                 private http: HttpService,
                 private prs: ProjectService,
+                private router: Router,
                 private pref: PreferenceService) {
-        this.showTasks = false; // TODO: save to preference
-        this.hideFinished = false; // TODO: save to preference
-        this.ui = {
-            'loading': {'show': false},
-            'awd': {'show': false, 'loading': false, 'item': {}},
-            'mtd': {'show': false},
-            'rwd': {'show': false}
-        };
-
         prs.projects.subscribe(ps => this.projects = ps);
         prs.current
             .filter(p => p != this.project)
@@ -159,28 +95,11 @@ export class BacklogComponent implements OnInit {
     loadItems() {
         let q = 'projectId=' + this.project.id;
         let types = 'UserStory,Defect';
-        if (this.showTasks) {
-            types += ',Task'
-        }
         q += '&types=' + types;
-        if (this.showTasks && this.hideFinished) {
-            q += '&status=New,InProgress,Pending,Dropped'
-        }
-
+        this.loading = true;
         this.http.get('/api/work-items/?' + q)
+            .finally(() => this.loading = false)
             .subscribe(b => this.items = b.json());
-    }
-
-    showAddItem(type) {
-        this.ui.awd.type = type;
-        this.ui.awd.item = {type: type};
-        if (this.project)
-            this.ui.awd.item.projectId = this.project.id;
-
-        if (type == 'Defect')
-            this.ui.awd.item.severity = 'Major';
-
-        this.ui.awd.show = true;
     }
 
     startFix(item) {
@@ -205,29 +124,15 @@ export class BacklogComponent implements OnInit {
             );
     }
 
-    showItem(item) {
-        this.ui.awd.item = JSON.parse(JSON.stringify(item));
-        this.ui.awd.show = true;
+    private showItem(item) {
+        this.router.navigate(['/backlog/story/' + item.id]);
     }
 
     private addChild(us) {
         console.log('adding child user story', us);
     }
 
-    removingItem(item) {
-        this.ui.rwd.item = item;
-        this.ui.rwd.show = true;
-    }
-
-    removeItem(item) {
-        this.http.delete('/api/work-items/' + item.id)
-            .subscribe(resp => {
-                this.loadItems();
-                this.ui.rwd.show = false;
-            });
-    }
-
-    sortResult(field) {
+    private sortResult(field) {
         if (field == this.sort.field)
             this.sort.order = this.sort.order == 'desc' ? 'asc' : 'desc';
         else
