@@ -33,6 +33,7 @@ module.exports = function (sequelize, DataTypes) {
                 item.belongsTo(models.user, {as: 'owner'});
                 item.belongsTo(models.user, {as: 'creator'});
                 item.hasMany(models.change);
+                item.hasMany(models.item, {as: 'children', foreignKey: 'parentId'});
               }
             }
         });

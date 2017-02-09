@@ -20,6 +20,7 @@ import { HttpService } from "./http.service";
                       <th> ID </th>
                       <th> Type </th>
                       <th> State </th>
+                      <th>  </th>
                       <th> Title </th>
                       <th> Owner </th>
                       <th> Operations </th>
@@ -29,6 +30,7 @@ import { HttpService } from "./http.service";
                       <td> {{item.type}} </td>
                       <td *ngIf="item.type != 'Defect'"> {{item.status}} </td>
                       <td *ngIf="item.type == 'Defect'"> {{item.state}} </td>
+                      <td><a (click)="expand(item)" *ngIf="item.children.length"> + </a></td>
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
                       <td *ngIf="item.owner"> {{item.owner.name}} </td>
                       <td *ngIf="!item.owner"> Unassigned </td>
@@ -95,7 +97,7 @@ export class BacklogComponent implements OnInit {
     loadItems() {
         let q = 'projectId=' + this.project.id;
         let types = ['UserStory', 'Defect'];
-        q += '&types=' + types.join(',');
+        q += '&types=' + types.join(',') + '&parent=null';
         this.loading = true;
         this.http.get('/api/work-items/?' + q)
             .finally(() => this.loading = false)

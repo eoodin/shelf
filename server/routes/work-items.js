@@ -17,6 +17,9 @@ module.exports = function(router) {
             else if (req.query.planId) {
                 where = {planId: req.query.planId};
             }
+            if (req.query.parent) {
+                where['parentId'] = req.query.parent == 'null' ? null : req.query.parent;
+            }
 
             if (req.query.types) {
                 let types = req.query.types.split(',');
@@ -33,10 +36,11 @@ module.exports = function(router) {
                 // TODO: keep only id of owner and creator to reduce data size
                 include: [
                     {model: models.user, as: 'owner'},
-                    {model: models.user, as: 'creator'}
+                    {model: models.user, as: 'creator'},
+                    {model: models.item, as: 'children'}
                 ],
                 order: ob
-            }).then(function(items) {
+            }).then(function(items) {   
                 if ('csv' == req.query.format) {
                     res.set('Content-disposition', 'attachment; filename=plan' + (req.query.planId ? req.query.planId : '') + '.csv');
                     res.set('Content-Type', 'text/csv');
