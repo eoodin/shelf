@@ -34,7 +34,6 @@ module.exports = function(router) {
                 include: [
                     {model: models.user, as: 'owner'},
                     {model: models.user, as: 'creator'}
-                    // {model: models.change}
                 ],
                 order: ob
             }).then(function(items) {
@@ -67,6 +66,7 @@ module.exports = function(router) {
             models.user.findById(req.user.id).then(function(u) {
                 let def = {
                     type: req.body.type,
+                    parentId: req.body.parentId,
                     status: 'New',
                     state: 'Created',
                     estimation: (req.body.estimation || 0),

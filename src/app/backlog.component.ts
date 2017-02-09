@@ -1,21 +1,20 @@
 import { Component, OnInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
-import {ProjectService} from "./project.service";
-import {Router} from '@angular/router';
-import {PreferenceService} from "./preference.service";
-import {HttpService} from "./http.service";
+import { ProjectService } from "./project.service";
+import { Router, ActivatedRoute } from '@angular/router';
+import { PreferenceService } from "./preference.service";
+import { HttpService } from "./http.service";
 
 @Component({
-  selector: 'backlog',
-  template: `
+    selector: 'backlog',
+    template: `
   <div class="plan-body">
       <div class="item-table">
           <div class="loading-mask" *ngIf="loading">
               <div class="spinner-loader"></div>
           </div>
           <div class="panel panel-default">
-              <!--div class="panel-heading work-items-heading">
-                  <span>Backlog</span>
-              </div-->
+              <div class="panel-heading work-items-heading">
+              </div>
               <table *ngIf="items" class="table">
                   <tr>
                       <th> ID </th>
@@ -52,7 +51,7 @@ import {HttpService} from "./http.service";
       </div>
   </div>
   `,
-  styles: [`
+    styles: [`
   .work-items-heading > div{float:right;}
     .work-items-heading { height: 38px; }
     .awd .modal-body .row {padding: 5px 0;}
@@ -67,8 +66,8 @@ import {HttpService} from "./http.service";
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
     .type-and-id input { display: inline-block; }
   `],
-  encapsulation: ViewEncapsulation.Emulated,
-  changeDetection: ChangeDetectionStrategy.Default
+    encapsulation: ViewEncapsulation.Emulated,
+    changeDetection: ChangeDetectionStrategy.Default
 })
 export class BacklogComponent implements OnInit {
     private project = null;
@@ -78,13 +77,14 @@ export class BacklogComponent implements OnInit {
     private requesting = false;
     private loading = false;
 
-  ngOnInit() {
-  }
-  constructor(private ele: ElementRef,
-                private http: HttpService,
-                private prs: ProjectService,
-                private router: Router,
-                private pref: PreferenceService) {
+    ngOnInit() {
+    }
+    constructor(private ele: ElementRef,
+        private http: HttpService,
+        private prs: ProjectService,
+        private router: Router,
+        private route: ActivatedRoute,
+        private pref: PreferenceService) {
         prs.projects.subscribe(ps => this.projects = ps);
         prs.current
             .filter(p => p != this.project)
@@ -94,8 +94,8 @@ export class BacklogComponent implements OnInit {
 
     loadItems() {
         let q = 'projectId=' + this.project.id;
-        let types = 'UserStory,Defect';
-        q += '&types=' + types;
+        let types = ['UserStory', 'Defect'];
+        q += '&types=' + types.join(',');
         this.loading = true;
         this.http.get('/api/work-items/?' + q)
             .finally(() => this.loading = false)
@@ -107,10 +107,10 @@ export class BacklogComponent implements OnInit {
         this.http.post('/api/defects/' + item.id + '/fix', '{}')
             .finally(() => this.requesting = false)
             .subscribe(
-                () => this.loadItems(),
-                (resp) => {
-                    window.alert('Error occurred: ' + resp.json()['error'])
-                }
+            () => this.loadItems(),
+            (resp) => {
+                window.alert('Error occurred: ' + resp.json()['error'])
+            }
             );
     }
 
@@ -119,8 +119,8 @@ export class BacklogComponent implements OnInit {
         this.http.post('/api/defects/' + item.id + '/test', '{}')
             .finally(() => this.requesting = false)
             .subscribe(
-                () => this.loadItems(),
-                () => window.alert('Error occurred.')
+            () => this.loadItems(),
+            () => window.alert('Error occurred.')
             );
     }
 
@@ -129,7 +129,8 @@ export class BacklogComponent implements OnInit {
     }
 
     private addChild(us) {
-        console.log('adding child user story', us);
+        this.router.navigate(['story', 'new'], 
+            {relativeTo: this.route,  queryParams: { type: 'UserStory', parent: us.id }});
     }
 
     private sortResult(field) {
