@@ -33,8 +33,8 @@ module.exports = function(router) {
                 // TODO: keep only id of owner and creator to reduce data size
                 include: [
                     {model: models.user, as: 'owner'},
-                    {model: models.user, as: 'creator'},
-                    {model: models.change}
+                    {model: models.user, as: 'creator'}
+                    // {model: models.change}
                 ],
                 order: ob
             }).then(function(items) {
