@@ -27,12 +27,18 @@ import { HttpService } from "./http.service";
                   </tr>
                   <tr *ngFor="let item of items">
                       <td class="tree-control">
-                        <div class="collapse" *ngIf="item.children.length && item.treeState != 'expand'">
+                        <div class="tree" [ngClass]="{
+                                collapse: item.children.length && item.treeState != 'expand',
+                                expand: item.children.length && item.treeState == 'expand',
+                                child: item.parentId,
+                                last: item.treeState == 'last',
+                                na: item.children.length == 0 && !item.parentId}">
                             <div class="v-line"></div>
-                            <div (click)="expand(item)" class="icon">
+                            <div (click)="toggleExpand(item)" *ngIf="!item.parentId" class="icon">
                                 <div class="h-cross"></div>
                                 <div class="v-cross"></div>
                             </div>
+                            <div class="child-h-line"></div>
                         </div>
                       </td>
                       <!--
@@ -57,7 +63,7 @@ import { HttpService } from "./http.service";
                       <td *ngIf="item.owner"> {{item.owner.name}} </td>
                       <td *ngIf="!item.owner"> Unassigned </td>
                       <td>
-                     middle     <button 
+                          <button 
                               *ngIf="item.type == 'Defect' && item.state == 'Created'"
                               [disabled]="requesting"
                               (click)="startFix(item)"
@@ -67,7 +73,7 @@ import { HttpService } from "./http.service";
                               [disabled]="requesting"
                               (click)="startTest(item)"
                               class="btn btn-default btn-sm">Start Test</button>
-                          <i *ngIf="item.type == 'UserStory'" (click)="addChild(item)" class="material-icons button">add</i>
+                          <i *ngIf="item.type == 'UserStory' && !item.parentId" (click)="addChild(item)" class="material-icons button">add</i>
                       </td>
                   </tr>
               </table>
@@ -86,12 +92,17 @@ import { HttpService } from "./http.service";
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
     .plan-head ul li span {font-weight: normal}
     .item-table{position:relative;}
-    .tree-control{ height: 100%; padding: 0;}
-    .tree-control .collapse {position: relative; height: 100%; display: block;}
-    .tree-control .collapse .v-line {height: 100%;width: 1px; border: 1px solid; position: absolute;left: calc(50% - 1px);}
-    .tree-control .collapse .icon {position: absolute;width: 16px;height: 16px;top: 8px;left: calc(50% - 8px);outline: 1px dotted red;background-color: white;outline: 2px solid black; cursor: pointer;}
-    .tree-control .collapse .h-cross {position: absolute;top: calc(50% - 1px);left: 10%;border: 1px solid black;width: 80%;}
-    .tree-control .collapse .v-cross {position: absolute;height: 80%;width: 1px;border: 1px solid black;left: calc(50% - 1px);top: 10%;}
+    .tree-control { height: 100%; position: relative; padding: 0; overflow: hidden; min-width: 24px;}
+    .tree {height: 100%; display: block;}
+    .tree .v-line {height: 100%;width: 1px; border: 1px solid; position: absolute;top:8px; left: calc(50% - 1px);}
+    .tree .icon {position: absolute;width: 16px;height: 16px;top: 8px;left: calc(50% - 8px);outline: 1px dotted red;background-color: white;outline: 2px solid black; cursor: pointer;}
+    .tree.na .v-line,.tree.collapse .v-line, .tree.na .icon {display: none;}
+    .tree .h-cross {position: absolute;top: calc(50% - 1px);left: 10%;border: 1px solid black;width: 80%;}
+    .tree .v-cross {position: absolute;height: 80%;width: 1px;border: 1px solid black;left: calc(50% - 1px);top: 10%;}
+    .tree.expand .v-cross {display:none;}
+    .tree.child .child-h-line {position: absolute;top: 16px;left: 50%;border: 1px solid black;width: 50%;}
+    .tree.child .v-line {top: 0;}
+    .tree.child.last .v-line {height: 16px;}
     .material-icons.button {cursor: pointer;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
     .type-and-id input { display: inline-block; }
@@ -161,6 +172,13 @@ export class BacklogComponent implements OnInit {
     private addChild(us) {
         this.router.navigate(['story', 'new'], 
             {relativeTo: this.route,  queryParams: { type: 'UserStory', parent: us.id }});
+    }
+
+    private toggleExpand(item) {
+        if (item.treeState != 'expand')
+            this.expand(item);
+        else 
+            this.collapse(item);
     }
 
     private expand(item) {
