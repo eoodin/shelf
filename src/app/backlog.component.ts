@@ -27,6 +27,16 @@ import { HttpService } from "./http.service";
                   </tr>
                   <tr *ngFor="let item of items">
                       <td class="tree-control">
+                        <div class="collapse" *ngIf="item.children.length && item.treeState != 'expand'">
+                            <div class="v-line"></div>
+                            <div (click)="expand(item)" class="icon">
+                                <div class="h-cross"></div>
+                                <div class="v-cross"></div>
+                            </div>
+                        </div>
+                      </td>
+                      <!--
+                      <td class="tree-control">
                         <div [ngClass]="item.treeState" >
                             <a (click)="expand(item)" *ngIf="item.children.length && item.treeState != 'expand'">
                                <span class="glyphicon glyphicon-chevron-right" ></span>
@@ -38,6 +48,7 @@ import { HttpService } from "./http.service";
                             <span *ngIf="item.treeState=='last'" style="line-height: 100%;">└</span>
                         </div>
                       </td>
+                      -->
                       <td> {{item.id}} </td>
                       <td> {{item.type}} </td>
                       <td *ngIf="item.type != 'Defect'"> {{item.status}} </td>
@@ -75,10 +86,12 @@ import { HttpService } from "./http.service";
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
     .plan-head ul li span {font-weight: normal}
     .item-table{position:relative;}
-    .tree-control {height: 100%; padding:0; width: 30px;}
-    .tree-control div {height: 100%;}
-    .tree-control div.middle { font-size: 200%; }
-    .tree-control div.last {font-size: 200%;}
+    .tree-control{ height: 100%; padding: 0;}
+    .tree-control .collapse {position: relative; height: 100%; display: block;}
+    .tree-control .collapse .v-line {height: 100%;width: 1px; border: 1px solid; position: absolute;left: calc(50% - 1px);}
+    .tree-control .collapse .icon {position: absolute;width: 16px;height: 16px;top: 8px;left: calc(50% - 8px);outline: 1px dotted red;background-color: white;outline: 2px solid black; cursor: pointer;}
+    .tree-control .collapse .h-cross {position: absolute;top: calc(50% - 1px);left: 10%;border: 1px solid black;width: 80%;}
+    .tree-control .collapse .v-cross {position: absolute;height: 80%;width: 1px;border: 1px solid black;left: calc(50% - 1px);top: 10%;}
     .material-icons.button {cursor: pointer;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
     .type-and-id input { display: inline-block; }
