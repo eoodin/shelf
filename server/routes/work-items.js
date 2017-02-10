@@ -17,6 +17,7 @@ module.exports = function(router) {
             else if (req.query.planId) {
                 where = {planId: req.query.planId};
             }
+            
             if (req.query.parent) {
                 where['parentId'] = req.query.parent == 'null' ? null : req.query.parent;
             }

@@ -17,25 +17,36 @@ import { HttpService } from "./http.service";
               </div>
               <table *ngIf="items" class="table">
                   <tr>
+                      <th>  </th>
                       <th> ID </th>
                       <th> Type </th>
                       <th> State </th>
-                      <th>  </th>
                       <th> Title </th>
                       <th> Owner </th>
                       <th> Operations </th>
                   </tr>
                   <tr *ngFor="let item of items">
+                      <td class="tree-control">
+                        <div [ngClass]="item.treeState" >
+                            <a (click)="expand(item)" *ngIf="item.children.length && item.treeState != 'expand'">
+                               <span class="glyphicon glyphicon-chevron-right" ></span>
+                            </a>
+                            <a (click)="collapse(item)" *ngIf="item.treeState == 'expand'">
+                               <span class="glyphicon glyphicon-chevron-down" ></span>
+                            </a>
+                            <span *ngIf="item.treeState=='middle'" style="line-height: 100%;">├</span>
+                            <span *ngIf="item.treeState=='last'" style="line-height: 100%;">└</span>
+                        </div>
+                      </td>
                       <td> {{item.id}} </td>
                       <td> {{item.type}} </td>
                       <td *ngIf="item.type != 'Defect'"> {{item.status}} </td>
                       <td *ngIf="item.type == 'Defect'"> {{item.state}} </td>
-                      <td><a (click)="expand(item)" *ngIf="item.children.length"> + </a></td>
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
                       <td *ngIf="item.owner"> {{item.owner.name}} </td>
                       <td *ngIf="!item.owner"> Unassigned </td>
                       <td>
-                          <button 
+                     middle     <button 
                               *ngIf="item.type == 'Defect' && item.state == 'Created'"
                               [disabled]="requesting"
                               (click)="startFix(item)"
@@ -54,7 +65,7 @@ import { HttpService } from "./http.service";
   </div>
   `,
     styles: [`
-  .work-items-heading > div{float:right;}
+   .work-items-heading > div{float:right;}
     .work-items-heading { height: 38px; }
     .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
@@ -64,6 +75,10 @@ import { HttpService } from "./http.service";
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
     .plan-head ul li span {font-weight: normal}
     .item-table{position:relative;}
+    .tree-control {height: 100%; padding:0; width: 30px;}
+    .tree-control div {height: 100%;}
+    .tree-control div.middle { font-size: 200%; }
+    .tree-control div.last {font-size: 200%;}
     .material-icons.button {cursor: pointer;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
     .type-and-id input { display: inline-block; }
@@ -133,6 +148,39 @@ export class BacklogComponent implements OnInit {
     private addChild(us) {
         this.router.navigate(['story', 'new'], 
             {relativeTo: this.route,  queryParams: { type: 'UserStory', parent: us.id }});
+    }
+
+    private expand(item) {
+        let q = 'types=UserStory&parent=' + item.id;
+        this.loading = true;
+        this.http.get('/api/work-items/?' + q)
+            .finally(() => this.loading = false)
+            .map(resp => resp.json())
+            .filter(children => children.length > 0)
+            .subscribe(children => {
+                let i = this.items.indexOf(item);
+                if (i != -1) {
+                    let last;
+                    for (let it of children) {
+                        it.treeState = 'middle';
+                        this.items.splice(++i, 0, it);
+                        last = it;
+                    }
+                    if (last) {
+                        last.treeState = 'last';
+                    }
+                    item.treeState = 'expand';
+                }
+            });
+    }
+    private collapse(item) {
+        let i = this.items.indexOf(item);
+        while(i >= 0 && i + 1 < this.items.length) {
+            if (this.items[i+1].parentId != item.id) break;
+            this.items.splice(i + 1, 1);
+        }
+
+        item.treeState = '';
     }
 
     private sortResult(field) {
