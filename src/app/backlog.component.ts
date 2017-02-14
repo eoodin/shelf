@@ -16,6 +16,9 @@ import { HttpService } from "./http.service";
               <div class="panel-heading work-items-heading">
                 <md-checkbox [disabled]="showStory && !showDefect" [(ngModel)]="showStory" (change)="filterChange($event)">User stories</md-checkbox>
                 <md-checkbox [disabled]="showDefect && !showStory" [(ngModel)]="showDefect" (change)="filterChange($event)">Defects</md-checkbox>
+                <div class="heding-right">
+                    <md-checkbox [(ngModel)]="hideFinished" (change)="filterChange($event)">Hide Finished</md-checkbox>
+                </div>
               </div>
               <table *ngIf="items" class="table">
                   <tr>
@@ -27,7 +30,7 @@ import { HttpService } from "./http.service";
                       <th> Owner </th>
                       <th> Operations </th>
                   </tr>
-                  <tr *ngFor="let item of items">
+                  <tr *ngFor="let item of visibleItems()">
                       <td class="tree-control">
                         <div class="tree" [ngClass]="{
                                 collapse: item.children.length && item.treeState != 'expand',
@@ -108,7 +111,7 @@ export class BacklogComponent implements OnInit {
 
     private showStory = true;
     private showDefect = true;
-
+    private hideFinished = true;
 
     ngOnInit() {
     }
@@ -137,6 +140,13 @@ export class BacklogComponent implements OnInit {
         this.http.get('/api/work-items/?' + q)
             .finally(() => this.loading = false)
             .subscribe(b => this.items = b.json());
+    }
+
+    visibleItems() {
+        if (this.hideFinished) {
+            return this.items.filter(item => item.status != 'Finished');
+        }
+        return this.items;
     }
 
     startFix(item) {

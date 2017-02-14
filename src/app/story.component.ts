@@ -72,7 +72,7 @@ export class StoryComponent implements OnDestroy {
     private saving = false;
     private parent = {};
     private editorConfig = {
-        extraPlugins: 'uploadimage',
+        extraPlugins: 'uploadimage,divarea',
         imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
         toolbar: [
             {
@@ -81,7 +81,8 @@ export class StoryComponent implements OnDestroy {
             },
             { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
             { name: 'tools', items: ['Maximize'] }
-        ]
+        ],
+        toolbarCanCollapse: true
     };
 
     constructor(private http: HttpService,
