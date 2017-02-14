@@ -14,6 +14,8 @@ import { HttpService } from "./http.service";
           </div>
           <div class="panel panel-default">
               <div class="panel-heading work-items-heading">
+                <md-checkbox [disabled]="showStory && !showDefect" [(ngModel)]="showStory" (change)="filterChange($event)">User stories</md-checkbox>
+                <md-checkbox [disabled]="showDefect && !showStory" [(ngModel)]="showDefect" (change)="filterChange($event)">Defects</md-checkbox>
               </div>
               <table *ngIf="items" class="table">
                   <tr>
@@ -41,20 +43,6 @@ import { HttpService } from "./http.service";
                             <div class="child-h-line"></div>
                         </div>
                       </td>
-                      <!--
-                      <td class="tree-control">
-                        <div [ngClass]="item.treeState" >
-                            <a (click)="expand(item)" *ngIf="item.children.length && item.treeState != 'expand'">
-                               <span class="glyphicon glyphicon-chevron-right" ></span>
-                            </a>
-                            <a (click)="collapse(item)" *ngIf="item.treeState == 'expand'">
-                               <span class="glyphicon glyphicon-chevron-down" ></span>
-                            </a>
-                            <span *ngIf="item.treeState=='middle'" style="line-height: 100%;">├</span>
-                            <span *ngIf="item.treeState=='last'" style="line-height: 100%;">└</span>
-                        </div>
-                      </td>
-                      -->
                       <td> {{item.id}} </td>
                       <td> {{item.type}} </td>
                       <td *ngIf="item.type != 'Defect'"> {{item.status}} </td>
@@ -118,6 +106,10 @@ export class BacklogComponent implements OnInit {
     private requesting = false;
     private loading = false;
 
+    private showStory = true;
+    private showDefect = true;
+
+
     ngOnInit() {
     }
     constructor(private ele: ElementRef,
@@ -134,8 +126,12 @@ export class BacklogComponent implements OnInit {
     }
 
     loadItems() {
+        if (!this.showStory && !this.showDefect) return;
         let q = 'projectId=' + this.project.id;
-        let types = ['UserStory', 'Defect'];
+        let types = [];
+        if (this.showStory) types.push('UserStory');
+        if (this.showDefect) types.push('Defect');
+        
         q += '&types=' + types.join(',') + '&parent=null';
         this.loading = true;
         this.http.get('/api/work-items/?' + q)
@@ -172,6 +168,10 @@ export class BacklogComponent implements OnInit {
     private addChild(us) {
         this.router.navigate(['story', 'new'], 
             {relativeTo: this.route,  queryParams: { type: 'UserStory', parent: us.id }});
+    }
+
+    private filterChange(e) {
+        this.loadItems();
     }
 
     private toggleExpand(item) {
