@@ -12,58 +12,34 @@ declare var CKEDITOR;
     selector: 'story',
     template: `
   <div class="item-details">
-  <button (click)="goBack()">Back</button>
     <form (ngSubmit)="save()">
-        <div class="row" >
+        <div>
+            <button (click)="goBack()" md-button> <i class="material-icons">arrow_back</i> Back</button>
+        </div>
+        <div>
             <h4 *ngIf="parent.id"> Adding child to: #{{parent.id}} {{parent.title}} </h4>
-            <div class="col-sm-12">
-                Type:
-                <select [(ngModel)]="_item.type" [ngModelOptions]="{standalone: true}" [disabled]="_item.id">
-                    <option value="UserStory" selected="selected">User Story</option>
-                    <option value="Task">Task</option>
-                    <option value="Defect">Defect</option>
-                </select>
-            </div>
         </div>
-        <div *ngIf="_item.type == 'Defect'" class="row">
-            <div class="col-sm-12">Severity:
-                <label><input #s1 type="radio" [checked]="_item.severity==s1.value" (click)="_item.severity=s1.value" value="Blocker">Blocker</label>
-                <label><input #s2 type="radio" [checked]="_item.severity==s2.value" (click)="_item.severity=s2.value" value="Critical">Critical</label>
-                <label><input #s3 type="radio" [checked]="_item.severity==s3.value" (click)="_item.severity=s3.value" value="Major">Major</label>
-                <label><input #s4 type="radio" [checked]="_item.severity==s4.value" (click)="_item.severity=s4.value" value="Minor">Minor</label>
-            </div>
+        <div>
+            <span>Points:</span> <input type="text" [(ngModel)]="_item.points" [ngModelOptions]="{standalone: true}" value="0">
         </div>
-        <div class="row">
-            <div class="col-sm-12 field-row">
-                <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="_item.title" [ngModelOptions]="{standalone: true}">
-            </div>
+        <div class="title-row">
+            <span>Title:</span> <input type="text" [(ngModel)]="_item.title" [ngModelOptions]="{standalone: true}"> 
         </div>
-        <div class="row">
-            <div class="col-sm-12">Description:</div>
+        <div>
+            <ckeditor [(ngModel)]="_item.description" [config]="editorConfig" [ngModelOptions]="{standalone: true}" debounce="400"></ckeditor>
         </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <ckeditor [(ngModel)]="_item.description" [config]="editorConfig" [ngModelOptions]="{standalone: true}" debounce="400"></ckeditor>
-            </div>
+        <div>
+            <button [disabled]="saving" md-button>Save</button>
         </div>
-        <div class="row" *ngIf="_item.type == 'UserStory'">
-            <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="_item.points" [ngModelOptions]="{standalone: true}" value="0"></div>
-        </div>
-        <button class="btn btn-default" [disabled]="saving">Save</button>
     </form>
   </div>
   `,
     styles: [`
-    .item-details { padding-left: 0;}
-    .item-details li { list-style:none; margin-bottom: 10px;}
-    .item-details li:last-child { margin-bottom: 0;}
-    .item-details li .title { font-weight: 700; }
-    .item-details li .big-section { display: block;}
-    .item-details .row {margin: 8px 0;}
-    .field-row {display: flex; flex-direction: row; flex-wrap: nowrap;}
-    .field-row .field-label { margin-right: 20px;}
-    .field-row input,select {flex-grow: 1;}
-     `],
+    .item-details>form>div{margin: 5px 0;}
+    .item-details>form>div>span {display: inline-block; width: 50px;}
+    .title-row {display:flex; flex-direction: row;}
+    .title-row input {flex-grow: 1; font-weight: 800;}
+    `],
     encapsulation: ViewEncapsulation.Emulated,
     changeDetection: ChangeDetectionStrategy.Default
 })
@@ -114,6 +90,7 @@ export class StoryComponent implements OnDestroy {
     save() {
         var data = JSON.parse(JSON.stringify(this._item));
         data.projectId = this.prjs.current.getValue()['id'];
+        if (!data['type']) data['type'] = 'UserStory';
         if (data['id']) {
             this.http.put('/api/work-items/' + data['id'], JSON.stringify(data))
                 .filter(resp => resp.json())
