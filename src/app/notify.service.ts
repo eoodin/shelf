@@ -15,14 +15,19 @@ export class NotifyService {
     this.notifier
       .share()
       .subscribe(object => this.send(object));
-
-    Notification.requestPermission((permission) => {
-      if (permission == 'denied')
-        alert('Notification disabled, enable it in browser settings.');
-    });
+    if (Notification) {
+      Notification.requestPermission((permission) => {
+        if (permission == 'denied')
+          alert('Notification disabled, enable it in browser settings.');
+      });
+    }
   }
 
   public notify(title, body) {
+    if (!Notification) {
+      return;
+    }
+    
     if (Notification.permission === 'granted') {
       return this.notifier.next({title: title, body: body});
     }
