@@ -10,6 +10,7 @@ var fs = require("fs"),
     methodOverride = require('method-override');
 var models = require('./models');
 models.sequelize.authenticate().then(function() {
+    models.sequelize.sync();
     console.log('Db connected.')
 }).catch(function(err){
     console.log('Unable to connect to db.', err);
