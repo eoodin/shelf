@@ -7,7 +7,11 @@
     {
       "root": "src",
       "outDir": "dist",
-      "assets": ["favicon.ico"],
+      "assets": [
+        "favicon.ico",
+        "spin.gif",
+        "app/images/icon-large.png"
+        ],
       "index": "index.html",
       "main": "main.ts",
       "test": "test.ts",
@@ -16,6 +20,7 @@
       "mobile": false,
       "styles": [
         "styles.css",
+        "css-spinner.css",
         "../node_modules/bootstrap/dist/css/bootstrap.min.css",
         "./assets/material-icons.css"
       ],
