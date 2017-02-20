@@ -19,8 +19,7 @@ import {Router, ActivatedRoute} from "@angular/router";
                </ul>
             </div>
             <div class="project-operations">
-                <button class="btn btn-primary" (click)="newStory()">Write User Story...</button>
-                <button class="btn btn-warning" (click)="newDefect()">Report Problem...</button>
+                <button class="btn btn-primary" (click)="newStory()">Add Story</button>
             </div>
         </div>
         <router-outlet></router-outlet>
@@ -49,9 +48,5 @@ export class Backlog {
 
     newStory() {
         this.router.navigate(['/backlog/story/new']);
-    }
-
-    newDefect() {
-        this.router.navigate(['/backlog/defect/new']);
     }
 }

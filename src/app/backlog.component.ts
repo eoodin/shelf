@@ -1,8 +1,9 @@
-import { Component, OnInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef } from '@angular/core';
 import { ProjectService } from "./project.service";
 import { Router, ActivatedRoute } from '@angular/router';
 import { PreferenceService } from "./preference.service";
-import { HttpService } from "./http.service";
+import { StoryService } from "./story.service";
+import {MdDialog, MdDialogRef} from '@angular/material';
 
 @Component({
     selector: 'backlog',
@@ -14,8 +15,6 @@ import { HttpService } from "./http.service";
           </div>
           <div class="panel panel-default">
               <div class="panel-heading work-items-heading">
-                <md-checkbox [disabled]="showStory && !showDefect" [(ngModel)]="showStory" (change)="filterChange($event)">User stories</md-checkbox>
-                <md-checkbox [disabled]="showDefect && !showStory" [(ngModel)]="showDefect" (change)="filterChange($event)">Defects</md-checkbox>
                 <div class="heding-right">
                     <md-checkbox [(ngModel)]="hideFinished" (change)="filterChange($event)">Hide Finished</md-checkbox>
                 </div>
@@ -27,7 +26,7 @@ import { HttpService } from "./http.service";
                       <th> Type </th>
                       <th> State </th>
                       <th> Title </th>
-                      <th> Owner </th>
+                      <th> Creator </th>
                       <th> Operations </th>
                   </tr>
                   <tr *ngFor="let item of visibleItems()">
@@ -51,20 +50,11 @@ import { HttpService } from "./http.service";
                       <td *ngIf="item.type != 'Defect'"> {{item.status}} </td>
                       <td *ngIf="item.type == 'Defect'"> {{item.state}} </td>
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
-                      <td *ngIf="item.owner"> {{item.owner.name}} </td>
-                      <td *ngIf="!item.owner"> Unassigned </td>
+                      <td *ngIf="item.creator"> {{item.creator.name}} </td>
+                      <td *ngIf="!item.creator"> Unassigned </td>
                       <td>
-                          <button 
-                              *ngIf="item.type == 'Defect' && item.state == 'Created'"
-                              [disabled]="requesting"
-                              (click)="startFix(item)"
-                                class="btn btn-default btn-sm">Start Fix</button>
-                          <button 
-                              *ngIf="item.type == 'Defect' && item.state == 'Fixed'"
-                              [disabled]="requesting"
-                              (click)="startTest(item)"
-                              class="btn btn-default btn-sm">Start Test</button>
-                          <i *ngIf="item.type == 'UserStory' && !item.parentId" (click)="addChild(item)" class="material-icons button">add</i>
+                          <i *ngIf="!item.parentId" (click)="addChild(item)" class="material-icons button">add</i>
+                          <i (click)="confirmDelete(item)" class="material-icons button">remove</i>
                       </td>
                   </tr>
               </table>
@@ -97,11 +87,9 @@ import { HttpService } from "./http.service";
     .material-icons.button {cursor: pointer;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
     .type-and-id input { display: inline-block; }
-  `],
-    encapsulation: ViewEncapsulation.Emulated,
-    changeDetection: ChangeDetectionStrategy.Default
+  `]
 })
-export class BacklogComponent implements OnInit {
+export class BacklogComponent {
     private project = null;
     private projects = [];
     private items = [];
@@ -109,14 +97,12 @@ export class BacklogComponent implements OnInit {
     private requesting = false;
     private loading = false;
 
-    private showStory = true;
-    private showDefect = true;
     private hideFinished = true;
 
-    ngOnInit() {
-    }
-    constructor(private ele: ElementRef,
-        private http: HttpService,
+    constructor(
+        public dialog: MdDialog,
+        private ele: ElementRef,
+        private stories: StoryService,
         private prs: ProjectService,
         private router: Router,
         private route: ActivatedRoute,
@@ -129,17 +115,10 @@ export class BacklogComponent implements OnInit {
     }
 
     loadItems() {
-        if (!this.showStory && !this.showDefect) return;
-        let q = 'projectId=' + this.project.id;
-        let types = [];
-        if (this.showStory) types.push('UserStory');
-        if (this.showDefect) types.push('Defect');
-        
-        q += '&types=' + types.join(',') + '&parent=null';
         this.loading = true;
-        this.http.get('/api/work-items/?' + q)
+        this.stories.load({projectId: this.project.id, parent: 'null'})
             .finally(() => this.loading = false)
-            .subscribe(b => this.items = b.json());
+            .subscribe(stories => this.items = stories);
     }
 
     visibleItems() {
@@ -149,28 +128,6 @@ export class BacklogComponent implements OnInit {
         return this.items;
     }
 
-    startFix(item) {
-        this.requesting = true;
-        this.http.post('/api/defects/' + item.id + '/fix', '{}')
-            .finally(() => this.requesting = false)
-            .subscribe(
-            () => this.loadItems(),
-            (resp) => {
-                window.alert('Error occurred: ' + resp.json()['error'])
-            }
-            );
-    }
-
-    startTest(item) {
-        this.requesting = true;
-        this.http.post('/api/defects/' + item.id + '/test', '{}')
-            .finally(() => this.requesting = false)
-            .subscribe(
-            () => this.loadItems(),
-            () => window.alert('Error occurred.')
-            );
-    }
-
     private showItem(item) {
         this.router.navigate(['/backlog/story/' + item.id]);
     }
@@ -178,6 +135,16 @@ export class BacklogComponent implements OnInit {
     private addChild(us) {
         this.router.navigate(['story', 'new'], 
             {relativeTo: this.route,  queryParams: { type: 'UserStory', parent: us.id }});
+    }
+
+    private confirmDelete(item) {
+        let dialogRef = this.dialog.open(DeleteConfirmDialog);
+        dialogRef.afterClosed().subscribe(result => {
+            if (result != 'yes') 
+                return;
+            this.stories.delete(item.id)
+                .subscribe(() => this.loadItems());
+        });
     }
 
     private filterChange(e) {
@@ -192,17 +159,15 @@ export class BacklogComponent implements OnInit {
     }
 
     private expand(item) {
-        let q = 'types=UserStory&parent=' + item.id;
         this.loading = true;
-        this.http.get('/api/work-items/?' + q)
+        this.stories.load({parent: item.id})
             .finally(() => this.loading = false)
-            .map(resp => resp.json())
             .filter(children => children.length > 0)
-            .subscribe(children => {
+            .subscribe(stories => {
                 let i = this.items.indexOf(item);
                 if (i != -1) {
                     let last;
-                    for (let it of children) {
+                    for (let it of stories) {
                         it.treeState = 'middle';
                         this.items.splice(++i, 0, it);
                         last = it;
@@ -232,5 +197,22 @@ export class BacklogComponent implements OnInit {
 
         this.sort.field = field;
         this.loadItems();
+    }
+}
+
+
+@Component({
+    selector: 'delete-confirm-dialog',
+    template: `
+    <h1 md-dialog-title>Deleting User Story</h1>
+    <div md-dialog-content>Do you want to delete the user story?</div>
+    <div md-dialog-actions>
+    <button md-button (click)="dialogRef.close('yes')">Yes</button>
+    <button md-button (click)="dialogRef.close('no')">Cancel</button>
+    </div>
+    `
+})
+export class DeleteConfirmDialog {
+    constructor(public dialogRef: MdDialogRef<DeleteConfirmDialog>) {
     }
 }

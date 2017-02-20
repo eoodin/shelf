@@ -28,6 +28,7 @@ import {AppService} from "./app.service";
                 <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/projects']" class="link">Dashboard</a></li>
                 <li [class.active]="getLinkStyle('/backlog')"><a [routerLink]="['/backlog']" class="link">Backlog</a></li>
                 <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/plans']" class="link">Plans</a></li>
+                <li [class.active]="getLinkStyle('/defects')"><a [routerLink]="['/defects']" class="link">Defects</a></li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
                 <li [class.active]="getLinkStyle('/settings')"><a [routerLink]="['/settings']">Settings</a></li>

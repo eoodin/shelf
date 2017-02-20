@@ -90,11 +90,11 @@ export class StoryComponent implements OnDestroy {
     save() {
         var data = JSON.parse(JSON.stringify(this._item));
         data.projectId = this.prjs.current.getValue()['id'];
-        if (!data['type']) data['type'] = 'UserStory';
-        if (data['id']) {
-            this.http.put('/api/work-items/' + data['id'], JSON.stringify(data))
-                .filter(resp => resp.json())
-                .subscribe(data => this.onSaved(data));
+        if (data.id) {
+            this.saving = true;
+            this.storyService.save(data)
+                .finally(() => this.saving = false)
+                .subscribe(() => this.goBack())
         }
         else {
             this.saving = true;

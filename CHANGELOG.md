@@ -11,8 +11,6 @@ Simplify allocation record of effort estimation:
 Add priority
  alter table items add column priority int(11) default 1;
 
-
-
 2017-01-10
 Separate team backlog from projects.
 Migration to database needed:
@@ -25,3 +23,12 @@ Migration to database needed:
   execute stmt;
   deallocate prepare stmt;
   alter table plans drop column projectId;
+
+2017-02-20
+Separate user story from work-items
+  insert into stories (title, description, status, points, projectId, creatorId, createdAt, updatedAt) \
+    select title,description,status,points,projectId,creatorId, createdAt,updatedAt from items where type='UserStory';
+If tree info need to be preserved, additional data fix needed.
+  delete from changes where itemId in (select id from items where type='UserStory');
+  delete from items where type='UserStory' and parentId is not null;
+  delete from items where type='UserStory';
