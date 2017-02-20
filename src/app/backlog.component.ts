@@ -23,8 +23,7 @@ import {MdDialog, MdDialogRef} from '@angular/material';
                   <tr>
                       <th>  </th>
                       <th> ID </th>
-                      <th> Type </th>
-                      <th> State </th>
+                      <th> Status </th>
                       <th> Title </th>
                       <th> Creator </th>
                       <th> Operations </th>
@@ -46,12 +45,9 @@ import {MdDialog, MdDialogRef} from '@angular/material';
                         </div>
                       </td>
                       <td> {{item.id}} </td>
-                      <td> {{item.type}} </td>
-                      <td *ngIf="item.type != 'Defect'"> {{item.status}} </td>
-                      <td *ngIf="item.type == 'Defect'"> {{item.state}} </td>
+                      <td > {{item.status}} </td>
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
-                      <td *ngIf="item.creator"> {{item.creator.name}} </td>
-                      <td *ngIf="!item.creator"> Unassigned </td>
+                      <td> {{item.creator.name}} </td>
                       <td>
                           <i *ngIf="!item.parentId" (click)="addChild(item)" class="material-icons button">add</i>
                           <i (click)="confirmDelete(item)" class="material-icons button">remove</i>

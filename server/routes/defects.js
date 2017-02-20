@@ -14,6 +14,109 @@ module.exports = function(router) {
         });
     }
 
+    router.route('/defects')
+        .get(function(req, res) {
+            var ob = req.query.sortBy ? req.query.sortBy : 'id';
+            // TODO: rename this field to eleminate the code.
+            if (ob == 'owner') ob = 'ownerId';
+
+            if (req.query.desc) {
+                ob = [[ob, 'desc']]
+            }
+            let where = {};
+            if (req.query.projectId) {
+                where = {projectId: req.query.projectId};
+            }
+
+            if (req.query.status) {
+                let status = req.query.status.split(',');
+                where['status'] = {$in : status};
+            }
+
+            models.item.findAll({
+                where: where,
+                order: ob
+            }).then(function(items) {   
+                res.json(items);
+            })
+        })
+        .post(function(req, res) {
+            if (!req.body.projectId) {
+                return res.sendStatus(404);
+            }
+
+            if (!req.user || !req.user.id) {
+                return res.sendStatus(403);
+            }
+
+            models.user.findById(req.user.id).then(function(u) {
+                let def = {
+                    status: 'Created',
+                    title: req.body.title,
+                    description: req.body.description,
+                    creatorId: u.id,
+                    projectId: (req.body.projectId || null),
+                    severity: req.body.severity
+                };
+                var item = models.item.build(def);
+                item.save().then(function (item) {
+                    res.json(item.id);
+                })
+            }).catch(function(errors){
+                console.log("Error: " + JSON.stringify(errors));
+                res.sendStatus(500);
+            });
+        });
+
+    router.route('/defects/:id')
+        .get(function(req, res) {
+            models.item.findById(req.params.id).then(function(item) {
+                res.json(item);
+            }).catch(function(errors){
+                console.log("Error: " + JSON.stringify(errors));
+                res.sendStatus(500);
+            });
+        })
+        .patch(function(req, res) {
+            models.item.findById(req.params.id).then(function(item) {
+                var origin = {};
+                var changes = {};
+                for(let f in req.body) {
+                    if (f == 'updatedAt' || f == 'createdAt') {
+                        continue;
+                    }
+
+                    if (item[f] != req.body[f]) {
+                        origin[f] = item[f];
+                        changes[f] = req.body[f];
+                    }
+                }
+
+                item.update(changes).then(function(item) {
+                    res.json(item);
+                });
+            }).catch(function(errors){
+                console.log("Error: " + JSON.stringify(errors));
+                res.sendStatus(500);
+            });
+        })
+        .delete(function(req, res){
+            models.item.findById(req.params.id).then(function(item) {
+                item.destroy().then(function(item) {
+                    res.json(req.params.id);
+                })
+                .catch(function(errors){
+                     console.log("Error: " + JSON.stringify(errors));
+                res.sendStatus(500);
+                });
+            }).catch(function(errors){
+                console.log("Error: " + JSON.stringify(errors));
+                res.sendStatus(500);
+            });
+        });
+
+
+
     router.route('/defects/:id/fix')
         .post(function(req, res) {
             models.sequelize.transaction(function(t) {

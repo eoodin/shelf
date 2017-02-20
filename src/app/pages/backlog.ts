@@ -8,16 +8,7 @@ import {Router, ActivatedRoute} from "@angular/router";
     template: `
     <div class="backlog-page">
         <div class="project-info">
-           <div class="dropdown project-select" dropdown keyboard-nav>
-               <a href="javascript:void(0);" class="dropdown-toggle" dropdownToggle>
-                   <h5 style="display:inline-block;" *ngIf="project">{{project.name}}</h5><span class="caret"></span>
-               </a>
-               <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
-                 <li *ngFor="let p of projects" role="menuitem">
-                   <a (click)="prs.setCurrent(p)">{{p.name}}</a>
-                 </li>
-               </ul>
-            </div>
+            <project-selector></project-selector>
             <div class="project-operations">
                 <button class="btn btn-primary" (click)="newStory()">Add Story</button>
             </div>
@@ -28,7 +19,6 @@ import {Router, ActivatedRoute} from "@angular/router";
     styles: [`
     .backlog-page {padding: 10px;}
     .project-info { height:40px; padding: 2px 0;}
-    .project-info .project-select{ display: inline-block;}
     .project-operations { float: right;}
     `]
 })

@@ -26,9 +26,14 @@ Migration to database needed:
 
 2017-02-20
 Separate user story from work-items
-  insert into stories (title, description, status, points, projectId, creatorId, createdAt, updatedAt) \
+  insert into stories (title, description, status, points, projectId, creatorId, createdAt, updatedAt) 
     select title,description,status,points,projectId,creatorId, createdAt,updatedAt from items where type='UserStory';
+  insert into defects (title, description, severity, status, projectId, creatorId, ownerId, createdAt, updatedAt) 
+    select title, description, severity, status, projectId, creatorId, ownerId, createdAt, updatedAt from items where type='Defect';
 If tree info need to be preserved, additional data fix needed.
   delete from changes where itemId in (select id from items where type='UserStory');
   delete from items where type='UserStory' and parentId is not null;
   delete from items where type='UserStory';
+  delete from changes where itemId in (select id from items where type='Defect');
+  delete from items where type='Defect';
+

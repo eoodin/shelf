@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
+import { Router } from "@angular/router";
 import { HttpService } from '../http.service';
 import { DefectService } from '../defect.service';
+import { ProjectService } from '../project.service';
 
 @Component({
   selector: 'app-content',
@@ -13,13 +15,12 @@ import { DefectService } from '../defect.service';
           <div class="panel panel-default">
               <div class="panel-heading work-items-heading">
                 <div class="heding-right">
-                    <md-checkbox [(ngModel)]="hideFinished" (change)="filterChange($event)">Hide Finished</md-checkbox>
+                    <md-checkbox [(ngModel)]="hideClosed" (change)="filterChange($event)">Hide Closed</md-checkbox>
                 </div>
               </div>
               <table *ngIf="items" class="table">
                   <tr>
                       <th> ID </th>
-                      <th> Type </th>
                       <th> State </th>
                       <th> Title </th>
                       <th> Owner </th>
@@ -27,7 +28,6 @@ import { DefectService } from '../defect.service';
                   </tr>
                   <tr *ngFor="let item of visibleItems()">
                       <td> {{item.id}} </td>
-                      <td> {{item.type}} </td>
                       <td> {{item.state}} </td>
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
                       <td *ngIf="item.owner"> {{item.owner.name}} </td>
@@ -67,30 +67,36 @@ import { DefectService } from '../defect.service';
   `]
 })
 export class ContentComponent {
-
-  private project = null;
-    private projects = [];
     private items = [];
     private sort: any;
     private requesting = false;
     private loading = false;
 
-    private hideFinished = true;
+    private project;
+    private hideClosed = true;
 
     constructor(
+         private router: Router,
         private http: HttpService,
-        private defects: DefectService) {
+        private defects: DefectService,
+        private projectSerivce: ProjectService) {
+        this.projectSerivce.current
+            .do(p => this.project = p)
+            .subscribe(() => this.loadItems());
     }
 
     loadItems() {
         this.loading = true;
-        this.defects.load({project: this.project.id})
+        let search = {};
+        if (this.project) search['project'] = this.project.id;
+
+        this.defects.load(search)
             .finally(() => this.loading = false)
             .subscribe(stories => this.items = stories);
     }
 
     visibleItems() {
-        if (this.hideFinished) {
+        if (this.hideClosed) {
             return this.items.filter(item => item.status != 'Finished');
         }
         return this.items;
@@ -118,9 +124,9 @@ export class ContentComponent {
             );
     }
 
-    // private showItem(item) {
-    //     this.router.navigate(['/backlog/story/' + item.id]);
-    // }
+    private showItem(item) {
+        this.router.navigate(['/defects/' + item.id]);
+    }
 
     // private addChild(us) {
     //     this.router.navigate(['story', 'new'], 
