@@ -122,7 +122,6 @@ module.exports = function(router) {
                                 originalEstimation: 8,
                                 projectId: defect.projectId,
                                 ownerId: req.user.id,
-                                parentId: defect.id,
                                 planId: req.body.planId
                             }).then(function(task) {
                                 // change log writing is missing, aspect programming?
@@ -157,7 +156,6 @@ module.exports = function(router) {
                             originalEstimation: 8,
                             projectId: defect.projectId,
                             ownerId: req.user.id,
-                            parentId: defect.id,
                             planId: req.body.planId
                         }).then(function(task){
                             return defect.update({status: 'Testing'}).then(function() {

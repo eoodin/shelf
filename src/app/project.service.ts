@@ -8,7 +8,7 @@ import {PreferenceService} from "./preference.service";
 export class ProjectService {
     private loading: boolean = false;
     private lastProjectId;
-    private _current: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+    private _current: BehaviorSubject<any> = new BehaviorSubject<any>({});
     private _projects = new BehaviorSubject<any>([]);
     private _plans = new BehaviorSubject<any>([]);
 
@@ -39,6 +39,7 @@ export class ProjectService {
                 }
                 this._current.next(select);
             });
+
         this.load();
     }
 

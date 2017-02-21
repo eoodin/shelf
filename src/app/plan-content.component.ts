@@ -1,13 +1,13 @@
-import {Component, ViewChild} from "@angular/core";
-import {Http} from "@angular/http";
-import {PreferenceService} from "./preference.service";
+import { Component, ViewChild } from "@angular/core";
+import { PreferenceService } from "./preference.service";
 import * as moment from "moment";
-import {PlanService} from "./plan.service";
-import {TeamService} from "./team.service";
+import { PlanService } from "./plan.service";
+import { TeamService } from "./team.service";
+import { TaskService } from './task.service';
 
 @Component({
-  selector: 'plan-content',
-  template: `
+    selector: 'plan-content',
+    template: `
        <div >
             <div class="plan-head" *ngIf="current.id">
                 <ul class="summary">
@@ -144,7 +144,6 @@ import {TeamService} from "./team.service";
                                 <td>{{item.estimation}}</td>
                                 <td>
                                     <a title="Remove this work item" (click)="removingItem(item)"><span class="glyphicon glyphicon-remove"></span></a>
-                                    <a title="Put back to backlog" (click)="moveToBacklog(item)"><span class="glyphicon glyphicon-level-up"></span></a>
                                 </td>
                             </tr>
                         </table>
@@ -226,16 +225,16 @@ export class PlanContentComponent {
 
     @ViewChild('downloader') downloader;
 
-    constructor(private http: Http,
-                private plans: PlanService,
-                private teams: TeamService,
-                private pref: PreferenceService) {
+    constructor(private plans: PlanService,
+        private tasks: TaskService,
+        private teams: TeamService,
+        private pref: PreferenceService) {
         this.ui = {
-            'loading': {'show': false},
-            'awd': {'show': false, 'loading': false, 'item': {}},
-            'mtd': {'show': false},
-            'cpd': {'show': false},
-            'rwd': {'show': false}
+            'loading': { 'show': false },
+            'awd': { 'show': false, 'loading': false, 'item': {} },
+            'mtd': { 'show': false },
+            'cpd': { 'show': false },
+            'rwd': { 'show': false }
         };
 
         this.teams.ownTeam
@@ -249,7 +248,7 @@ export class PlanContentComponent {
         this.plans.all().subscribe(plans => this._plans = plans);
 
         pref.values
-            .filter(prefs => typeof(prefs['hideFinished']) != 'undefined')
+            .filter(prefs => typeof (prefs['hideFinished']) != 'undefined')
             .subscribe(ps => this.hideFinished = ps.hideFinished);
     }
 
@@ -268,17 +267,13 @@ export class PlanContentComponent {
             return;
         }
 
-        this.http.patch('/api/work-item/bunch', JSON.stringify({'ids': ids, 'changes': {'planId': planId}}))
-            .subscribe(resp => this.onMoveToPlanResponse(resp));
-    }
-
-    onMoveToPlanResponse(response) {
-        this.ui.mtd.show = false;
-        this.loadWorkItems();
+        this.tasks.moveToPlan(ids, planId)
+            .finally(() => { this.ui.mtd.show = false; })
+            .subscribe(resp => this.loadWorkItems());
     }
 
     showAddItem(type) {
-        this.ui.awd.item = {'planId': this.current['id']};
+        this.ui.awd.item = { 'planId': this.current['id'] };
         this.ui.awd.type = type;
         if (type) {
             this.ui.awd.item.type = type;
@@ -298,20 +293,10 @@ export class PlanContentComponent {
         this.ui.rwd.show = true;
     }
 
-    moveToBacklog(item) {
-        this.ui.loading.show = true;
-        var change = {'planId': null};
-        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
-            .finally(() => this.ui.loading.show = false)
-            .subscribe(resp => this.loadWorkItems());
-    }
-
     removeItem(item) {
-        this.http.delete('/api/work-items/' + item.id)
-            .subscribe(resp => {
-                this.loadWorkItems();
-                this.ui.rwd.show = false;
-            });
+        this.tasks.delete(item.id)
+            .finally(() => { this.ui.rwd.show = false })
+            .subscribe(() => this.loadWorkItems())
     }
 
     visibleItems() {
@@ -320,26 +305,24 @@ export class PlanContentComponent {
 
     changeStatus(item, status) {
         this.ui.loading.show = true;
-
-        var change = {'status': status};
-        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
+        var change = { 'status': status };
+        this.tasks.save(item.id, change)
             .finally(() => this.ui.loading.show = false)
             .subscribe(resp => this.loadWorkItems());
     }
 
     changePriority(item, priority) {
         this.ui.loading.show = true;
-
-        var change = {'priority': priority};
-        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
+        var change = { 'priority': priority };
+        this.tasks.save(item.id, change)
             .finally(() => this.ui.loading.show = false)
             .subscribe(resp => this.loadWorkItems());
     }
 
     assignTo(item, member) {
         this.ui.loading.show = true;
-        var change = {'ownerId': member ? member.id : null};
-        this.http.put('api/work-items/' + item.id, JSON.stringify(change))
+        var change = { 'ownerId': member ? member.id : null };
+        this.tasks.save(item.id, change)
             .finally(() => this.ui.loading.show = false)
             .subscribe(resp => this.loadWorkItems());
     }
@@ -364,14 +347,15 @@ export class PlanContentComponent {
     }
 
     loadWorkItems() {
-        var fetchUrl = '/api/work-items/?planId=' + this.current['id'];
+        var fetchUrl = '/api/tasks/?planId=' + this.current['id'];
+        let search = { planId: this.current['id'] };
         if (this.sort['field']) {
-            fetchUrl += '&sortBy=' + this.sort['field'];
-            this.sort['order'] == 'desc' && (fetchUrl += '&desc=true');
+            search['sortBy'] = this.sort['field'];
+            if (this.sort['order'] == 'desc')
+                search['desc'] = 'true';
         }
-
-        this.http.get(fetchUrl)
-            .subscribe(resp => this.setWorkItems(resp.json()));
+        this.tasks.fetch(search)
+            .subscribe(tasks => this.setWorkItems(tasks));
     }
 
     setWorkItems(items) {
@@ -403,7 +387,7 @@ export class PlanContentComponent {
     }
 
     exportCsv() {
-        this.downloader.nativeElement.src = '/api/work-items/?format=csv&planId=' + this.current['id']
+        this.downloader.nativeElement.src = '/api/tasks/?format=csv&planId=' + this.current['id']
     }
 
     private getSelectedWorkItemIds() {

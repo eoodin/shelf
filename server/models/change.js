@@ -10,7 +10,7 @@ module.exports = function (sequelize, DataTypes) {
             updatedAt: false,
             classMethods: {
               associate: function(models) {
-                change.belongsTo(models.item);
+                change.belongsTo(models.task);
                 change.belongsTo(models.user);
               }
             }

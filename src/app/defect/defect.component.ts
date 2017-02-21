@@ -31,10 +31,11 @@ import { DefectService } from '../defect.service';
   </div>
   `,
   styles: [`
-  .defect-edit>div{margin: 5px 0;}
+  .defect-edit>div{margin: 7px 0;}
   .defect-edit>div>span {display: inline-block; width: 50px;}
   .title-row {display:flex; flex-direction: row;}
   .title-row input {flex-grow: 1; font-weight: 800;}
+  md-radio-button {margin: 0 7px;}
   `]
 })
 export class DefectComponent {
@@ -59,6 +60,7 @@ export class DefectComponent {
     private route: ActivatedRoute,
     private defects: DefectService,
     private prjs: ProjectService) {
+      this.defect['severity'] = 'Major';
     this.route.params
       .filter(params => params['id'] && params['id'] != 'new')
       .switchMap((params: Params) => this.defects.single(params['id']))

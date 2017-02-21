@@ -147,17 +147,16 @@ export class ItemDetail implements OnInit {
 
     saveItem() {
         var data = JSON.parse(JSON.stringify(this._item));
-        data.projectId = this.prjs.current.getValue()['id'];
         if (!data['id']) {
-            this.http.post('/api/work-items/', JSON.stringify(data))
+            data.projectId = this.prjs.current.getValue()['id'];
+            this.http.post('/api/tasks/', JSON.stringify(data))
                 .subscribe(resp => this.saved.emit(resp));
         }
         else {
-            this.http.put('/api/work-items/' + data['id'], JSON.stringify(data))
+            this.http.patch('/api/tasks/' + data['id'], JSON.stringify(data))
                 .subscribe(resp => this.saved.emit(resp));
         }
 
-        // close the dialog?
         this.showChange.emit(false);
     }
 }

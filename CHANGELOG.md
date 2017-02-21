@@ -38,4 +38,12 @@ If tree info need to be preserved, additional data fix needed.
   delete from items where type='UserStory';
   delete from changes where itemId in (select id from items where type='Defect');
   delete from items where type='Defect';
-
+  insert into tasks (title, priority, originalEstimation, estimation, description, status, createdAt, updatedAt, planId, ownerId, creatorId) select title, priority, originalEstimation, estimation, description, status, createdAt, updatedAt, planId, ownerId, creatorId from items where type='Task';
+  alter table changes add column taskId bigint(20);
+  update changes left join items on changes.itemId=items.id left join tasks on tasks.title=items.title and tasks.createdAt=items.createdAt set taskId=task.id;
+  SELECT constraint_name INTO @cn FROM  information_schema.KEY_COLUMN_USAGE WHERE table_name = 'changes' AND column_name = 'itemId';
+  select CONCAT('alter table changes drop foreign key ', @cn) into @sql;
+  prepare stmt from @sql;
+  execute stmt;
+  deallocate prepare stmt;
+  alter table changes drop column itemId;

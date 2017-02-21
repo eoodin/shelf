@@ -199,6 +199,8 @@ export class SelectPlanDialog {
     constructor(
         public dialogRef: MdDialogRef<SelectPlanDialog>,
         private plans: PlanService) {
-        this.plans.current().subscribe(p => this.plan = p);
+        this.plans.current()
+            .filter(plan => plan)
+            .subscribe(p => this.plan = p);
     }
 }

@@ -27,6 +27,7 @@ import { StoryService } from "./story.service";
 import { ProjectService } from "./project.service";
 import { PlanService } from "./plan.service";
 import { UserService } from "./user.service";
+import { TaskService } from "./task.service";
 import { AppService } from "./app.service";
 import { PlanCreatorComponent } from './plan-creator.component';
 import { StoryComponent } from './story.component';
@@ -109,6 +110,7 @@ export class ShelfRequestOptions extends RequestOptions {
         PlanService,
         UserService,
         DefectService,
+        TaskService,
         AppService,
         { provide: RequestOptions, useClass: ShelfRequestOptions },
         { provide: LocationStrategy, useClass: HashLocationStrategy }

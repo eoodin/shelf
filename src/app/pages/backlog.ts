@@ -32,7 +32,6 @@ export class Backlog {
                 private prs: ProjectService,
                 private pref: PreferenceService) {
         prs.projects.subscribe(ps => this.projects = ps);
-        
         prs.current.subscribe(p => this.project = p);
     }
 
