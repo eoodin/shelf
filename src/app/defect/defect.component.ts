@@ -14,13 +14,12 @@ import { DefectService } from '../defect.service';
           <a routerLink=".."> <i class="material-icons">arrow_back</i></a>
       </div>
       <div>
-          <span>Severity:</span> 
           <md-radio-group [(ngModel)]="defect.severity">
             <md-radio-button *ngFor="let s of ['Blocker', 'Critical', 'Major', 'Minor']" [value]="s"> {{s}} </md-radio-button>
           </md-radio-group>
       </div>
       <div class="title-row">
-          <span>Title:</span> <input type="text" [(ngModel)]="defect.title"> 
+          <input type="text" [(ngModel)]="defect.title"> 
       </div>
       <div>
           <ckeditor [(ngModel)]="defect.description" [config]="editorConfig" debounce="400"></ckeditor>
