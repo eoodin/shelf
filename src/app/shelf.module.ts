@@ -32,7 +32,7 @@ import { PlanCreatorComponent } from './plan-creator.component';
 import { StoryComponent } from './story.component';
 import { BacklogComponent, DeleteConfirmDialog } from './backlog.component';
 import { PageComponent as DefectPage } from './defect/page.component';
-import { ContentComponent as DefectContent } from './defect/content.component';
+import { ContentComponent as DefectContent, SelectPlanDialog } from './defect/content.component';
 import { DefectComponent as DefectDetail } from './defect/defect.component';
 import { ProjectSelectorComponent } from './components/project-selector.component';
 
@@ -93,6 +93,7 @@ export class ShelfRequestOptions extends RequestOptions {
         StoryComponent,
         BacklogComponent,
         DeleteConfirmDialog,
+        SelectPlanDialog,
         DefectPage,
         DefectDetail,
         DefectContent,
@@ -122,7 +123,8 @@ export class ShelfRequestOptions extends RequestOptions {
         Ng2BootstrapModule
     ],
     entryComponents: [
-        DeleteConfirmDialog
+        DeleteConfirmDialog,
+        SelectPlanDialog
     ],
     bootstrap: [ShelfAppComponent],
 })

@@ -48,7 +48,7 @@ export class StoryComponent implements OnDestroy {
     private saving = false;
     private parent = {};
     private editorConfig = {
-        extraPlugins: 'uploadimage,divarea',
+        extraPlugins: 'uploadimage',
         imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
         toolbar: [
             {

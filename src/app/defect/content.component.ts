@@ -1,8 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from "@angular/router";
+import {MdDialog, MdDialogRef} from '@angular/material';
 import { HttpService } from '../http.service';
 import { DefectService } from '../defect.service';
 import { ProjectService } from '../project.service';
+import { PlanService } from '../plan.service';
+
 
 @Component({
   selector: 'app-content',
@@ -21,25 +24,45 @@ import { ProjectService } from '../project.service';
               <table *ngIf="items" class="table">
                   <tr>
                       <th> ID </th>
-                      <th> State </th>
-                      <th> Title </th>
+                      <th>
+                      <a (click)="sortResult('status')"> Status
+                            <span *ngIf="sort.field=='status'">
+                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                            </span>
+                        </a>
+                      </th>
+                      <th> 
+                        <a (click)="sortResult('severity')">Severity
+                            <span *ngIf="sort.field=='severity'">
+                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                            </span>
+                        </a>
+                      </th>
+                      <th> 
+                        <a (click)="sortResult('title')">Title
+                            <span *ngIf="sort.field=='title'">
+                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                            </span>
+                        </a>
+                      </th>
                       <th> Owner </th>
                       <th> Operations </th>
                   </tr>
                   <tr *ngFor="let item of visibleItems()">
                       <td> {{item.id}} </td>
-                      <td> {{item.state}} </td>
+                      <td> {{item.status}} </td>
+                      <td> {{item.severity}} </td>
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
                       <td *ngIf="item.owner"> {{item.owner.name}} </td>
                       <td *ngIf="!item.owner"> Unassigned </td>
                       <td>
                           <button 
-                              *ngIf="item.state == 'Created'"
+                              *ngIf="item.status == 'Created'"
                               [disabled]="requesting"
                               (click)="startFix(item)"
                                 class="btn btn-default btn-sm">Start Fix</button>
                           <button 
-                              *ngIf="item.state == 'Fixed'"
+                              *ngIf="item.status == 'Fixed'"
                               [disabled]="requesting"
                               (click)="startTest(item)"
                               class="btn btn-default btn-sm">Start Test</button>
@@ -68,7 +91,7 @@ import { ProjectService } from '../project.service';
 })
 export class ContentComponent {
     private items = [];
-    private sort: any;
+    private sort = {field: 'id', order: 'desc'};
     private requesting = false;
     private loading = false;
 
@@ -76,7 +99,8 @@ export class ContentComponent {
     private hideClosed = true;
 
     constructor(
-         private router: Router,
+        public dialog: MdDialog,
+        private router: Router,
         private http: HttpService,
         private defects: DefectService,
         private projectSerivce: ProjectService) {
@@ -89,7 +113,11 @@ export class ContentComponent {
         this.loading = true;
         let search = {};
         if (this.project) search['project'] = this.project.id;
-
+        if (this.sort['field']) {
+            search['sortBy'] = this.sort.field;
+            if (this.sort.order == 'desc') 
+                search['desc'] = 'true';
+        }
         this.defects.load(search)
             .finally(() => this.loading = false)
             .subscribe(stories => this.items = stories);
@@ -97,21 +125,28 @@ export class ContentComponent {
 
     visibleItems() {
         if (this.hideClosed) {
-            return this.items.filter(item => item.status != 'Finished');
+            return this.items.filter(item => item.status != 'Tested');
         }
         return this.items;
     }
 
     startFix(item) {
-        this.requesting = true;
-        this.http.post('/api/defects/' + item.id + '/fix', '{}')
-            .finally(() => this.requesting = false)
-            .subscribe(
-            () => this.loadItems(),
-            (resp) => {
-                window.alert('Error occurred: ' + resp.json()['error'])
-            }
-            );
+        let dialogRef = this.dialog.open(SelectPlanDialog);
+        dialogRef.afterClosed().subscribe(result => {
+            if (!result) 
+                return;
+
+            this.requesting = true;
+            this.http.post('/api/defects/' + item.id + '/fix', JSON.stringify({planId: result}))
+                .finally(() => this.requesting = false)
+                .subscribe(
+                () => this.loadItems(),
+                (resp) => {
+                    window.alert('Error occurred: ' + resp.json()['error'])
+                });
+        });
+
+        
     }
 
     startTest(item) {
@@ -128,14 +163,10 @@ export class ContentComponent {
         this.router.navigate(['/defects/' + item.id]);
     }
 
-    // private addChild(us) {
-    //     this.router.navigate(['story', 'new'], 
-    //         {relativeTo: this.route,  queryParams: { type: 'UserStory', parent: us.id }});
-    // }
-
     private filterChange(e) {
         this.loadItems();
     }
+
 
     private sortResult(field) {
         if (field == this.sort.field)
@@ -145,5 +176,29 @@ export class ContentComponent {
 
         this.sort.field = field;
         this.loadItems();
+    }
+}
+
+@Component({
+    selector: 'select-plan-dialog',
+    template: `
+    <h1 md-dialog-title>Create Task</h1>
+    <div md-dialog-content>
+        You are about to create a task in following plan:
+        <div>{{plan.name}}</div>
+    </div>
+    <div md-dialog-actions>
+    <button md-button (click)="dialogRef.close(plan.id)">OK</button>
+    <button md-button (click)="dialogRef.close(null)">Cancel</button>
+    </div>
+    `
+})
+export class SelectPlanDialog {
+    private plan = {};
+
+    constructor(
+        public dialogRef: MdDialogRef<SelectPlanDialog>,
+        private plans: PlanService) {
+        this.plans.current().subscribe(p => this.plan = p);
     }
 }

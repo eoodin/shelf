@@ -30,6 +30,8 @@ Separate user story from work-items
     select title,description,status,points,projectId,creatorId, createdAt,updatedAt from items where type='UserStory';
   insert into defects (title, description, severity, status, projectId, creatorId, ownerId, createdAt, updatedAt) 
     select title, description, severity, status, projectId, creatorId, ownerId, createdAt, updatedAt from items where type='Defect';
+  update defects set status='Created' where status is null;
+  update defects set severity='Major' where severity is null;
 If tree info need to be preserved, additional data fix needed.
   delete from changes where itemId in (select id from items where type='UserStory');
   delete from items where type='UserStory' and parentId is not null;

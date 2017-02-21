@@ -1,19 +1,6 @@
 module.exports = function(router) {
     var models = require('../models');
 
-    function currentPlan(pid) {
-        // TODO: the timezone difference between db and node could cause query failure.
-        var now = new Date();
-        return models.plan.findOne({
-            where: {
-                start: {$lt: now},
-                end: {$gt: now},
-                projectId: pid,
-                type: 'sprint'
-            }
-        });
-    }
-
     router.route('/defects')
         .get(function(req, res) {
             var ob = req.query.sortBy ? req.query.sortBy : 'id';
@@ -24,8 +11,8 @@ module.exports = function(router) {
                 ob = [[ob, 'desc']]
             }
             let where = {};
-            if (req.query.projectId) {
-                where = {projectId: req.query.projectId};
+            if (req.query.project) {
+                where = {projectId: req.query.project};
             }
 
             if (req.query.status) {
@@ -33,11 +20,11 @@ module.exports = function(router) {
                 where['status'] = {$in : status};
             }
 
-            models.item.findAll({
+            models.defect.findAll({
                 where: where,
                 order: ob
-            }).then(function(items) {   
-                res.json(items);
+            }).then(function(defects) {   
+                res.json(defects);
             })
         })
         .post(function(req, res) {
@@ -58,9 +45,9 @@ module.exports = function(router) {
                     projectId: (req.body.projectId || null),
                     severity: req.body.severity
                 };
-                var item = models.item.build(def);
-                item.save().then(function (item) {
-                    res.json(item.id);
+                var defect = models.defect.build(def);
+                defect.save().then(function (defect) {
+                    res.json(defect.id);
                 })
             }).catch(function(errors){
                 console.log("Error: " + JSON.stringify(errors));
@@ -70,15 +57,15 @@ module.exports = function(router) {
 
     router.route('/defects/:id')
         .get(function(req, res) {
-            models.item.findById(req.params.id).then(function(item) {
-                res.json(item);
+            models.defect.findById(req.params.id).then(function(d) {
+                res.json(d);
             }).catch(function(errors){
                 console.log("Error: " + JSON.stringify(errors));
                 res.sendStatus(500);
             });
         })
         .patch(function(req, res) {
-            models.item.findById(req.params.id).then(function(item) {
+            models.defect.findById(req.params.id).then(function(d) {
                 var origin = {};
                 var changes = {};
                 for(let f in req.body) {
@@ -86,14 +73,14 @@ module.exports = function(router) {
                         continue;
                     }
 
-                    if (item[f] != req.body[f]) {
-                        origin[f] = item[f];
+                    if (d[f] != req.body[f]) {
+                        origin[f] = d[f];
                         changes[f] = req.body[f];
                     }
                 }
 
-                item.update(changes).then(function(item) {
-                    res.json(item);
+                d.update(changes).then(function(d) {
+                    res.json(d);
                 });
             }).catch(function(errors){
                 console.log("Error: " + JSON.stringify(errors));
@@ -101,8 +88,8 @@ module.exports = function(router) {
             });
         })
         .delete(function(req, res){
-            models.item.findById(req.params.id).then(function(item) {
-                item.destroy().then(function(item) {
+            models.defect.findById(req.params.id).then(function(d) {
+                d.destroy().then(function(d) {
                     res.json(req.params.id);
                 })
                 .catch(function(errors){
@@ -115,19 +102,17 @@ module.exports = function(router) {
             });
         });
 
-
-
     router.route('/defects/:id/fix')
         .post(function(req, res) {
-            models.sequelize.transaction(function(t) {
-                return models.item.findById(req.params.id)
-                    .then(function(defect) {
-                        return currentPlan(defect.projectId).then(function(plan) {
-                            if (!plan) {
-                                throw new Error('Cannot locate current plan.');
-                            }
+            if (!req.body.planId) {
+                res.sendStatus(404);
+                return;
+            }
 
-                            return models.item.create({
+            models.sequelize.transaction(function(t) {
+                return models.defect.findById(req.params.id)
+                    .then(function(defect) {
+                        return models.item.create({
                                 type:'Task',
                                 catalog:  'Development',
                                 status: 'InProgress',
@@ -138,13 +123,13 @@ module.exports = function(router) {
                                 projectId: defect.projectId,
                                 ownerId: req.user.id,
                                 parentId: defect.id,
-                                planId: plan.id
+                                planId: req.body.planId
                             }).then(function(task) {
                                 // change log writing is missing, aspect programming?
-                                return defect.update({status: 'InProgress', state: 'Fixing'});
-                                res.json(task)
+                                return defect.update({status: 'Fixing'}).then(function() {
+                                    res.json(task);
+                                });
                             });
-                        });
                     });
             }).then(function() {
                 res.end();
@@ -156,14 +141,13 @@ module.exports = function(router) {
 
     router.route('/defects/:id/test')
         .post(function(req, res) {
-            models.sequelize.transaction(function(t) {
-                return models.item.findById(req.params.id).then(function(defect) {
-                    return currentPlan(defect.projectId).then(function(plan) {
-                        if (!plan) {
-                            return res.status(501).json({error: 'Cannot locate current plan.'})
-                        }
+            if (!req.body.planId) {
+                res.sendStatus(404);
+            }
 
-                        return models.item.create({
+            models.sequelize.transaction(function(t) {
+                return models.defect.findById(req.params.id).then(function(defect) {
+                    return models.item.create({
                             type:'Task',
                             catalog:  'Testing',
                             status: 'InProgress',
@@ -174,13 +158,12 @@ module.exports = function(router) {
                             projectId: defect.projectId,
                             ownerId: req.user.id,
                             parentId: defect.id,
-                            planId: plan.id
+                            planId: req.body.planId
                         }).then(function(task){
-                            return defect.update({status: 'InProgress', state: 'Testing'}).then(function() {
+                            return defect.update({status: 'Testing'}).then(function() {
                                 res.json({});
                             });
                         });
-                    });
                 });
             }).then(function(){
                 res.end();

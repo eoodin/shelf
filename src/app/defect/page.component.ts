@@ -8,7 +8,7 @@ import { Router, ActivatedRoute } from "@angular/router";
       <div class="info">
           <project-selector></project-selector>
           <div class="operations">
-              <button class="btn btn-primary" (click)="newStory()">Add Story</button>
+              <a md-button routerLink="./new">New Defect</a>
           </div>
         </div>
       <router-outlet></router-outlet>
