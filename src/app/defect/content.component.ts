@@ -55,7 +55,7 @@ import { PlanService } from '../plan.service';
                   </tr>
                   <tr *ngFor="let item of visibleItems()">
                       <td> {{item.id}} </td>
-                      <td>
+                      <td class="changeable">
                         <button md-button [mdMenuTriggerFor]="statusMenu">{{item.status}}</button>
                             <md-menu #statusMenu="mdMenu">
                             <button *ngFor="let st of settableStatus(item)" (click)="changeStatus(item, st)"  md-menu-item>{{st}}</button>
@@ -65,17 +65,9 @@ import { PlanService } from '../plan.service';
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
                       <td *ngIf="item.owner"> {{item.owner.name}} </td>
                       <td *ngIf="!item.owner"> Unassigned </td>
-                      <td>
-                          <button 
-                              *ngIf="item.status == 'Open'"
-                              [disabled]="requesting"
-                              (click)="startFix(item)"
-                                class="btn btn-default btn-sm">Start Fix</button>
-                          <button 
-                              *ngIf="item.status == 'Fixed'"
-                              [disabled]="requesting"
-                              (click)="startTest(item)"
-                              class="btn btn-default btn-sm">Start Test</button>
+                      <td class="changeable">
+                        <a *ngIf="item.status == 'Open'" (click)="startFix(item)"  md-button>Start Fix</a>
+                        <a *ngIf="item.status == 'Fixed'" (click)="startTest(item)"  md-button>Start Test</a>
                       </td>
                   </tr>
               </table>
@@ -94,6 +86,7 @@ import { PlanService } from '../plan.service';
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
     .plan-head ul li span {font-weight: normal}
     .item-table{position:relative;}
+    td.changeable button, td.changeable a {line-height: 1.4em;}
     .material-icons.button {cursor: pointer;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
     .type-and-id input { display: inline-block; }
@@ -135,17 +128,18 @@ export class ContentComponent {
 
     visibleItems() {
         if (this.hideClosed) {
-            return this.items.filter(item => item.status != 'Tested');
+            return this.items.filter(item => item.status != 'Closed');
         }
+
         return this.items;
     }
 
     private settableStatus(item) {
-        let allStatus = ['Open', 'Declined', 'Fixing', 'Fixed', 'Testing', 'Tested', 'Failed'];
+        let allStatus = ['Open', 'Declined', 'Fixing', 'Fixed', 'Testing', 'Failed', 'Closed'];
         let i = allStatus.indexOf(item.status);
 
         // Make reopen possible
-        if (item.status == 'Declined' || item.status == 'Failed')
+        if (item.status == 'Declined' || item.status == 'Failed' || item.status == 'Closed')
             return ['Open'];
 
         return allStatus.splice(i + 1, 2);

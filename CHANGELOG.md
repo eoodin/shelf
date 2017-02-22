@@ -32,7 +32,7 @@ Separate user story from work-items
     select title, description, severity, status, projectId, creatorId, ownerId, createdAt, updatedAt from items where type='Defect';
   update defects set status='Created' where status is null;
   update defects set severity='Major' where severity is null;
-  alter table defects modify column status enum('Open', 'Analyzing', 'Declined', 'Fixing', 'Fixed', 'Testing', 'Tested', 'Failed');
+  alter table defects modify column status enum('Open', 'Analyzing', 'Declined', 'Fixing', 'Fixed', 'Testing', 'Failed', 'Closed');
   update defects set status='Open' where status = '';
 If tree info need to be preserved, additional data fix needed.
   delete from changes where itemId in (select id from items where type='UserStory');
