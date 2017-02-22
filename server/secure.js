@@ -65,8 +65,8 @@ module.exports = function(app) {
                 if (err) { return next(err); }
                 if (!user) { return res.json({"result": "failed"}); }
                 user['id'] = user['uid'];
-                models.user.findById(user['id']).then(function(user) {
-                    if (!user) {
+                models.user.findById(user['id']).then(function(fu) {
+                    if (!fu) {
                         models.user.create({
                             id: user['id'],
                             name: user['displayName'],

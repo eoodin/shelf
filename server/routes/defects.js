@@ -16,8 +16,18 @@ module.exports = function(router) {
                 where = {projectId: req.query.project};
             }
             
+            let excludeStatus = [];
+            
             if (req.query.noclosed == 'true') {
-                where['status'] = {$ne: 'Closed'}
+                excludeStatus.push('Closed');
+            }
+
+            if (req.query.nodeclined == 'true') {
+                excludeStatus.push('Declined');
+            }
+
+            if (excludeStatus.length) {
+                where['status'] = {$notIn: excludeStatus}
             }
             if (req.query.ownonly == 'true') {
                 where['ownerId'] = req.user.id;

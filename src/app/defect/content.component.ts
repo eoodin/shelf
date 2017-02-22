@@ -19,6 +19,7 @@ import { UserService } from '../user.service'
               <div class="panel-heading work-items-heading">
                 <div class="heding-right">
                     <md-checkbox [(ngModel)]="hideClosed" (change)="filterChange($event)">Hide Closed</md-checkbox>
+                    <md-checkbox [(ngModel)]="hideDeclined" (change)="filterChange($event)">Hide Declined</md-checkbox>
                     <md-checkbox [(ngModel)]="onlyOwned" (change)="filterChange($event)">Mine Only</md-checkbox>
                 </div>
               </div>
@@ -101,6 +102,7 @@ export class ContentComponent {
 
     private project;
     private hideClosed = true;
+    private hideDeclined = true;
     private onlyOwned = false;
 
     constructor(
@@ -127,8 +129,9 @@ export class ContentComponent {
                 search['desc'] = 'true';
         }
         if (this.hideClosed) search['noclosed'] = 'true';
-        if (this.onlyOwned) search['ownonly'] = 'true';
-        
+        if (this.onlyOwned) search['ownonly'] = 'true';        
+        if (this.hideDeclined) search['nodeclined'] = 'true';
+
         this.defects.load(search)
             .finally(() => this.loading = false)
             .subscribe(stories => this.items = stories);
