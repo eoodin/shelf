@@ -1,7 +1,8 @@
-import {Component, Input, Output, EventEmitter, ViewChild, OnInit } from '@angular/core';
-import {Http} from '@angular/http';
-import {ModalDirective} from 'ng2-bootstrap';
-import {ProjectService} from "../project.service";
+import { Component, Input, Output, EventEmitter, ViewChild, OnInit } from '@angular/core';
+import { Http } from '@angular/http';
+import { ModalDirective } from 'ng2-bootstrap';
+import { ProjectService } from "../project.service";
+import { TaskService } from '../task.service';
 
 declare var CKEDITOR;
 
@@ -90,6 +91,7 @@ export class ItemDetail implements OnInit {
     private initialized;
     private _item: Object = {};
     private _type: string = 'Task';
+    private project = {};
     private editorConfig = {
         extraPlugins: 'uploadimage',
         imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
@@ -98,9 +100,9 @@ export class ItemDetail implements OnInit {
                 name: 'styles',
                 items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']
             },
-            {name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar']},
-            {name: 'tools', items: ['Maximize']}
-            ]
+            { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+            { name: 'tools', items: ['Maximize'] }
+        ]
     };
 
     @ViewChild('detailDialog')
@@ -113,7 +115,9 @@ export class ItemDetail implements OnInit {
     public saved: EventEmitter<Object> = new EventEmitter();
 
     constructor(private http: Http,
-                private prjs: ProjectService) {
+        private tasks: TaskService,
+        private prjs: ProjectService) {
+        prjs.current.subscribe(p => this.project = p);
     }
 
     ngOnInit() {
@@ -148,13 +152,15 @@ export class ItemDetail implements OnInit {
     saveItem() {
         var data = JSON.parse(JSON.stringify(this._item));
         if (!data['id']) {
-            data.projectId = this.prjs.current.getValue()['id'];
-            this.http.post('/api/tasks/', JSON.stringify(data))
-                .subscribe(resp => this.saved.emit(resp));
+            data.projectId = this.project['id'];
+            this.tasks.create(data)
+                .subscribe(result => this.saved.emit(result));
         }
         else {
-            this.http.patch('/api/tasks/' + data['id'], JSON.stringify(data))
-                .subscribe(resp => this.saved.emit(resp));
+            let id = data['id'];
+            delete data['id'];
+            this.tasks.save(id, data)
+                .subscribe(result => this.saved.emit(result));
         }
 
         this.showChange.emit(false);

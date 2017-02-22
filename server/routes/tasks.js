@@ -92,9 +92,25 @@ module.exports = function(router) {
                 console.log("Error: " + JSON.stringify(errors));
                 res.sendStatus(500);
             });
+        })
+        .patch(function(req, res){
+            let ids = req.body.ids;
+            if (!ids || !ids.length) {
+                return res.sendStatus(404);
+            }
+
+            let changes = req.body.changes;
+            console.log(JSON.stringify(changes));
+            models.task.update(changes, {
+                where: {
+                    id: { $in: ids }
+                }
+            }).then(function (affected) {
+                res.json(affected);
+            })
         });
 
-    router.route('/tasks/:id')
+    router.route('/task/:id')
         .get(function(req, res) {
             models.task.findById(req.params.id).then(function(task) {
                 res.json(task);
@@ -159,23 +175,5 @@ module.exports = function(router) {
                 console.log("Error: " + JSON.stringify(errors));
                 res.sendStatus(500);
             });
-        });
-
-    router.route('/tasks/bunch')
-        .patch(function(req, res){
-            let ids = req.body.ids;
-            if (!ids || !ids.length) {
-                // TODO: Check and correct.
-                return res.sendStatus(404);
-            }
-
-            let changes = req.body.changes;
-            models.task.update(changes, {
-                where: {
-                    id: { $in: ids }
-                }
-            }).then(function (affected) {
-                res.json(affected);
-            })
         });
 };
