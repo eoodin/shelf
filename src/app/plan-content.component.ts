@@ -20,9 +20,9 @@ import { TaskService } from './task.service';
             <div class="project-info">
                 <div class="project-operations">
                     <iframe #downloader style="display:none;"></iframe>
-                    <button (click)="exportCsv()" class="btn btn-primary">
-                        <i class="glyphicon glyphicon-export" aria-hidden="true"></i> Export as CSV
-                    </button>
+                    <button md-button (click)="exportCsv()"><i class="glyphicon glyphicon-export" aria-hidden="true"></i>Export as CSV</button>
+                    <button md-button (click)="showAddItem()">New Task...</button>
+                    <button md-button (click)="ui.mtd.show = true" [disabled]="!selectedIds().length">Move...</button>
                 </div>
             </div>
             <div class="plan-body">
@@ -33,10 +33,7 @@ import { TaskService } from './task.service';
                     <div class="panel panel-default">
                         <div class="panel-heading work-items-heading">
                             <div>
-                                <label>
-                                    <input type="checkbox" [(ngModel)]="hideFinished"  (click)="onHideFinishedCheck()"/>
-                                    Hide Finished
-                                </label>
+                                <md-checkbox [(ngModel)]="hideFinished" (change)="onHideFinishedCheck()">Hide Finished</md-checkbox>
                             </div>
                         </div>
                         <table *ngIf="workItems" class="table">
@@ -146,14 +143,6 @@ import { TaskService } from './task.service';
                         </table>
                     </div>
                 </div>
-                <div class="buttom-row">
-                    <div class="col-sm-2">
-                        <button class="btn btn-primary" (click)="showAddItem()">Add Work Item...</button>
-                    </div>
-                    <div class="col-sm-6">
-                        <button class="btn btn-primary" (click)="ui.mtd.show = true">Move To...</button>
-                    </div>
-                </div>
             </div>
         </div>
   
@@ -257,7 +246,7 @@ export class PlanContentComponent {
     }
 
     moveItemsToPlan(planId) {
-        var ids = this.getSelectedWorkItemIds();
+        var ids = this.selectedIds();
         if (!ids.length) {
             alert("No selected work item.");
             return;
@@ -380,7 +369,7 @@ export class PlanContentComponent {
         this.downloader.nativeElement.src = '/api/tasks/?format=csv&planId=' + this.current['id']
     }
 
-    private getSelectedWorkItemIds() {
+    private selectedIds() {
         return this.visibleItems().filter(i => i.checked).map(i => i.id);
     }
 

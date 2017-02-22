@@ -10,14 +10,17 @@ module.exports = function(router) {
             if (req.query.desc) {
                 ob = [[ob, 'desc']]
             }
+
             let where = {};
             if (req.query.project) {
                 where = {projectId: req.query.project};
             }
-
-            if (req.query.status) {
-                let status = req.query.status.split(',');
-                where['status'] = {$in : status};
+            
+            if (req.query.noclosed == 'true') {
+                where['status'] = {$ne: 'Closed'}
+            }
+            if (req.query.ownonly == 'true') {
+                where['ownerId'] = req.user.id;
             }
 
             models.defect.findAll({

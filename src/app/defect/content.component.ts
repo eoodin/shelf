@@ -5,7 +5,7 @@ import { HttpService } from '../http.service';
 import { DefectService } from '../defect.service';
 import { ProjectService } from '../project.service';
 import { PlanService } from '../plan.service';
-
+import { UserService } from '../user.service'
 
 @Component({
   selector: 'app-content',
@@ -19,6 +19,7 @@ import { PlanService } from '../plan.service';
               <div class="panel-heading work-items-heading">
                 <div class="heding-right">
                     <md-checkbox [(ngModel)]="hideClosed" (change)="filterChange($event)">Hide Closed</md-checkbox>
+                    <md-checkbox [(ngModel)]="onlyOwned" (change)="filterChange($event)">Mine Only</md-checkbox>
                 </div>
               </div>
               <table *ngIf="items" class="table">
@@ -53,7 +54,7 @@ import { PlanService } from '../plan.service';
                       </th>
                       <th> Operations </th>
                   </tr>
-                  <tr *ngFor="let item of visibleItems()">
+                  <tr *ngFor="let item of items">
                       <td> {{item.id}} </td>
                       <td class="changeable">
                         <button md-button [mdMenuTriggerFor]="statusMenu">{{item.status}}</button>
@@ -95,18 +96,22 @@ import { PlanService } from '../plan.service';
 export class ContentComponent {
     private items = [];
     private sort = {field: 'id', order: 'desc'};
-    private requesting = false;
     private loading = false;
+    private user;
 
     private project;
     private hideClosed = true;
+    private onlyOwned = false;
 
     constructor(
         public dialog: MdDialog,
         private router: Router,
         private http: HttpService,
         private defects: DefectService,
+        private userService: UserService,
         private projectSerivce: ProjectService) {
+
+        this.userService.currentUser.subscribe(u => this.user = u);
         this.projectSerivce.current
             .do(p => this.project = p)
             .subscribe(() => this.loadItems());
@@ -121,17 +126,12 @@ export class ContentComponent {
             if (this.sort.order == 'desc') 
                 search['desc'] = 'true';
         }
+        if (this.hideClosed) search['noclosed'] = 'true';
+        if (this.onlyOwned) search['ownonly'] = 'true';
+        
         this.defects.load(search)
             .finally(() => this.loading = false)
             .subscribe(stories => this.items = stories);
-    }
-
-    visibleItems() {
-        if (this.hideClosed) {
-            return this.items.filter(item => item.status != 'Closed');
-        }
-
-        return this.items;
     }
 
     private settableStatus(item) {
@@ -151,9 +151,9 @@ export class ContentComponent {
             if (!result) 
                 return;
 
-            this.requesting = true;
+            this.loading = true;
             this.http.post('/api/defect/' + item.id + '/fix', JSON.stringify({planId: result}))
-                .finally(() => this.requesting = false)
+                .finally(() => this.loading = false)
                 .subscribe(
                 () => this.loadItems(),
                 (resp) => {
@@ -168,9 +168,9 @@ export class ContentComponent {
             if (!result) 
                 return;
 
-            this.requesting = true;
+            this.loading = true;
             this.http.post('/api/defect/' + item.id + '/test', JSON.stringify({planId: result}))
-                .finally(() => this.requesting = false)
+                .finally(() => this.loading = false)
                 .subscribe(
                 () => this.loadItems(),
                 (resp) => {
