@@ -17,13 +17,14 @@ export class DefectService {
   }
 
   public single(id) {
-    return this.http.get('/api/defects/' + id).map(resp => resp.json());
+    return this.http.get('/api/defect/' + id).map(resp => resp.json());
   }
 
-  public save(data) {
-    if (!data['id']) {
-      return this.http.post('/api/defects/', JSON.stringify(data)) .map(resp => resp.json());
-    }
-    return this.http.patch('/api/defects/' + data['id'], JSON.stringify(data)) .map(resp => resp.json());
+  public save(id, changes) {
+    return this.http.patch('/api/defect/' + id, JSON.stringify(changes));
+  }
+
+  public create(data) {
+    return this.http.post('/api/defects/', JSON.stringify(data)) .map(resp => resp.json());
   }
 }

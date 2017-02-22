@@ -16,36 +16,11 @@ declare var CKEDITOR;
             <button type="button" class="close" (click)="dialog.hide();" aria-label="Close">
             <span aria-hidden="true">&times;</span>
             </button>
-            <h4 class="modal-title">Item details</h4>
+            <h4 class="modal-title">{{(_item.id ? 'Task Details' : 'Adding Task...') }}</h4>
         </div>
         <div class="modal-body">
           <div class="item-details">
             <form (ngSubmit)="saveItem()">
-                <div class="row" >
-                    <div class="col-sm-12">
-                        Type:
-                        <select *ngIf="!_item.id" [(ngModel)]="_item.type" [ngModelOptions]="{standalone: true}" [disabled]="_type">
-                            <option value="UserStory" selected="selected">User Story</option>
-                            <option value="Task">Task</option>
-                            <option value="Defect">Defect</option>
-                        </select>
-                        <span *ngIf="_item.id">{{_item.type}}</span>
-                    </div>
-                </div>
-                <div *ngIf="_item.type == 'Defect'" class="row">
-                    <div class="col-sm-12">Severity:
-                        <label><input #s1 type="radio" [checked]="_item.severity==s1.value" (click)="_item.severity=s1.value" value="Blocker">Blocker</label>
-                        <label><input #s2 type="radio" [checked]="_item.severity==s2.value" (click)="_item.severity=s2.value" value="Critical">Critical</label>
-                        <label><input #s3 type="radio" [checked]="_item.severity==s3.value" (click)="_item.severity=s3.value" value="Major">Major</label>
-                        <label><input #s4 type="radio" [checked]="_item.severity==s4.value" (click)="_item.severity=s4.value" value="Minor">Minor</label>
-                    </div>
-                </div>
-                <div *ngIf="_item.type == 'Defect'" class="row">
-                    <div class="col-sm-12 field-row">
-                        <span class="field-label">Found in:</span>
-                        <input [(ngModel)]="_item.version" [ngModelOptions]="{standalone: true}">
-                    </div>
-                </div>
                 <div class="row">
                     <div class="col-sm-12 field-row">
                         <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="_item.title" [ngModelOptions]="{standalone: true}">
@@ -59,11 +34,8 @@ declare var CKEDITOR;
                         <ckeditor [(ngModel)]="_item.description" [config]="editorConfig" [ngModelOptions]="{standalone: true}" debounce="400"></ckeditor>
                     </div>
                 </div>
-                <div *ngIf="_item.type == 'Task'" class="row">
+                <div class="row">
                     <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="_item.estimation" [ngModelOptions]="{standalone: true}"></div>
-                </div>
-                <div class="row" *ngIf="_item.type == 'UserStory'">
-                    <div class="col-sm-12">Story Points: <input type="text" [(ngModel)]="_item.points" [ngModelOptions]="{standalone: true}" value="0"></div>
                 </div>
             </form>
         </div>
@@ -90,7 +62,6 @@ declare var CKEDITOR;
 export class ItemDetail implements OnInit {
     private initialized;
     private _item: Object = {};
-    private _type: string = 'Task';
     private project = {};
     private editorConfig = {
         extraPlugins: 'uploadimage',
@@ -138,11 +109,6 @@ export class ItemDetail implements OnInit {
     @Input()
     public set item(i: Object) {
         this._item = i || {};
-    }
-
-    @Input()
-    public set type(t: string) {
-        this._type = t;
     }
 
     showChanged(e: boolean) {

@@ -11,7 +11,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         status: {
             type: DataTypes.ENUM,
-            values: ['Created', 'Analyzing', 'Analyzed', 'Fixing', 'Fixed', 'Testing', 'Tested', 'Failed']
+            values: ['Open', 'Analyzing', 'Declined', 'Fixing', 'Fixed', 'Testing', 'Tested', 'Failed']
         }
     }, {
             classMethods: {

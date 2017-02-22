@@ -23,7 +23,6 @@ import { TaskService } from './task.service';
                     <button (click)="exportCsv()" class="btn btn-primary">
                         <i class="glyphicon glyphicon-export" aria-hidden="true"></i> Export as CSV
                     </button>
-                    <button class="btn btn-warning" (click)="showAddItem('Defect')">Report Problem</button>
                 </div>
             </div>
             <div class="plan-body">
@@ -90,9 +89,7 @@ import { TaskService } from './task.service';
                                     </label>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.type=='UserStory'" class="us glyphicon glyphicon-edit"></span>
-                                    <span *ngIf="item.type=='Defect'" class="defect glyphicon glyphicon-fire"></span>
-                                    <span *ngIf="item.type=='Task'" class="task glyphicon glyphicon-check"></span>
+                                    <span  class="task glyphicon glyphicon-check"></span>
                                     <a (click)="showItem(item)">{{item.title}}</a>
                                 </td>
                                 <td>
@@ -183,7 +180,6 @@ import { TaskService } from './task.service';
     </modal-dialog>
     <item-detail [item]="ui.awd.item"
                  [(show)]="ui.awd.show"
-                 [type]="ui.awd.type"
                  (saved)="onWorkSaved();">
     </item-detail>
     `,
@@ -272,14 +268,8 @@ export class PlanContentComponent {
             .subscribe(resp => this.loadWorkItems());
     }
 
-    showAddItem(type) {
+    showAddItem() {
         this.ui.awd.item = { 'planId': this.current['id'] };
-        this.ui.awd.type = type;
-        if (type) {
-            this.ui.awd.item.type = type;
-            this.ui.awd.item.severity = 'Major';
-        }
-
         this.ui.awd.show = true;
     }
 

@@ -45,19 +45,29 @@ import { PlanService } from '../plan.service';
                             </span>
                         </a>
                       </th>
-                      <th> Owner </th>
+                      <th> <a (click)="sortResult('owner')">Owner
+                            <span *ngIf="sort.field=='owner'">
+                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                            </span>
+                        </a> 
+                      </th>
                       <th> Operations </th>
                   </tr>
                   <tr *ngFor="let item of visibleItems()">
                       <td> {{item.id}} </td>
-                      <td> {{item.status}} </td>
+                      <td>
+                        <button md-button [mdMenuTriggerFor]="statusMenu">{{item.status}}</button>
+                            <md-menu #statusMenu="mdMenu">
+                            <button *ngFor="let st of settableStatus(item)" (click)="changeStatus(item, st)"  md-menu-item>{{st}}</button>
+                        </md-menu>
+                      </td>
                       <td> {{item.severity}} </td>
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
                       <td *ngIf="item.owner"> {{item.owner.name}} </td>
                       <td *ngIf="!item.owner"> Unassigned </td>
                       <td>
                           <button 
-                              *ngIf="item.status == 'Created'"
+                              *ngIf="item.status == 'Open'"
                               [disabled]="requesting"
                               (click)="startFix(item)"
                                 class="btn btn-default btn-sm">Start Fix</button>
@@ -130,6 +140,17 @@ export class ContentComponent {
         return this.items;
     }
 
+    private settableStatus(item) {
+        let allStatus = ['Open', 'Declined', 'Fixing', 'Fixed', 'Testing', 'Tested', 'Failed'];
+        let i = allStatus.indexOf(item.status);
+
+        // Make reopen possible
+        if (item.status == 'Declined' || item.status == 'Failed')
+            return ['Open'];
+
+        return allStatus.splice(i + 1, 2);
+    }
+
     startFix(item) {
         let dialogRef = this.dialog.open(SelectPlanDialog);
         dialogRef.afterClosed().subscribe(result => {
@@ -137,7 +158,7 @@ export class ContentComponent {
                 return;
 
             this.requesting = true;
-            this.http.post('/api/defects/' + item.id + '/fix', JSON.stringify({planId: result}))
+            this.http.post('/api/defect/' + item.id + '/fix', JSON.stringify({planId: result}))
                 .finally(() => this.requesting = false)
                 .subscribe(
                 () => this.loadItems(),
@@ -145,18 +166,23 @@ export class ContentComponent {
                     window.alert('Error occurred: ' + resp.json()['error'])
                 });
         });
-
-        
     }
 
     startTest(item) {
-        this.requesting = true;
-        this.http.post('/api/defects/' + item.id + '/test', '{}')
-            .finally(() => this.requesting = false)
-            .subscribe(
-            () => this.loadItems(),
-            () => window.alert('Error occurred.')
-            );
+        let dialogRef = this.dialog.open(SelectPlanDialog);
+        dialogRef.afterClosed().subscribe(result => {
+            if (!result) 
+                return;
+
+            this.requesting = true;
+            this.http.post('/api/defect/' + item.id + '/test', JSON.stringify({planId: result}))
+                .finally(() => this.requesting = false)
+                .subscribe(
+                () => this.loadItems(),
+                (resp) => {
+                    window.alert('Error occurred: ' + resp.json()['error'])
+                });
+        });
     }
 
     private showItem(item) {
@@ -167,6 +193,11 @@ export class ContentComponent {
         this.loadItems();
     }
 
+    private changeStatus(item, status) {
+        if (item.status == status) return;
+        this.defects.save(item.id, {status: status})
+            .subscribe(() => this.loadItems());
+    }
 
     private sortResult(field) {
         if (field == this.sort.field)

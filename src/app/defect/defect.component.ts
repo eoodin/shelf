@@ -19,6 +19,7 @@ import { DefectService } from '../defect.service';
           </md-radio-group>
       </div>
       <div class="title-row">
+          <div class="status">{{defect.status}}</div>
           <input type="text" [(ngModel)]="defect.title"> 
       </div>
       <div>
@@ -33,8 +34,9 @@ import { DefectService } from '../defect.service';
   styles: [`
   .defect-edit>div{margin: 7px 0;}
   .defect-edit>div>span {display: inline-block; width: 50px;}
+  .status {padding: 0 7px; font-weight: 700;}
   .title-row {display:flex; flex-direction: row;}
-  .title-row input {flex-grow: 1; font-weight: 800;}
+  .title-row input {flex-grow: 1; font-weight: 700;}
   md-radio-button {margin: 0 7px;}
   `]
 })
@@ -70,9 +72,17 @@ export class DefectComponent {
   private save(another) {
     var data = JSON.parse(JSON.stringify(this.defect));
     data.projectId = this.prjs.current.getValue()['id'];
+    delete data['owner'];
     this.saving = true;
-    this.defects.save(data)
-      .finally(() => this.saving = false)
-      .subscribe(() => this.defect = {});
+    if (data['id']) {
+      this.defects.save([data['id']], data)
+        .finally(() => this.saving = false)
+        .subscribe(() => this.defect = {});
+    }
+    else {
+      this.defects.create(data)
+        .finally(() => this.saving = false)
+        .subscribe(() => this.defect = {});
+    }
   }
 }

@@ -22,7 +22,8 @@ module.exports = function(router) {
 
             models.defect.findAll({
                 where: where,
-                order: ob
+                order: ob,
+                include: [{model: models.user, as: 'owner'}]
             }).then(function(defects) {   
                 res.json(defects);
             })
@@ -38,7 +39,7 @@ module.exports = function(router) {
 
             models.user.findById(req.user.id).then(function(u) {
                 let def = {
-                    status: 'Created',
+                    status: 'Open',
                     title: req.body.title,
                     description: req.body.description,
                     creatorId: u.id,
@@ -55,7 +56,7 @@ module.exports = function(router) {
             });
         });
 
-    router.route('/defects/:id')
+    router.route('/defect/:id')
         .get(function(req, res) {
             models.defect.findById(req.params.id).then(function(d) {
                 res.json(d);
@@ -102,7 +103,7 @@ module.exports = function(router) {
             });
         });
 
-    router.route('/defects/:id/fix')
+    router.route('/defect/:id/fix')
         .post(function(req, res) {
             if (!req.body.planId) {
                 res.sendStatus(404);
@@ -112,20 +113,18 @@ module.exports = function(router) {
             models.sequelize.transaction(function(t) {
                 return models.defect.findById(req.params.id)
                     .then(function(defect) {
-                        return models.item.create({
-                                type:'Task',
-                                catalog:  'Development',
+                        return models.task.create({
                                 status: 'InProgress',
                                 title: 'Fix defect #' + defect.id + ': ' + defect.title,
                                 description: 'Auto-generated task for fixing issue #' + defect.id,
                                 estimation: 8,
                                 originalEstimation: 8,
-                                projectId: defect.projectId,
                                 ownerId: req.user.id,
+                                creatorId: req.user.id,
                                 planId: req.body.planId
                             }).then(function(task) {
                                 // change log writing is missing, aspect programming?
-                                return defect.update({status: 'Fixing'}).then(function() {
+                                return defect.update({status: 'Fixing', ownerId: req.user.id}).then(function() {
                                     res.json(task);
                                 });
                             });
@@ -138,7 +137,7 @@ module.exports = function(router) {
             });
         });
 
-    router.route('/defects/:id/test')
+    router.route('/defect/:id/test')
         .post(function(req, res) {
             if (!req.body.planId) {
                 res.sendStatus(404);
@@ -146,19 +145,17 @@ module.exports = function(router) {
 
             models.sequelize.transaction(function(t) {
                 return models.defect.findById(req.params.id).then(function(defect) {
-                    return models.item.create({
-                            type:'Task',
-                            catalog:  'Testing',
+                    return models.task.create({
                             status: 'InProgress',
                             title: 'Test fix for defect #' + defect.id + ': ' + defect.title,
                             description: 'Auto-generated task for testing fixed issue #' + defect.id,
                             estimation: 8,
                             originalEstimation: 8,
-                            projectId: defect.projectId,
                             ownerId: req.user.id,
+                            creatorId: req.user.id,
                             planId: req.body.planId
                         }).then(function(task){
-                            return defect.update({status: 'Testing'}).then(function() {
+                            return defect.update({status: 'Testing', ownerId: req.user.id}).then(function() {
                                 res.json({});
                             });
                         });
