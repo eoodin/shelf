@@ -33,7 +33,8 @@ import { TaskService } from './task.service';
                     <div class="panel panel-default">
                         <div class="panel-heading work-items-heading">
                             <div>
-                                <md-checkbox [(ngModel)]="hideFinished" (change)="onHideFinishedCheck()">Hide Finished</md-checkbox>
+                                <md-checkbox [(ngModel)]="hideFinished" (change)="loadWorkItems()">Hide Finished</md-checkbox>
+                                <md-checkbox [(ngModel)]="onlyOwned" (change)="loadWorkItems()">Mine Only</md-checkbox>
                             </div>
                         </div>
                         <table *ngIf="workItems" class="table">
@@ -78,7 +79,7 @@ import { TaskService } from './task.service';
                                 <th>Remaining</th>
                                 <th>Operations</th>
                             </tr>
-                            <tr *ngFor="let item of visibleItems()">
+                            <tr *ngFor="let item of workItems">
                                 <td class="id">
                                     <label>
                                         <input class="checkbox" [(ngModel)]="item.checked" type="checkbox">
@@ -204,6 +205,7 @@ export class PlanContentComponent {
     private team;
     private ui;
     private hideFinished = false;
+    private onlyOwned = false;
     private PRI = ['High', 'Medium', 'Low'];
 
     project = null;
@@ -237,13 +239,6 @@ export class PlanContentComponent {
             .subscribe(ps => this.hideFinished = ps.hideFinished);
     }
 
-    onHideFinishedCheck() {
-        this.workItems
-            .filter(i => i.status == 'Finished')
-            .forEach(i => i.hidden = this.hideFinished);
-        this.pref.setPreference('hideFinished', this.hideFinished);
-    }
-
     moveItemsToPlan(planId) {
         var ids = this.selectedIds();
         if (!ids.length) {
@@ -275,10 +270,6 @@ export class PlanContentComponent {
         this.tasks.delete(item.id)
             .finally(() => { this.ui.rwd.show = false })
             .subscribe(() => this.loadWorkItems())
-    }
-
-    visibleItems() {
-        return this.workItems.filter(i => (!i.hidden));
     }
 
     changeStatus(item, status) {
@@ -332,6 +323,10 @@ export class PlanContentComponent {
             if (this.sort['order'] == 'desc')
                 search['desc'] = 'true';
         }
+
+        if (this.hideFinished) search['nofinished'] = 'true';
+        if (this.onlyOwned) search['ownonly'] = 'true';
+
         this.tasks.fetch(search)
             .subscribe(tasks => this.setWorkItems(tasks));
     }
@@ -357,11 +352,11 @@ export class PlanContentComponent {
     }
 
     onAllCheck(checked) {
-        this.visibleItems().forEach(item => item.checked = checked);
+        this.workItems.forEach(item => item.checked = checked);
     }
 
     allChecked(): boolean {
-        return this.visibleItems().every(item => item.checked);
+        return this.workItems.every(item => item.checked);
     }
 
     exportCsv() {
@@ -369,7 +364,7 @@ export class PlanContentComponent {
     }
 
     private selectedIds() {
-        return this.visibleItems().filter(i => i.checked).map(i => i.id);
+        return this.workItems.filter(i => i.checked).map(i => i.id);
     }
 
     private switchPlan(plan) {

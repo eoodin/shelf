@@ -4,32 +4,22 @@ module.exports = function(router) {
     router.route('/tasks')
         .get(function(req, res) {
             var ob = req.query.sortBy ? req.query.sortBy : 'id';
-            // TODO: rename this field to eleminate the code.
             if (ob == 'owner') ob = 'ownerId';
 
             if (req.query.desc) {
                 ob = [[ob, 'desc']]
             }
             let where = {};
-            if (req.query.projectId) {
-                where = {projectId: req.query.projectId};
-            }
-            else if (req.query.planId) {
+
+            if (req.query.planId) {
                 where = {planId: req.query.planId};
             }
-            
-            if (req.query.parent) {
-                where['parentId'] = req.query.parent == 'null' ? null : req.query.parent;
-            }
 
-            if (req.query.types) {
-                let types = req.query.types.split(',');
-                where['type'] = {$in : types}
+            if (req.query.nofinished == 'true') {
+                where['status'] = {$ne: 'Finished'}
             }
-
-            if (req.query.status) {
-                let status = req.query.status.split(',');
-                where['status'] = {$in : status};
+            if (req.query.ownonly == 'true') {
+                where['ownerId'] = req.user.id;
             }
 
             models.task.findAll({
@@ -47,7 +37,6 @@ module.exports = function(router) {
                     return csv(res, tasks, [
                         'id',
                         'status',
-                        'type',
                         'title',
                         { field: 'creator', title: 'Creator', map: function(f) { return f == null ? 'Unknonwn' : f.name; } },
                         { field: 'owner', title: 'Owner', map: function(f) { return f == null ? 'Unassigned' : f.name; } },
@@ -69,20 +58,14 @@ module.exports = function(router) {
 
             models.user.findById(req.user.id).then(function(u) {
                 let def = {
-                    type: req.body.type,
-                    parentId: req.body.parentId,
                     status: 'New',
-                    state: 'Created',
+                    title: req.body.title,
                     estimation: (req.body.estimation || 0),
                     originalEstimation: (req.body.estimation || 0),
-                    title: req.body.title,
                     description: req.body.description,
                     ownerId: u.id,
                     creatorId: u.id,
-                    planId: (req.body.planId || null),
-                    projectId: (req.body.projectId || null),
-                    points: req.body.points,
-                    severity: req.body.severity
+                    planId: (req.body.planId || null)
                 };
                 var task = models.task.build(def);
                 task.save().then(function (task) {
@@ -123,8 +106,9 @@ module.exports = function(router) {
             models.task.findById(req.params.id).then(function(task) {
                 var origin = {};
                 var changes = {};
+                let skipFields = ['updatedAt', 'createdAt', 'owner', 'creatorId'];
                 for(let f in req.body) {
-                    if (f == 'updatedAt' || f == 'createdAt') {
+                    if (skipFields.indexOf(f) != -1) {
                         continue;
                     }
 
@@ -133,16 +117,13 @@ module.exports = function(router) {
                         changes[f] = req.body[f];
                     }
 
-                    let toFinish = false;
                     if (f == 'estimation' && req.body[f] == 0) {
                         origin.status = task.status;
                         changes.status = 'Finished';
-                        toFinish = true;
                     }
                     else if (f == 'status' && req.body.status == 'Finished') {
                         origin.estimation = task.estimation;
                         changes.estimation = 0;
-                        toFinish = true;
                     }
                     // TODO: auto change status of defect?
                 }
