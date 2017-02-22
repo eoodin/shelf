@@ -238,11 +238,10 @@ export class PlanContentComponent {
     }
 
     onHideFinishedCheck() {
-        let hidden = !this.hideFinished;
         this.workItems
             .filter(i => i.status == 'Finished')
-            .forEach(i => i.hidden = hidden);
-        this.pref.setPreference('hideFinished', hidden);
+            .forEach(i => i.hidden = this.hideFinished);
+        this.pref.setPreference('hideFinished', this.hideFinished);
     }
 
     moveItemsToPlan(planId) {
