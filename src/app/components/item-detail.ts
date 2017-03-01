@@ -31,7 +31,7 @@ declare var CKEDITOR;
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <ckeditor [(ngModel)]="_item.description" [config]="editorConfig" [ngModelOptions]="{standalone: true}" debounce="400"></ckeditor>
+                        <rich-editor rich-editor [(content)]="_item.description"> </rich-editor>
                     </div>
                 </div>
                 <div class="row">

@@ -23,6 +23,9 @@ module.exports = function(router) {
             if (req.query.api == 'ckeditor-uploadimage') {
                 return res.json({uploaded: 1,fileName: file.id, url: '/api/file/' + file.id});
             }
+            if (req.query.api == 'tinymce') {
+                return res.json({ location : '/uploaded/image/path/image.png' + file.id});
+            }
 
             res.json(file.id);
         }).catch(function(errors){
