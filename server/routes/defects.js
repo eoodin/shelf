@@ -6,6 +6,7 @@ module.exports = function(router) {
             var ob = req.query.sortBy ? req.query.sortBy : 'id';
             // TODO: rename this field to eleminate the code.
             if (ob == 'owner') ob = 'ownerId';
+            if (ob == 'creator') ob = 'creatorId';
 
             if (req.query.desc) {
                 ob = [[ob, 'desc']]
@@ -36,7 +37,7 @@ module.exports = function(router) {
             models.defect.findAll({
                 where: where,
                 order: ob,
-                include: [{model: models.user, as: 'owner'}]
+                include: [{model: models.user, as: 'owner'}, {model: models.user, as: 'creator'}]
             }).then(function(defects) {   
                 res.json(defects);
             })

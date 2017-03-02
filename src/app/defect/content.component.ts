@@ -47,6 +47,18 @@ import { UserService } from '../user.service'
                             </span>
                         </a>
                       </th>
+                      <th> <a (click)="sortResult('creator')">Reporter
+                            <span *ngIf="sort.field=='creator'">
+                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                            </span>
+                        </a> 
+                      </th>
+                      <th> <a (click)="sortResult('createdAt')">Report Date
+                            <span *ngIf="sort.field=='createdAt'">
+                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                            </span>
+                        </a> 
+                      </th>
                       <th> <a (click)="sortResult('owner')">Owner
                             <span *ngIf="sort.field=='owner'">
                                 <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
@@ -65,8 +77,9 @@ import { UserService } from '../user.service'
                       </td>
                       <td> {{item.severity}} </td>
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
-                      <td *ngIf="item.owner"> {{item.owner.name}} </td>
-                      <td *ngIf="!item.owner"> Unassigned </td>
+                      <td><span *ngIf="item.creator">{{item.creator.name}}</span></td>
+                      <td><span> {{item.createdAt | date: 'y-MM-dd'}} </span> </td>
+                      <td><span *ngIf="item.owner">{{item.owner.name}}</span><span *ngIf="!item.owner"> Unassigned </span></td>
                       <td class="changeable">
                         <a *ngIf="item.status == 'Open'" (click)="startFix(item)"  md-button>Start Fix</a>
                         <a *ngIf="item.status == 'Fixed'" (click)="startTest(item)"  md-button>Start Test</a>
