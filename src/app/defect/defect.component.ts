@@ -45,7 +45,7 @@ export class DefectComponent {
   private saving;
 
   private editorConfig = {
-    extraPlugins: 'uploadimage',
+    extraPlugins: 'uploadimage,divarea',
     imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
     toolbar: [
       {

@@ -36,7 +36,6 @@ import { PageComponent as DefectPage } from './defect/page.component';
 import { ContentComponent as DefectContent, SelectPlanDialog } from './defect/content.component';
 import { DefectComponent as DefectDetail } from './defect/defect.component';
 import { ProjectSelectorComponent } from './components/project-selector.component';
-import { RichEditorComponent } from './components/richeditor.component';
 
 let routes = [
     { path: '', pathMatch: 'full', redirectTo: 'plans' },
@@ -98,8 +97,7 @@ export class ShelfRequestOptions extends RequestOptions {
         DefectPage,
         DefectDetail,
         DefectContent,
-        ProjectSelectorComponent,
-        RichEditorComponent
+        ProjectSelectorComponent
     ],
     providers: [
         NotifyService,

@@ -49,3 +49,9 @@ If tree info need to be preserved, additional data fix needed.
   execute stmt;
   deallocate prepare stmt;
   alter table changes drop column itemId;
+
+2017-03-02
+  alter table tasks modify column description longtext;
+  alter table defects modify column description longtext;
+  
+    
