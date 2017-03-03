@@ -317,7 +317,7 @@ export class PlanContentComponent {
 
     loadWorkItems() {
         var fetchUrl = '/api/tasks/?planId=' + this.current['id'];
-        let search = { planId: this.current['id'] };
+        let search = { planId: this.current['id'], exclude: 'description' };
         if (this.sort['field']) {
             search['sortBy'] = this.sort['field'];
             if (this.sort['order'] == 'desc')

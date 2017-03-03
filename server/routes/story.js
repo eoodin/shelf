@@ -23,14 +23,14 @@ module.exports = function(router) {
                 where['status'] = {$in : status};
             }
 
+            let ex = (req.query.exclude) ? req.query.exclude : [];    
             models.story.findAll({
+                attributes: {exclude: ex},
                 where: where,
-                // TODO: keep only id of owner and creator to reduce data size
+                order: ob,
                 include: [
-                    {model: models.user, as: 'creator'},
                     {model: models.story, as: 'children'}
                 ],
-                order: ob
             }).then(function(stories) {   
                 res.json(stories);
             })

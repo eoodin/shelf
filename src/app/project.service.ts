@@ -60,6 +60,7 @@ export class ProjectService {
     }
 
     public load() {
+        // TODO: timer need to be eliminated
         Observable.timer(200).subscribe( _ => {
             this.loading = true;
             this.http.get('/api/projects')

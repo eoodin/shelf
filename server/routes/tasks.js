@@ -21,14 +21,10 @@ module.exports = function(router) {
             if (req.query.ownonly == 'true') {
                 where['ownerId'] = req.user.id;
             }
-
+            let ex = (req.query.exclude) ? req.query.exclude : [];
             models.task.findAll({
+                attributes: {exclude: ex},
                 where: where,
-                // TODO: keep only id of owner and creator to reduce data size
-                include: [
-                    {model: models.user, as: 'owner'},
-                    {model: models.user, as: 'creator'}
-                ],
                 order: ob
             }).then(function(tasks) {   
                 if ('csv' == req.query.format) {

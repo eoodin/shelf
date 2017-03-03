@@ -60,7 +60,7 @@ import {MdDialog, MdDialogRef} from '@angular/material';
                       </td>
                       <td > {{item.status}} </td>
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
-                      <td> {{item.creator.name}} </td>
+                      <td><span *ngIf="item.creator">{{item.creator.name}}</span></td>
                       <td>
                           <i *ngIf="!item.parentId" (click)="addChild(item)" class="material-icons button">add</i>
                           <i (click)="confirmDelete(item)" class="material-icons button">remove</i>

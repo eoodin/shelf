@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpService } from './http.service';
+import { UserService } from './user.service';
 import { RequestOptions, URLSearchParams } from '@angular/http';
 
 @Injectable()
 export class TaskService {
 
-  constructor(private http: HttpService) { }
+  constructor(private http: HttpService, private users: UserService) { }
 
   public delete(id) {
     return this.http.delete('/api/task/' + id);
@@ -26,7 +27,13 @@ export class TaskService {
     }
     
     let options = new RequestOptions({ search: params });
-    return this.http.get('/api/tasks/', options).map(resp => resp.json());
+    return this.http.get('/api/tasks/', options)
+      .share()
+      .map(resp => resp.json())
+      .do(tasks => tasks.forEach(t => {
+        this.users.getUser(t.creatorId).subscribe(u => t.creator = u);
+        this.users.getUser(t.ownerId).subscribe(u => t.owner = u);
+      }));
   }
 
   public moveToPlan(ids, planId) {

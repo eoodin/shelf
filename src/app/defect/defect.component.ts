@@ -22,7 +22,7 @@ import { DefectService } from '../defect.service';
           <input type="text" [(ngModel)]="defect.title"> 
       </div>
       <div><label>Status</label><span class="status">{{defect.status}}</span></div>
-      <div><label>Reporter</label><span>{{defect.creatorId}}</span></div>
+      <div><label>Reporter</label><span *ngIf="defect.creator">{{defect.creator.name}}</span></div>
       <div><label>Reported Time</label><span>{{defect.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span></div>
       <div>
           <ckeditor [(ngModel)]="defect.description" [config]="editorConfig" debounce="400"></ckeditor>
@@ -67,10 +67,10 @@ export class DefectComponent {
     private defects: DefectService,
     private prjs: ProjectService) {
       this.defect['severity'] = 'Major';
-    this.route.params
-      .filter(params => params['id'] && params['id'] != 'new')
-      .switchMap((params: Params) => this.defects.single(params['id']))
-      .subscribe(item => this.defect = item);
+      this.route.params
+        .filter(params => params['id'] && params['id'] != 'new')
+        .switchMap((params: Params) => this.defects.single(params['id']))
+        .subscribe(item => this.defect = item);
   }
 
   private save(another) {

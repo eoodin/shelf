@@ -33,11 +33,11 @@ module.exports = function(router) {
             if (req.query.ownonly == 'true') {
                 where['ownerId'] = req.user.id;
             }
-
+            let ex = (req.query.exclude) ? req.query.exclude : [];    
             models.defect.findAll({
+                attributes: {exclude: ex},
                 where: where,
-                order: ob,
-                include: [{model: models.user, as: 'owner'}, {model: models.user, as: 'creator'}]
+                order: ob
             }).then(function(defects) {   
                 res.json(defects);
             })
