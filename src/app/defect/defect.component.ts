@@ -19,9 +19,11 @@ import { DefectService } from '../defect.service';
           </md-radio-group>
       </div>
       <div class="title-row">
-          <div class="status">{{defect.status}}</div>
           <input type="text" [(ngModel)]="defect.title"> 
       </div>
+      <div><label>Status</label><span class="status">{{defect.status}}</span></div>
+      <div><label>Reporter</label><span>{{defect.creatorId}}</span></div>
+      <div><label>Reported Time</label><span>{{defect.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span></div>
       <div>
           <ckeditor [(ngModel)]="defect.description" [config]="editorConfig" debounce="400"></ckeditor>
       </div>
@@ -33,8 +35,10 @@ import { DefectService } from '../defect.service';
   `,
   styles: [`
   .defect-edit>div{margin: 7px 0;}
-  .defect-edit>div>span {display: inline-block; width: 50px;}
-  .status {padding: 0 7px; font-weight: 700;}
+  .defect-edit>div>label{padding-right: 20px;}
+  .defect-edit>div>label:after {content: ':';}
+  .defect-edit>div>span {display: inline-block;}
+  .status {font-weight: 700;}
   .title-row {display:flex; flex-direction: row;}
   .title-row input {flex-grow: 1; font-weight: 700;}
   md-radio-button {margin: 0 7px;}
