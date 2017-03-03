@@ -1,14 +1,22 @@
 import {Injectable} from '@angular/core';
 import {RequestOptionsArgs, Response, Http} from "@angular/http";
+import {Location} from '@angular/common';
+import {ActivatedRoute} from "@angular/router";
 import 'rxjs/operator/onErrorResumeNext'
-import {Observable, BehaviorSubject} from "rxjs";
+import {Observable, ReplaySubject} from "rxjs";
+import {LoginService } from './login.service';
 
 @Injectable()
 export class HttpService {
+    private authenticated = false;
+    private httpQueue: ReplaySubject<Object> = new ReplaySubject<Object>(1);
 
-    private unauth: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-
-    constructor(private http: Http) { }
+    constructor(
+        private http: Http, 
+        private route: ActivatedRoute,
+        private loginService: LoginService) {
+        
+    }
 
     get(url: string, options?: RequestOptionsArgs): Observable<Response> {
         return this.go(this.http.get(url, options));
@@ -31,26 +39,16 @@ export class HttpService {
     }
 
     go(operation) {
-        let shared = operation.share();
-        if (this.unauth.getValue()) {
-            return Observable.empty<Response>();
-        }
-
-        shared.subscribe(() => {}, err => this.error(err));
-        return shared;
+        return operation.do(() => {}, err => this.error(err), () => {});
     }
 
-    error(err) {
-        if (err.status == 403 && !this.unauth.getValue()) {
-            this.unauth.next(true);
+    private error(err) {
+        if (err.status == 403) {
+            this.loginService.requireAuth.next(true);
         }
     }
 
-    public authFail() {
-        return this.unauth;
-    }
-
-    resume() {
-        this.unauth.next(false);
+    private resume() {
+        // this.authenticated = true;
     }
 }

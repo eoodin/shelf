@@ -4,6 +4,7 @@ import {Http} from "@angular/http";
 import {Location} from '@angular/common';
 import {Router, ActivatedRoute} from "@angular/router";
 import {UserService} from './user.service';
+import {LoginService} from './login.service';
 
 @Component({
     selector: 'app-login',
@@ -36,15 +37,13 @@ import {UserService} from './user.service';
     `]
 })
 export class LoginComponent {
-
     private goto;
     private proceeding;
-
     constructor(private http: HttpService,
                 private router: Router,
                 private route: ActivatedRoute,
                 private users: UserService,
-                private rawHttp: Http) {
+                private loginService: LoginService) {
         route.params
             .filter(params => params['goto'])
             .subscribe(params => this.goto = params['goto']);
@@ -52,12 +51,10 @@ export class LoginComponent {
 
     login(data) {
         this.proceeding = true;
-        this.rawHttp.post('/passport/login', JSON.stringify(data))
+        this.loginService.login(data)
             .subscribe(resp => {
-                this.http.resume();
-                // TODO: add retry mechnaism on auth fail in http service and remove following
                 this.users.refresh();
-                this.router.navigate([this.goto ? this.goto : '/plans']);
+                this.router.navigate([(this.goto ? this.goto : '/')]);
             },
             err => {},
             () => {this.proceeding = false}

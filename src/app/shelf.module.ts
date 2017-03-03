@@ -29,6 +29,7 @@ import { PlanService } from "./plan.service";
 import { UserService } from "./user.service";
 import { TaskService } from "./task.service";
 import { AppService } from "./app.service";
+import { LoginService } from "./login.service";
 import { PlanCreatorComponent } from './plan-creator.component';
 import { StoryComponent } from './story.component';
 import { BacklogComponent, DeleteConfirmDialog } from './backlog.component';
@@ -111,6 +112,7 @@ export class ShelfRequestOptions extends RequestOptions {
         DefectService,
         TaskService,
         AppService,
+        LoginService,
         { provide: RequestOptions, useClass: ShelfRequestOptions },
         { provide: LocationStrategy, useClass: HashLocationStrategy }
     ],

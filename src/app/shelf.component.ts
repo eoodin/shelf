@@ -4,7 +4,7 @@ import {Http} from "@angular/http";
 import {Location} from "@angular/common";
 import {NotifyService} from "./notify.service";
 import {Observable} from "rxjs/Rx";
-import {HttpService} from "./http.service";
+import {LoginService} from "./login.service";
 import {ProjectService} from "./project.service";
 import {AppService} from "./app.service";
 
@@ -58,21 +58,12 @@ export class ShelfAppComponent {
 
     constructor(private router: Router,
                 private location: Location,
-                private prjs: ProjectService,
                 private notify: NotifyService,
-                private rawHttp: Http,
-                private http: HttpService,
+                private loginService: LoginService,
                 private apps: AppService,
                 rootView: ViewContainerRef) {
         this.viewContainerRef = rootView;
-        http.authFail()
-            .filter(failed => failed && !router.url.includes('/login'))
-            .subscribe(() => {
-                this.router.navigate(['/login', {goto: router.url}]);
-            });
-
         apps.info.subscribe(app => this.app = app);
-
         Observable.interval(1000 * 60)
             .map(() => new Date())
             .filter(now => now.getMinutes() == 0)
@@ -90,11 +81,7 @@ export class ShelfAppComponent {
     }
 
     logoutApp() {
-        this.rawHttp.get('/passport/logout')
-            .map(resp => resp.json())
-            .subscribe(
-                status => this.router.navigate(['/login']),
-                err => {alert("Logout error!")}
-            );
+        this.loginService.logout()
+            .subscribe(status => this.router.navigate(['/login']));
     }
 }
