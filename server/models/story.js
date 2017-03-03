@@ -4,6 +4,7 @@ module.exports = function (sequelize, DataTypes) {
     var story = sequelize.define("story", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         title: DataTypes.STRING,
+        priority: { type:   DataTypes.INTEGER, defaultValue: 1 },
         points: { type: DataTypes.INTEGER, defaultValue: 0 },
         description: { type: DataTypes.STRING, length: 'long' /*524288*/ },
         status: {

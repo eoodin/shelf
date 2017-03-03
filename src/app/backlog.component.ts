@@ -23,6 +23,13 @@ import {MdDialog, MdDialogRef} from '@angular/material';
                   <tr>
                       <th>  </th>
                       <th> ID </th>
+                      <th> 
+                        <a (click)="sortResult('priority')">Priority
+                            <span *ngIf="sort.field=='priority'">
+                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
+                            </span>
+                        </a>
+                      </th>
                       <th> Status </th>
                       <th> Title </th>
                       <th> Creator </th>
@@ -45,6 +52,12 @@ import {MdDialog, MdDialogRef} from '@angular/material';
                         </div>
                       </td>
                       <td> {{item.id}} </td>
+                      <td > 
+                        <button md-button [mdMenuTriggerFor]="priorityMenu">{{PRI[item.priority]}}</button>
+                            <md-menu #priorityMenu="mdMenu">
+                            <button *ngFor="let pr of [0, 1, 2]" (click)="changePriority(item, pr)"  md-menu-item>{{PRI[pr]}}</button>
+                        </md-menu>
+                      </td>
                       <td > {{item.status}} </td>
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
                       <td> {{item.creator.name}} </td>
@@ -89,9 +102,10 @@ export class BacklogComponent {
     private project = null;
     private projects = [];
     private items = [];
-    private sort: any;
+    private sort = {field: 'id', order: 'desc'};
     private requesting = false;
     private loading = false;
+    private PRI = ['High', 'Medium', 'Low'];
 
     private hideFinished = true;
 
@@ -122,6 +136,12 @@ export class BacklogComponent {
             return this.items.filter(item => item.status != 'Finished');
         }
         return this.items;
+    }
+
+    private changePriority(item, pr) {
+        if (item.priority == pr) return;
+        let change = {id: item.id, priority: pr};
+        this.stories.save(change).subscribe(() => this.loadItems());
     }
 
     private showItem(item) {

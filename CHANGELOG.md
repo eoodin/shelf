@@ -54,4 +54,6 @@ If tree info need to be preserved, additional data fix needed.
   alter table tasks modify column description longtext;
   alter table defects modify column description longtext;
   
-    
+2017-03-03
+  alter table stories add column priority int(11) default 1;
+  
