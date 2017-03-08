@@ -44,6 +44,13 @@ export class LoginComponent {
                 private route: ActivatedRoute,
                 private users: UserService,
                 private loginService: LoginService) {
+        let redirecting = false;
+        loginService.requireAuth
+            .filter(required => required && !redirecting)
+            .subscribe(() => {
+                redirecting = true;
+                this.router.navigate(['/login', {goto: router.url}]);
+            });
         route.params
             .filter(params => params['goto'])
             .subscribe(params => this.goto = params['goto']);

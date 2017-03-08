@@ -12,13 +12,7 @@ export class LoginService {
 
   constructor(
     private router: Router,
-    private http: Http) {
-      this._requireAuth
-            .filter(required => required)
-            .subscribe(() => {
-                this.router.navigate(['/login', {goto: router.url}]);
-            });
-  }
+    private http: Http) { }
 
   public authenticated() {
     return this._authenticated;
