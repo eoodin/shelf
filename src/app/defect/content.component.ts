@@ -134,6 +134,7 @@ export class ContentComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.userService.currentUser.subscribe(u => this.user = u);
         this.psubscription = this.projectSerivce.current
+            .filter(p => p && p.id)
             .do(p => this.project = p)
             .subscribe(() => this.loadItems());
     }
@@ -251,7 +252,7 @@ export class SelectPlanDialog {
     constructor(
         public dialogRef: MdDialogRef<SelectPlanDialog>,
         private plans: PlanService) {
-        this.plans.current()
+        this.plans.current
             .filter(plan => plan)
             .subscribe(p => this.plan = p);
     }

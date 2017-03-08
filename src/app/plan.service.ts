@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject} from "rxjs";
+import {Subject, BehaviorSubject} from "rxjs";
 import {PreferenceService} from "./preference.service";
 import {TeamService} from "./team.service";
 import {HttpService} from "./http.service";
@@ -7,27 +7,25 @@ import {HttpService} from "./http.service";
 @Injectable()
 export class PlanService {
 
-    private _plans: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+    private _plans: Subject<any> = new Subject<any>();
     private _current: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
     constructor(private pref: PreferenceService,
                 private http: HttpService,
                 private teams: TeamService) {
         this._plans
-            .filter(plans => plans && plans.length)
             .subscribe(plans => this.planUpdated(plans));
 
         this.teams.ownTeam
-            .filter(team => team)
             .subscribe(team => this.loadPlans(team));
     }
 
-    public all(): BehaviorSubject<any> {
+    public all(): Subject<any> {
         return this._plans;
     }
 
-    public current(): BehaviorSubject<any> {
-        return this._current;
+    public get current() {
+        return this._current.filter(v => v != null);
     }
 
     public setCurrent(plan) {
@@ -51,17 +49,18 @@ export class PlanService {
         plans.sort((a, b) => {return b.end.localeCompare(a.end);});
         this.pref.values
             .map(prefs => prefs['lastSelectedPlan'])
-            .filter(lsp => lsp)
             .subscribe(lsp => {
-            var selectPlan = plans[0];
-            for (var p of plans) {
-                if (p.id == lsp) {
-                    selectPlan = p;
-                    break;
+                var selectPlan = plans[0];
+                for (var p of plans) {
+                    if (p.id == lsp) {
+                        selectPlan = p;
+                        break;
+                    }
                 }
-            }
 
-            this._current.next(selectPlan);
+                if (this._current.getValue() != selectPlan) {
+                    this._current.next(selectPlan);
+                }
         });
     }
 }

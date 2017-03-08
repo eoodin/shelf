@@ -228,8 +228,7 @@ export class PlanContentComponent {
             .filter(team => team)
             .subscribe(team => this.team = team);
 
-        this.plans.current()
-            .filter(plan => plan)
+        this.plans.current
             .subscribe(plan => this.switchPlan(plan));
 
         this.plans.all().subscribe(plans => this._plans = plans);

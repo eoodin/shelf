@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import {BehaviorSubject, Observable} from "rxjs";
+import {Subject, Observable} from "rxjs";
 import {HttpService} from "./http.service";
 
 @Injectable()
 export class UserService {
     private usersCache;
 
-    private _currentUser: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+    private _currentUser: Subject<any> = new Subject<any>();
 
     constructor(private http: HttpService) {
         this.refresh();
@@ -23,7 +23,7 @@ export class UserService {
     }
 
     public get currentUser(): Observable<any> {
-        return this._currentUser.filter(u => u);
+        return this._currentUser;
     }
 
     public getUser(id) {

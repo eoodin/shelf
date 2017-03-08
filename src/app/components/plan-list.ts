@@ -25,13 +25,6 @@ export class PlanList {
     private selected: any;
     @Output() public select: EventEmitter<PlanList> = new EventEmitter<PlanList>();
 
-    @Input()
-    set team(team) {
-        if (team && team.id) {
-            this.plans.loadPlans(team);
-        }
-    }
-
     constructor(private pref: PreferenceService,
                 private plans: PlanService) {
         
@@ -39,7 +32,7 @@ export class PlanList {
             .filter(plans => plans)
             .subscribe(plans => this._plans = plans);
 
-        this.plans.current()
+        this.plans.current
             .subscribe(p => this.selectPlan(p));
     }
 

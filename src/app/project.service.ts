@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {Subject, BehaviorSubject} from 'rxjs';
 import {HttpService} from "./http.service";
 import {PreferenceService} from "./preference.service";
 
@@ -9,7 +9,7 @@ export class ProjectService {
     private loading: boolean = false;
     private lastProjectId;
     private _current: BehaviorSubject<any> = new BehaviorSubject<any>({});
-    private _projects = new BehaviorSubject<any>([]);
+    private _projects = new Subject<any>();
     private _plans = new BehaviorSubject<any>([]);
 
     constructor(private http: HttpService, private prf: PreferenceService) {
@@ -24,20 +24,17 @@ export class ProjectService {
             .subscribe(prefs => this.lastProjectId = prefs['lastProjectId']);
 
         this._projects
-            .filter(projects => !projects.length)
-            .subscribe(() => this._current.next(null));
-
-        this._projects
-            .filter(projects => projects.length)
             .filter((projects) => this.loading)
             .subscribe((projects) => {
                 let select = projects[0];
-                let pref = this.prf.values.getValue();
-                if (pref['lastProjectId'] && select != pref['lastProjectId']) {
-                    projects.filter(p => p.id == pref['lastProjectId'])
-                        .forEach(p => select = p);
-                }
-                this._current.next(select);
+                let pref = this.prf.values
+                    .map(pref => pref['lastProjectId'])
+                    .subscribe(lsp => {
+                        if (lsp && lsp != select.id) {
+                            select = projects.find(p => p.id == lsp);
+                        }
+                        this._current.next(select);
+                    });
             });
 
         this.load();
@@ -60,20 +57,15 @@ export class ProjectService {
     }
 
     public load() {
-        // TODO: timer need to be eliminated
-        Observable.timer(200).subscribe( _ => {
-            this.loading = true;
-            this.http.get('/api/projects')
-                .share()
-                .map(resp => resp.json())
-                .subscribe(
-                    (projects) => {
-                        this._projects.next(projects);
-                        this.loading = false;
-                    },
-                    () => this.loading = false,
-                    () => this.loading = false);
-        });
-
+        this.loading = true;
+        this.http.get('/api/projects')
+            .map(resp => resp.json())
+            .subscribe(
+                (projects) => {
+                    this._projects.next(projects);
+                    this.loading = false;
+                },
+                () => this.loading = false,
+                () => this.loading = false);
     }
 }

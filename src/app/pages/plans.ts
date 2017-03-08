@@ -7,7 +7,7 @@ import {TeamService} from '../team.service';
     template: `
     <md-sidenav-container class="workspace">
        <md-sidenav #sidenav class="sidenav">
-          <plan-list [team]="team" (select)="sidenav.close()"></plan-list>
+          <plan-list (select)="sidenav.close()"></plan-list>
        </md-sidenav>
         <div class="plan-content">
             <h3>
@@ -44,8 +44,7 @@ export class Plans {
 
     constructor(private planService: PlanService,
                 private teamService: TeamService) {
-        planService.current()
-            .filter(plan => plan)
+        planService.current
             .subscribe(plan => this.current = plan);
         teamService.teams.subscribe(teams => this.setTeams(teams));
     }
