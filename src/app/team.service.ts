@@ -1,14 +1,14 @@
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
 import {BehaviorSubject} from "rxjs";
 import {UserService} from "./user.service";
+import {HttpService} from "./http.service";
 
 @Injectable()
 export class TeamService {
     private _teams: BehaviorSubject<any> = new BehaviorSubject<any>([]);
     private _ownTeam: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-    constructor(private http: Http,
+    constructor(private http: HttpService,
                 private users: UserService
         ) {
         this.users.currentUser

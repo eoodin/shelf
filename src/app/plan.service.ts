@@ -50,8 +50,8 @@ export class PlanService {
     private planUpdated(plans: any) {
         plans.sort((a, b) => {return b.end.localeCompare(a.end);});
         this.pref.values
-            .filter(prefs => prefs['lastSelectedPlan'])
             .map(prefs => prefs['lastSelectedPlan'])
+            .filter(lsp => lsp)
             .subscribe(lsp => {
             var selectPlan = plans[0];
             for (var p of plans) {

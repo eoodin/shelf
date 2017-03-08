@@ -5,22 +5,30 @@ import { Observable, ReplaySubject, Subject } from "rxjs";
 
 @Injectable()
 export class LoginService {
-  private authed: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
   private _requireAuth: Subject<boolean> = new Subject();
   private _authenticated: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
-  private _authObs = null;
 
   constructor(
     private router: Router,
-    private http: Http) { }
+    private http: Http) {
+      let redirecting = false;
+      this._requireAuth
+          .filter(required => required && !redirecting)
+          .subscribe(() => {
+              redirecting = true;
+              this.router.navigate(['/login', {goto: router.url}]);
+          });
+    }
 
-  public authenticated() {
+  public get authenticated() {
     return this._authenticated;
   }
 
   public login(data) {
     return this.http.post('/passport/login', JSON.stringify(data))
-      .do(() => this._authenticated.next(true));
+      .do((resp) => {
+        this._authenticated.next((resp.json().result == 'loggedin'));
+      });
   }
 
   public logout() {

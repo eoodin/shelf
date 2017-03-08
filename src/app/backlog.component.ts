@@ -127,8 +127,10 @@ export class BacklogComponent {
     loadItems() {
         this.loading = true;
         this.stories.load({projectId: this.project.id, parent: 'null'})
-            .finally(() => this.loading = false)
-            .subscribe(stories => this.items = stories);
+            .subscribe(
+                stories => this.items = stories,
+                err => {},
+                () => this.loading = false);
     }
 
     visibleItems() {

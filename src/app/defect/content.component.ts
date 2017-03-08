@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from "@angular/router";
 import {MdDialog, MdDialogRef} from '@angular/material';
 import { HttpService } from '../http.service';
@@ -107,7 +107,9 @@ import { UserService } from '../user.service'
     .type-and-id input { display: inline-block; }
   `]
 })
-export class ContentComponent {
+export class ContentComponent implements OnInit, OnDestroy {
+        
+
     private items = [];
     private sort = {field: 'id', order: 'desc'};
     private loading = false;
@@ -118,6 +120,8 @@ export class ContentComponent {
     private hideDeclined = true;
     private onlyOwned = false;
 
+    private psubscription;
+
     constructor(
         public dialog: MdDialog,
         private router: Router,
@@ -125,11 +129,17 @@ export class ContentComponent {
         private defects: DefectService,
         private userService: UserService,
         private projectSerivce: ProjectService) {
+    }
 
+    ngOnInit(): void {
         this.userService.currentUser.subscribe(u => this.user = u);
-        this.projectSerivce.current
+        this.psubscription = this.projectSerivce.current
             .do(p => this.project = p)
             .subscribe(() => this.loadItems());
+    }
+
+    ngOnDestroy(): void {
+        this.psubscription.unsubscribe();
     }
 
     loadItems() {
@@ -146,8 +156,9 @@ export class ContentComponent {
         if (this.hideDeclined) search['nodeclined'] = 'true';
 
         this.defects.load(search)
-            .finally(() => this.loading = false)
-            .subscribe(stories => this.items = stories);
+            .subscribe(stories => this.items = stories,
+                 err => {},
+                 () => this.loading = false);
     }
 
     private settableStatus(item) {
@@ -169,12 +180,12 @@ export class ContentComponent {
 
             this.loading = true;
             this.http.post('/api/defect/' + item.id + '/fix', JSON.stringify({planId: result}))
-                .finally(() => this.loading = false)
                 .subscribe(
                 () => this.loadItems(),
                 (resp) => {
                     window.alert('Error occurred: ' + resp.json()['error'])
-                });
+                },
+                () => this.loading = false);
         });
     }
 
@@ -186,12 +197,12 @@ export class ContentComponent {
 
             this.loading = true;
             this.http.post('/api/defect/' + item.id + '/test', JSON.stringify({planId: result}))
-                .finally(() => this.loading = false)
                 .subscribe(
                 () => this.loadItems(),
                 (resp) => {
                     window.alert('Error occurred: ' + resp.json()['error'])
-                });
+                },
+                () => this.loading = false);
         });
     }
 

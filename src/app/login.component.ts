@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {HttpService} from "./http.service";
 import {Http} from "@angular/http";
 import {Location} from '@angular/common';
 import {Router, ActivatedRoute} from "@angular/router";
@@ -12,6 +11,7 @@ import {LoginService} from './login.service';
     <div class="login-pannel">
         <form class="form-signin" #f="ngForm" (ngSubmit)="login(f.value)">
             <h2 class="form-signin-heading">Please sign in</h2>
+            <h3 *ngIf="failedMessage" class="fail-message">{{failedMessage}}</h3>
             <div class="row">
                 <input  name="username"  ngModel class="form-control" placeholder="ID" required autofocus>
             </div>
@@ -34,25 +34,21 @@ import {LoginService} from './login.service';
     .form-signin { max-width: 330px;padding: 15px; margin: 0 auto;}
     .form-signin .form-control {width: 100%; font-size: 16px;}
     .form-signin .row {margin: 5px auto;}
+    .fail-message {font-size: 1.5 em; color: #A33;}
     `]
 })
 export class LoginComponent {
     private goto;
     private proceeding;
-    constructor(private http: HttpService,
-                private router: Router,
+    private failedMessage;
+
+    constructor(private router: Router,
                 private route: ActivatedRoute,
                 private users: UserService,
                 private loginService: LoginService) {
-        let redirecting = false;
-        loginService.requireAuth
-            .filter(required => required && !redirecting)
-            .subscribe(() => {
-                redirecting = true;
-                this.router.navigate(['/login', {goto: router.url}]);
-            });
         route.params
             .filter(params => params['goto'])
+            .filter(params => params['goto'].indexOf('/login') == -1)
             .subscribe(params => this.goto = params['goto']);
     }
 
@@ -60,8 +56,12 @@ export class LoginComponent {
         this.proceeding = true;
         this.loginService.login(data)
             .subscribe(resp => {
-                this.users.refresh();
-                this.router.navigate([(this.goto ? this.goto : '/')]);
+                if (resp.json().result == 'loggedin'){
+                    this.router.navigate([(this.goto ? this.goto : '/')]);
+                }
+                else {
+                    this.failedMessage = resp.json().result;
+                }
             },
             err => {},
             () => {this.proceeding = false}

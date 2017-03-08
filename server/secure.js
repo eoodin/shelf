@@ -44,17 +44,7 @@ module.exports = function(app) {
     });
 
     app.all('/', function(req, res, next) {
-            //Automatic login
-            // if (!usingLdap && !req.isAuthenticated()) {
-            //     let auth = passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login.html'});
-            //     req.body.username = 'jefliu';
-            //     req.body.password = '1';
-            //     return auth(req, res, next);
-            // }
-
             if (req.isAuthenticated()) {
-                // check and create user in database
-                // fields fetched from ldap: user.mail, user.displayName, user.employeeNumber
                 return next();
             }
         });
@@ -81,7 +71,7 @@ module.exports = function(app) {
 
                 req.logIn(user, function(err) {
                     if (err) { return next(err); }
-                    return res.redirect('/');
+                    res.json({"result": "loggedin"});
                 });
             })(req, res, next);
         });
@@ -91,7 +81,7 @@ module.exports = function(app) {
             let auth = passport.authenticate('local');
             auth(req, res, next);
         }, function(req, res) {
-            res.redirect('/');
+            res.json({"result": "loggedin"});
         });
     }
 

@@ -1,14 +1,14 @@
 import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs";
-import {Http} from "@angular/http";
 import {UserService} from "./user.service";
+import {HttpService} from "./http.service";
 
 @Injectable()
 export class PreferenceService {
 
     private _values: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
-    constructor(private http: Http, private us: UserService) {
+    constructor(private http: HttpService, private us: UserService) {
         us.currentUser.subscribe(u => this.load(u));
     }
 
