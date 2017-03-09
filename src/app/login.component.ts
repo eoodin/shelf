@@ -46,10 +46,7 @@ export class LoginComponent {
                 private route: ActivatedRoute,
                 private users: UserService,
                 private loginService: LoginService) {
-        route.params
-            .filter(params => params['goto'])
-            .filter(params => params['goto'].indexOf('/login') == -1)
-            .subscribe(params => this.goto = params['goto']);
+        route.params.subscribe(params => this.goto = params['goto']);
     }
 
     login(data) {

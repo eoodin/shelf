@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { RequestOptionsArgs, Response, Http } from "@angular/http";
-import {Router} from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import { Observable, ReplaySubject, Subject } from "rxjs";
 
 @Injectable()
@@ -10,13 +10,18 @@ export class LoginService {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private http: Http) {
       let redirecting = false;
       this._requireAuth
           .filter(required => required && !redirecting)
           .subscribe(() => {
               redirecting = true;
-              this.router.navigate(['/login', {goto: router.url}]);
+              route.params
+                .subscribe(params => {
+                   let gotoUrl = params['goto'] || '/plans';
+                   this.router.navigate(['/login'], {queryParams: {goto: gotoUrl}});
+                });
           });
     }
 
