@@ -13,9 +13,11 @@ export class UserService {
     }
 
     public refresh() {
-         this.http.get('/api/users/me')
+         Observable.of(1).flatMap(() => this.http.get('/api/users/me'))
+            .retry(1)
             .map(res => res.json())
             .subscribe(user => this._currentUser.next(user));
+            
         this.usersCache = {};
         this.http.get('/api/users')
             .map(resp => resp.json())
