@@ -17,6 +17,7 @@ import { UserService } from '../user.service'
           </div>
           <div class="panel panel-default">
               <div class="panel-heading work-items-heading">
+                <div class="heading-left"><span>{{total}} defects</span></div>
                 <div class="heding-right">
                     <md-checkbox [(ngModel)]="hideClosed" (change)="filterChange($event)">Hide Closed</md-checkbox>
                     <md-checkbox [(ngModel)]="hideDeclined" (change)="filterChange($event)">Hide Declined</md-checkbox>
@@ -91,7 +92,8 @@ import { UserService } from '../user.service'
   </div>
   `,
     styles: [`
-   .work-items-heading > div{float:right;}
+   .work-items-heading > .heading-left {float: left}
+   .work-items-heading > .heding-right{float:right;}
     .work-items-heading { height: 38px; }
     .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
@@ -109,7 +111,7 @@ import { UserService } from '../user.service'
 })
 export class ContentComponent implements OnInit, OnDestroy {
         
-
+    private total = 0;
     private items = [];
     private sort = {field: 'id', order: 'desc'};
     private loading = false;
@@ -157,7 +159,7 @@ export class ContentComponent implements OnInit, OnDestroy {
         if (this.hideDeclined) search['nodeclined'] = 'true';
 
         this.defects.load(search)
-            .subscribe(stories => this.items = stories,
+            .subscribe(result => {this.items = result.rows; this.total = result.count;},
                  err => {},
                  () => this.loading = false);
     }

@@ -22,8 +22,8 @@ export class DefectService {
     let options = new RequestOptions({ search: params });
     return this.http.get('/api/defects/', options)
       .map(resp => resp.json())
-      .do(defects => {
-        defects.forEach(defect => {
+      .do(result => {
+        result.rows.forEach(defect => {
           this.users.getUser(defect.creatorId).subscribe(u => defect.creator = u);
           this.users.getUser(defect.ownerId).subscribe(u => defect.owner = u);
         })

@@ -1,43 +1,44 @@
 module.exports = function(router) {
     var models = require('../models');
+    function composeOrder(req) {
+        var ob = req.query.sortBy ? req.query.sortBy : 'id';
+        // TODO: rename this field to eleminate the code.
+        if (ob == 'owner') ob = 'ownerId';
+        if (ob == 'creator') ob = 'creatorId';
+
+        if (req.query.desc) {
+            ob = [[ob, 'desc']]
+        }
+        return ob;
+    };
+    function composeWhere(req) {
+        let where = {};
+        let excludeStatus = [];
+        
+        if (req.query.noclosed == 'true') {
+            excludeStatus.push('Closed');
+        }
+
+        if (req.query.nodeclined == 'true') {
+            excludeStatus.push('Declined');
+        }
+
+        if (excludeStatus.length) {
+            where['status'] = {$notIn: excludeStatus}
+        }
+        if (req.query.ownonly == 'true') {
+            where['ownerId'] = req.user.id;
+        }
+        return where;
+    }
 
     router.route('/defects')
         .get(function(req, res) {
-            var ob = req.query.sortBy ? req.query.sortBy : 'id';
-            // TODO: rename this field to eleminate the code.
-            if (ob == 'owner') ob = 'ownerId';
-            if (ob == 'creator') ob = 'creatorId';
-
-            if (req.query.desc) {
-                ob = [[ob, 'desc']]
-            }
-
-            let where = {};
-            if (req.query.project) {
-                where = {projectId: req.query.project};
-            }
-            
-            let excludeStatus = [];
-            
-            if (req.query.noclosed == 'true') {
-                excludeStatus.push('Closed');
-            }
-
-            if (req.query.nodeclined == 'true') {
-                excludeStatus.push('Declined');
-            }
-
-            if (excludeStatus.length) {
-                where['status'] = {$notIn: excludeStatus}
-            }
-            if (req.query.ownonly == 'true') {
-                where['ownerId'] = req.user.id;
-            }
             let ex = (req.query.exclude) ? req.query.exclude : [];    
-            models.defect.findAll({
+            models.defect.findAndCountAll({
                 attributes: {exclude: ex},
-                where: where,
-                order: ob
+                where: composeWhere(req),
+                order: composeOrder(req)
             }).then(function(defects) {   
                 res.json(defects);
             })
