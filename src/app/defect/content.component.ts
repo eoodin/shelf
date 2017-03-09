@@ -17,7 +17,7 @@ import { UserService } from '../user.service'
           </div>
           <div class="panel panel-default">
               <div class="panel-heading work-items-heading">
-                <div class="heading-left"><span>{{total}} defects</span></div>
+                <div class="heading-left"><span>{{total}} defects in table</span></div>
                 <div class="heding-right">
                     <md-checkbox [(ngModel)]="hideClosed" (change)="filterChange($event)">Hide Closed</md-checkbox>
                     <md-checkbox [(ngModel)]="hideDeclined" (change)="filterChange($event)">Hide Declined</md-checkbox>
