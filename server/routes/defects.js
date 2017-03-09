@@ -15,6 +15,10 @@ module.exports = function(router) {
         let where = {};
         let excludeStatus = [];
         
+        if (req.query.project) {
+            where['projectId'] = req.query.project;
+        }
+        
         if (req.query.noclosed == 'true') {
             excludeStatus.push('Closed');
         }
