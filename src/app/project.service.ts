@@ -9,7 +9,7 @@ export class ProjectService {
     private loading: boolean = false;
     private lastProjectId;
     private _current: BehaviorSubject<any> = new BehaviorSubject<any>({});
-    private _projects = new Subject<any>();
+    private _projects = new BehaviorSubject<any>([]);
     private _plans = new BehaviorSubject<any>([]);
 
     constructor(private http: HttpService, private prf: PreferenceService) {
@@ -48,12 +48,8 @@ export class ProjectService {
         return this._current;
     }
 
-    get projects(): Observable<any> {
+    get projects() {
         return this._projects;
-    }
-
-    public get plans(): Observable<any> {
-        return this._plans;
     }
 
     public load() {

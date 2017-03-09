@@ -7,7 +7,7 @@ import {HttpService} from "./http.service";
 @Injectable()
 export class PlanService {
 
-    private _plans: Subject<any> = new Subject<any>();
+    private _plans: BehaviorSubject<any> = new BehaviorSubject<any>([]);
     private _current: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
     constructor(private pref: PreferenceService,
@@ -20,8 +20,8 @@ export class PlanService {
             .subscribe(team => this.loadPlans(team));
     }
 
-    public all(): Subject<any> {
-        return this._plans;
+    public all() {
+        return this._plans.filter(ps => ps.length);
     }
 
     public get current() {

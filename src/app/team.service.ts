@@ -1,12 +1,12 @@
 import {Injectable} from "@angular/core";
-import {Subject} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {UserService} from "./user.service";
 import {HttpService} from "./http.service";
 
 @Injectable()
 export class TeamService {
-    private _teams: Subject<any> = new Subject<any>();
-    private _ownTeam: Subject<any> = new Subject<any>();
+    private _teams: BehaviorSubject<any> = new BehaviorSubject<any>([]);
+    private _ownTeam: BehaviorSubject<any> = new BehaviorSubject<any>({});
 
     constructor(private http: HttpService,
                 private users: UserService
@@ -19,12 +19,12 @@ export class TeamService {
         this.load();
     }
 
-    get ownTeam(): Subject<any> {
-        return this._ownTeam;
+    get ownTeam() {
+        return this._ownTeam.filter(t => t.id);
     }
 
-    get teams(): Subject<any> {
-        return this._teams;
+    get teams() {
+        return this._teams.filter(ts => ts.length);
     }
 
     set teams(projects) {

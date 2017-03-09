@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { PreferenceService } from "./preference.service";
 import * as moment from "moment";
 import { PlanService } from "./plan.service";
@@ -197,7 +197,7 @@ import { TaskService } from './task.service';
     .buttom-row:after {content: ''; height: 0; display: block; clear:both;}
     `]
 })
-export class PlanContentComponent {
+export class PlanContentComponent implements OnInit{
     private current = {};
     private workItems = [];
     private _plans = [];
@@ -236,6 +236,10 @@ export class PlanContentComponent {
         pref.values
             .filter(prefs => typeof (prefs['hideFinished']) != 'undefined')
             .subscribe(ps => this.hideFinished = ps.hideFinished);
+    }
+
+    public ngOnInit() {
+
     }
 
     moveItemsToPlan(planId) {
