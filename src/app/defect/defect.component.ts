@@ -21,9 +21,9 @@ import { DefectService } from '../defect.service';
       <div class="title-row">
           <input type="text" [(ngModel)]="defect.title"> 
       </div>
-      <div><label>Status</label><span class="status">{{defect.status}}</span></div>
-      <div><label>Reporter</label><span *ngIf="defect.creator">{{defect.creator.name}}</span></div>
-      <div><label>Reported Time</label><span>{{defect.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span></div>
+      <div *ngIf="defect.id"><label>Status</label><span class="status">{{defect.status}}</span></div>
+      <div *ngIf="defect.id"><label>Reporter</label><span *ngIf="defect.creator">{{defect.creator.name}}</span></div>
+      <div *ngIf="defect.id"><label>Reported Time</label><span>{{defect.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span></div>
       <div>
           <ckeditor [(ngModel)]="defect.description" [config]="editorConfig" debounce="400"></ckeditor>
       </div>
