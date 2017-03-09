@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
-import { ShelfAppComponent } from "./shelf.component";
+import { ShelfAppComponent, AboutDialog } from "./shelf.component";
 import { RouterModule } from "@angular/router";
 import { HttpModule, RequestOptions, Headers } from "@angular/http";
 import { PlanList } from "./components/plan-list";
@@ -95,6 +95,7 @@ export class ShelfRequestOptions extends RequestOptions {
         BacklogComponent,
         DeleteConfirmDialog,
         SelectPlanDialog,
+        AboutDialog,
         DefectPage,
         DefectDetail,
         DefectContent,
@@ -127,7 +128,8 @@ export class ShelfRequestOptions extends RequestOptions {
     ],
     entryComponents: [
         DeleteConfirmDialog,
-        SelectPlanDialog
+        SelectPlanDialog,
+        AboutDialog
     ],
     bootstrap: [ShelfAppComponent],
 })

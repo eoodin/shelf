@@ -7,6 +7,7 @@ import {Observable} from "rxjs/Rx";
 import {LoginService} from "./login.service";
 import {ProjectService} from "./project.service";
 import {AppService} from "./app.service";
+import {MdDialog, MdDialogRef} from '@angular/material';
 
 @Component({
     selector: '[shelf-app]',
@@ -32,7 +33,7 @@ import {AppService} from "./app.service";
               </ul>
               <ul class="nav navbar-nav navbar-right">
                 <li [class.active]="getLinkStyle('/settings')"><a [routerLink]="['/settings']">Settings</a></li>
-                <li><a href="javascript:void(0);" title="{{app.version}}({{app.commit}} at {{app.update}})">About</a></li>
+                <li><a (click)="showAbout()">About</a></li>
                 <li><a (click)="logoutApp()" >Logout</a></li>
               </ul>
             </div><!--/.nav-collapse -->
@@ -56,14 +57,13 @@ export class ShelfAppComponent {
     private app = {};
     private ui;
 
-    constructor(private router: Router,
+    constructor(private dialog: MdDialog,
+                private router: Router,
                 private location: Location,
                 private notify: NotifyService,
                 private loginService: LoginService,
-                private apps: AppService,
                 rootView: ViewContainerRef) {
         this.viewContainerRef = rootView;
-        apps.info.subscribe(app => this.app = app);
         Observable.interval(1000 * 60)
             .map(() => new Date())
             .filter(now => now.getMinutes() == 0)
@@ -83,5 +83,33 @@ export class ShelfAppComponent {
     logoutApp() {
         this.loginService.logout()
             .subscribe(status => this.router.navigate(['/login']));
+    }
+
+    showAbout() {
+        this.dialog.open(AboutDialog);
+    }
+}
+
+
+@Component({
+    selector: 'shelf-about-dialog',
+    template: `
+    <h1 md-dialog-title>About Shelf</h1>
+    <div md-dialog-content>
+        <div>Release channel: {{info.branch}}</div>
+        <div>Last commit: </div>
+        <div><pre>{{info.commit}}</pre></div>
+    </div>
+    <div md-dialog-actions>
+        <button md-button (click)="dialogRef.close()">OK</button>
+    </div>
+    `
+})
+export class AboutDialog {
+    private info;
+    constructor(
+        public dialogRef: MdDialogRef<AboutDialog>,
+        private apps: AppService) {
+       this.apps.info.subscribe(info => this.info = info);
     }
 }

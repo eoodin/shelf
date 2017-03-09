@@ -1,6 +1,9 @@
 module.exports = function(router) {
     router.route('/app/info').get(function(req, res){
-        //TODO: re-implement this.
-        res.send({"commit":"10c93e4","version":"1.0-SNAPSHOT","update":"31.05.2016 @ 22:25:09 CST"});
+        var childProcess = require('child_process');
+        let commitMsg = childProcess.execSync('git log -1').toString();
+        let branch = childProcess.execSync('git branch').toString();
+        branch = branch.substr(2);
+        res.send({"commit": commitMsg, "branch": branch});
     });
 };
