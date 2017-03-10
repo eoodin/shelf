@@ -17,7 +17,7 @@ module.exports = function(router) {
             .then(function(plans) {
                 res.json(plans);
             }).catch(function(errors) {
-                console.log('error' + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
     });
@@ -31,13 +31,13 @@ module.exports = function(router) {
                 end: req.body.end,
                 teamId: req.body.teamId
             }).then(function(plan) {
-                console.log('plan created, add allocation');
+                logger.info('plan created, add allocation');
                 models.allocation.create({
                     teamId: req.body.teamId,
                     effort: req.body.availableHours,
                     planId: plan.id
                 }).then(function(alloc) {
-                    console.log('update plan for allocation');
+                    logger.info('update plan for allocation');
                     plan.save({allocation: alloc}).then(function() {
                         res.json(plan);
                     });

@@ -44,6 +44,7 @@
     "rxjs": "^5.1.0",
     "sequelize": "^3.23.4",
     "ts-helpers": "^1.1.1",
+    "winston": "^2.3.1",
     "zone.js": "^0.7.6"
   },
   "devDependencies": {

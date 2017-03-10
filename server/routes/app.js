@@ -4,6 +4,7 @@ module.exports = function(router) {
         let commitMsg = childProcess.execSync('git log -1').toString();
         let branch = childProcess.execSync('git branch').toString();
         branch = branch.substr(2);
+        logger.info('getting commit message', commitMsg);
         res.send({"commit": commitMsg, "branch": branch});
     });
 };

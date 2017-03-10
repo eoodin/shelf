@@ -15,7 +15,7 @@ module.exports = function(app) {
 
     var usingLdap = fs.existsSync(securityConfig);
     if(usingLdap) {
-        console.log('ldap.json found, using ldap auth');
+        logger.info('ldap.json found, using ldap auth');
         var LdapStrategy = require('passport-ldapauth');
         passport.use(new LdapStrategy(require(securityConfig)));
     }
@@ -24,7 +24,7 @@ module.exports = function(app) {
             return models.user.find({where: {id: username}}).then(function(u) {
                 done(null, u);
             }, function(error) {
-                console.log('Authenticate failed: ', error);
+                logger.error('Authenticate failed: ', error);
             });
         }));
     }
@@ -39,7 +39,7 @@ module.exports = function(app) {
 
     app.all('/api/*', function(req, res, next) {
         if (req.isAuthenticated()) { return next(); }
-        console.log('Unauthenticated access to ' + req.originalUrl);
+        logger.warn('Unauthenticated access to ' + req.originalUrl);
         res.status(403).send({error: 'Unauthenticated'});
     });
 
@@ -62,11 +62,11 @@ module.exports = function(app) {
                             name: user['displayName'],
                             email: user['mail']
                         }).then(function(u) {
-                            console.log('Successful login new user, created.');
+                            logger.info('user created', u);
                         });
                     }
                 }).catch(function(errors) {
-                    console.log('Error', errors);
+                    logger.error(errors);
                 });
 
                 req.logIn(user, function(err) {

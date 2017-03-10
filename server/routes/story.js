@@ -55,7 +55,7 @@ module.exports = function(router) {
                     res.json(story.id);
                 })
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
         });
@@ -65,7 +65,7 @@ module.exports = function(router) {
             models.story.findById(req.params.id).then(function(story) {
                 res.json(story);
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
         })
@@ -85,11 +85,11 @@ module.exports = function(router) {
                 }
 
                 story.update(changes).then(function(story) {
-                    console.log('Story changed');
+                    logger.info('Story changed');
                     res.json(story);
                 });
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
         })
@@ -99,11 +99,11 @@ module.exports = function(router) {
                     res.json(req.params.id);
                 })
                 .catch(function(errors){
-                    console.log("Error: " + JSON.stringify(errors));
+                    logger.error(errors);
                     res.sendStatus(500);
                 });
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
         });

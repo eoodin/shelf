@@ -15,7 +15,6 @@ describe('App: ShelfServer', () => {
 
         return tcb.createAsync(ShelfAppComponent).then((componentFixture) => {
             componentFixture.detectChanges();
-            console.log('info', componentFixture);
         });
     }));
 });

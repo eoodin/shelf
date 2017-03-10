@@ -43,10 +43,10 @@ module.exports = function(router) {
                 }
             });
         }).then(function() {
-            console.log('Preference saved');
+            logger.info('Preference saved');
             res.end();
         }).catch(function(err){
-            console.log('Error caught!', err);
+            logger.info('Error caught!', err);
             res.sendStatus(500);
         });
     });

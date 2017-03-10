@@ -70,7 +70,7 @@ module.exports = function(router) {
                     res.json(defect.id);
                 })
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(JSON.stringify(errors));
                 res.sendStatus(500);
             });
         });
@@ -80,7 +80,7 @@ module.exports = function(router) {
             models.defect.findById(req.params.id).then(function(d) {
                 res.json(d);
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
         })
@@ -103,7 +103,7 @@ module.exports = function(router) {
                     res.json(d);
                 });
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
         })
@@ -113,11 +113,11 @@ module.exports = function(router) {
                     res.json(req.params.id);
                 })
                 .catch(function(errors){
-                     console.log("Error: " + JSON.stringify(errors));
+                     logger.error(errors);
                 res.sendStatus(500);
                 });
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
         });
@@ -151,7 +151,7 @@ module.exports = function(router) {
             }).then(function() {
                 res.end();
             }).catch(function(errors) {
-                console.log('Error caught: ', errors);
+                logger.error(errors);
                 res.sendStatus(500);
             });
         });
@@ -182,7 +182,7 @@ module.exports = function(router) {
             }).then(function(){
                 res.end();
             }).catch(function(errors) {
-                console.log('Error caught: ', errors);
+                logger.error(errors);
                 res.sendStatus(500);
             });
         });

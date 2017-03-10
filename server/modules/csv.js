@@ -32,7 +32,7 @@ module.exports = function(res, data, defs) {
     body += titles.join(',') + '\r\n';
     
   data.forEach(function(item) {
-        console.log('converting Item: ' + JSON.stringify(item));
+        logger.info('converting Item: ' + JSON.stringify(item));
           var arr = [];
           for (let f of fields) {
                 let prop = item[f];

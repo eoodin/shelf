@@ -68,7 +68,7 @@ module.exports = function(router) {
                     res.json(task.id);
                 })
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
         })
@@ -79,7 +79,7 @@ module.exports = function(router) {
             }
 
             let changes = req.body.changes;
-            console.log(JSON.stringify(changes));
+            logger.info('performing changes: ', changes);
             models.task.update(changes, {
                 where: {
                     id: { $in: ids }
@@ -94,7 +94,7 @@ module.exports = function(router) {
             models.task.findById(req.params.id).then(function(task) {
                 res.json(task);
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
         })
@@ -135,7 +135,7 @@ module.exports = function(router) {
                     });
                 });
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
         })
@@ -145,11 +145,11 @@ module.exports = function(router) {
                     res.json(req.params.id);
                 })
                 .catch(function(errors){
-                     console.log("Error: " + JSON.stringify(errors));
-                res.sendStatus(500);
+                     logger.error(errors);
+                    res.sendStatus(500);
                 });
             }).catch(function(errors){
-                console.log("Error: " + JSON.stringify(errors));
+                logger.error(errors);
                 res.sendStatus(500);
             });
         });
