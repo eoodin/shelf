@@ -78,14 +78,14 @@ import {PreferenceService} from "./preference.service";
     changeDetection: ChangeDetectionStrategy.Default
 })
 export class PlanCreatorComponent {
-    private _visible = false;
-    private name;
-    private start;
-    private end;
-    private workdays = 0;
-    private holiday = 0;
-    private availableHours = 0;
-    private team;
+    _visible = false;
+    name;
+    start;
+    end;
+    workdays = 0;
+    holiday = 0;
+    availableHours = 0;
+    team;
 
     private allocs = {};
 
@@ -186,7 +186,7 @@ export class PlanCreatorComponent {
         this.close();
     }
 
-    private close() {
+    close() {
         this._visible = false;
         this.showChange.next(false);
     }

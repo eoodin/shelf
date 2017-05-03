@@ -1,20 +1,27 @@
-import {addProviders, inject, TestComponentBuilder} from '@angular/core/testing';
-import {provide} from '@angular/core';
-import {SpyLocation} from '@angular/common/testing';
-import {Location} from '@angular/common';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+
 import {ShelfAppComponent} from '../app/shelf.component';
 
 declare var describe, it, expect, beforeEach;
 
 describe('App: ShelfServer', () => {
-    beforeEach(() => {
-        addProviders([ShelfAppComponent, provide(Location, {useClass: SpyLocation})]);
-    });
+  let component: ShelfAppComponent;
+  let fixture: ComponentFixture<ShelfAppComponent>;
 
-    it('should be able to test', inject([TestComponentBuilder], (tcb: TestComponentBuilder) => {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ ShelfAppComponent ]
+    })
+    .compileComponents();
+  }));
 
-        return tcb.createAsync(ShelfAppComponent).then((componentFixture) => {
-            componentFixture.detectChanges();
-        });
-    }));
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ShelfAppComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
 });

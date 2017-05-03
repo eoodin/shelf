@@ -61,9 +61,9 @@ declare var CKEDITOR;
 })
 export class ItemDetail implements OnInit {
     private initialized;
-    private _item: Object = {};
-    private project = {};
-    private editorConfig = {
+    _item;
+    project = {};
+    editorConfig = {
         extraPlugins: 'uploadimage,divarea',
         imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
         toolbar: [

@@ -44,10 +44,10 @@ declare var CKEDITOR;
     changeDetection: ChangeDetectionStrategy.Default
 })
 export class StoryComponent implements OnDestroy {
-    private _item: Object = {};
-    private saving = false;
-    private parent = {};
-    private editorConfig = {
+    _item;
+    saving = false;
+    parent;
+    editorConfig = {
         extraPlugins: 'uploadimage',
         imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
         toolbar: [

@@ -28,7 +28,7 @@ import {Observable} from 'rxjs/Rx';
     styles: ['']
 })
 export class ModalDialog implements OnInit, OnDestroy {
-    private _show: boolean = false;
+    _show: boolean = false;
     private keySubscription;
 
     @Output()

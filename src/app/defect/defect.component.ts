@@ -5,6 +5,7 @@ import { HttpService } from '../http.service';
 import { ModalDirective } from 'ng2-bootstrap';
 import { ProjectService } from "../project.service";
 import { DefectService } from '../defect.service';
+import { Defect } from '../model/defect';
 
 @Component({
   selector: 'app-defect',
@@ -28,7 +29,7 @@ import { DefectService } from '../defect.service';
           <ckeditor [(ngModel)]="defect.description" [config]="editorConfig" debounce="400"></ckeditor>
       </div>
       <div>
-          <a md-button routerLink=".." (click)="save()">Save</a>
+          <a md-button routerLink=".." (click)="save(false)">Save</a>
           <a md-button *ngIf="!defect.id" [disabled]="saving" (click)="save(true)">Save and New</a>
       </div>
   </div>
@@ -45,10 +46,10 @@ import { DefectService } from '../defect.service';
   `]
 })
 export class DefectComponent {
-  private defect = {};
-  private saving;
+  defect;
+  saving;
 
-  private editorConfig = {
+  editorConfig = {
     extraPlugins: 'uploadimage,divarea',
     imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
     toolbar: [
@@ -66,14 +67,15 @@ export class DefectComponent {
     private route: ActivatedRoute,
     private defects: DefectService,
     private prjs: ProjectService) {
-      this.defect['severity'] = 'Major';
+      this.defect = new Defect();
+      // this.defect['severity'] = 'Major';
       this.route.params
         .filter(params => params['id'] && params['id'] != 'new')
         .switchMap((params: Params) => this.defects.single(params['id']))
         .subscribe(item => this.defect = item);
   }
 
-  private save(another) {
+  save(another) {
     var data = JSON.parse(JSON.stringify(this.defect));
     data.projectId = this.prjs.current.getValue()['id'];
     delete data['owner'];

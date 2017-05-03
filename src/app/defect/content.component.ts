@@ -110,19 +110,18 @@ import { UserService } from '../user.service'
   `]
 })
 export class ContentComponent implements OnInit, OnDestroy {
-        
-    private total = 0;
-    private items = [];
-    private sort = {field: 'id', order: 'desc'};
-    private loading = false;
-    private user;
+    total = 0;
+    items = [];
+    sort = {field: 'id', order: 'desc'};
+    loading = false;
+    user;
 
-    private project;
-    private hideClosed = true;
-    private hideDeclined = true;
-    private onlyOwned = false;
+    project;
+    hideClosed = true;
+    hideDeclined = true;
+    onlyOwned = false;
 
-    private psubscription;
+    psubscription;
 
     constructor(
         public dialog: MdDialog,
@@ -164,7 +163,7 @@ export class ContentComponent implements OnInit, OnDestroy {
                  () => this.loading = false);
     }
 
-    private settableStatus(item) {
+    settableStatus(item) {
         let allStatus = ['Open', 'Declined', 'Fixing', 'Fixed', 'Testing', 'Failed', 'Closed'];
         let i = allStatus.indexOf(item.status);
 
@@ -209,21 +208,21 @@ export class ContentComponent implements OnInit, OnDestroy {
         });
     }
 
-    private showItem(item) {
+    showItem(item) {
         this.router.navigate(['/defects/' + item.id]);
     }
 
-    private filterChange(e) {
+    filterChange(e) {
         this.loadItems();
     }
 
-    private changeStatus(item, status) {
+    changeStatus(item, status) {
         if (item.status == status) return;
         this.defects.save(item.id, {status: status})
             .subscribe(() => this.loadItems());
     }
 
-    private sortResult(field) {
+    sortResult(field) {
         if (field == this.sort.field)
             this.sort.order = this.sort.order == 'desc' ? 'asc' : 'desc';
         else
@@ -249,8 +248,7 @@ export class ContentComponent implements OnInit, OnDestroy {
     `
 })
 export class SelectPlanDialog {
-    private plan = {};
-
+    plan;
     constructor(
         public dialogRef: MdDialogRef<SelectPlanDialog>,
         private plans: PlanService) {

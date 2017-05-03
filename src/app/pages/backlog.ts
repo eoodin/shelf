@@ -23,8 +23,8 @@ import {Router, ActivatedRoute} from "@angular/router";
     `]
 })
 export class Backlog {
-    private projects = [];
-    private project;
+    projects = [];
+    project;
 
     constructor(private ele: ElementRef,
                 private router: Router,

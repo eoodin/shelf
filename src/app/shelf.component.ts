@@ -106,7 +106,7 @@ export class ShelfAppComponent {
     `
 })
 export class AboutDialog {
-    private info;
+    info;
     constructor(
         public dialogRef: MdDialogRef<AboutDialog>,
         private apps: AppService) {

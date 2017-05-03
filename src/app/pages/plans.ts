@@ -37,15 +37,15 @@ import {TeamService} from '../team.service';
     `]
 })
 export class Plans {
-    private current = {};
-    private showCreator = false;
-    private teams = [];
-    private lastSelectTeamId;
+    current;
+    showCreator = false;
+    teams = [];
+    lastSelectTeamId;
 
     constructor(private planService: PlanService,
                 private teamService: TeamService) {
-        planService.current
-            .subscribe(plan => this.current = plan);
+        this.current = {};
+        planService.current.subscribe(plan => this.current = plan);
         teamService.teams.subscribe(teams => this.setTeams(teams));
     }
 

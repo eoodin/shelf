@@ -99,15 +99,15 @@ import {MdDialog, MdDialogRef} from '@angular/material';
   `]
 })
 export class BacklogComponent {
-    private project = null;
-    private projects = [];
-    private items = [];
-    private sort = {field: 'id', order: 'desc'};
-    private requesting = false;
-    private loading = false;
-    private PRI = ['High', 'Medium', 'Low'];
+    project = null;
+    projects = [];
+    items = [];
+    sort = {field: 'id', order: 'desc'};
+    requesting = false;
+    loading = false;
+    PRI = ['High', 'Medium', 'Low'];
 
-    private hideFinished = true;
+    hideFinished = true;
 
     constructor(
         public dialog: MdDialog,
@@ -165,7 +165,7 @@ export class BacklogComponent {
         });
     }
 
-    private filterChange(e) {
+    filterChange(e) {
         this.loadItems();
     }
 
@@ -207,7 +207,7 @@ export class BacklogComponent {
         item.treeState = '';
     }
 
-    private sortResult(field) {
+    sortResult(field) {
         if (field == this.sort.field)
             this.sort.order = this.sort.order == 'desc' ? 'asc' : 'desc';
         else

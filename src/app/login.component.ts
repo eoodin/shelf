@@ -38,9 +38,10 @@ import {LoginService} from './login.service';
     `]
 })
 export class LoginComponent {
+    proceeding;
+    failedMessage;
+    
     private goto;
-    private proceeding;
-    private failedMessage;
 
     constructor(private router: Router,
                 private route: ActivatedRoute,

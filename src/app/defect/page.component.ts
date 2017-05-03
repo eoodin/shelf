@@ -22,6 +22,5 @@ import { Router, ActivatedRoute } from "@angular/router";
   `]
 })
 export class PageComponent {
-
   constructor( private router: Router) {  }
 }

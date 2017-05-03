@@ -198,15 +198,15 @@ import { TaskService } from './task.service';
     `]
 })
 export class PlanContentComponent implements OnInit{
-    private current = {};
-    private workItems = [];
-    private _plans = [];
-    private sort = {};
-    private team;
-    private ui;
-    private hideFinished = false;
-    private onlyOwned = false;
-    private PRI = ['High', 'Medium', 'Low'];
+    current;
+    workItems = [];
+    _plans = [];
+    sort;
+    team;
+    ui;
+    hideFinished = false;
+    onlyOwned = false;
+    PRI = ['High', 'Medium', 'Low'];
 
     project = null;
 
@@ -223,7 +223,7 @@ export class PlanContentComponent implements OnInit{
             'cpd': { 'show': false },
             'rwd': { 'show': false }
         };
-
+        this.current = this.sort =  this.team = {};
         this.teams.ownTeam
             .filter(team => team)
             .subscribe(team => this.team = team);
@@ -299,7 +299,7 @@ export class PlanContentComponent implements OnInit{
             .subscribe(resp => this.loadWorkItems());
     }
 
-    onWorkSaved(resp) {
+    onWorkSaved() {
         this.ui.awd.show = false;
         this.loadWorkItems();
     }
@@ -312,10 +312,6 @@ export class PlanContentComponent implements OnInit{
 
         this.sort['field'] = field;
         this.loadWorkItems();
-    }
-
-    detailClosed() {
-        this.ui.awd.show = false;
     }
 
     loadWorkItems() {
@@ -365,11 +361,11 @@ export class PlanContentComponent implements OnInit{
         this.downloader.nativeElement.src = '/api/tasks/?format=csv&planId=' + this.current['id']
     }
 
-    private selectedIds() {
+    selectedIds() {
         return this.workItems.filter(i => i.checked).map(i => i.id);
     }
 
-    private switchPlan(plan) {
+    switchPlan(plan) {
         this.current = plan;
         this.loadWorkItems();
     }

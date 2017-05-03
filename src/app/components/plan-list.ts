@@ -19,10 +19,10 @@ import {PlanService} from "../plan.service";
     `]
 })
 export class PlanList {
-    private _plans: Array<any> = [];
-    private showAll: boolean;
-
-    private selected: any;
+    _plans: Array<any> = [];
+    showAll: boolean;
+    selected: any;
+    
     @Output() public select: EventEmitter<PlanList> = new EventEmitter<PlanList>();
 
     constructor(private pref: PreferenceService,
@@ -36,11 +36,11 @@ export class PlanList {
             .subscribe(p => this.selectPlan(p));
     }
 
-    private toggleAll() {
+    toggleAll() {
         this.showAll = !this.showAll;
     }
 
-    private visiblePlans() {
+    visiblePlans() {
         return this.showAll ? this._plans : this._plans.slice(0, 10);
     }
 

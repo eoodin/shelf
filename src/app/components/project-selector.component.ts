@@ -18,9 +18,8 @@ import {ProjectService} from "../project.service";
   styles: [`.project-select{ display: inline-block;}`]
 })
 export class ProjectSelectorComponent {
-
-  private projects = [];
-  private project;
+  projects = [];
+  project;
 
   constructor(
     private projService: ProjectService) {

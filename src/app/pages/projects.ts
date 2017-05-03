@@ -133,10 +133,10 @@ class Project {
     `]
 })
 export class Projects {
-    private ui;
-    private permitSA: boolean = false;
-    private projects: any[];
-    private teams = [];
+    ui;
+    permitSA: boolean = false;
+    projects: any[];
+    teams = [];
 
     constructor(private http: Http,
                 private prjs: ProjectService,

@@ -1,4 +1,5 @@
 import { NgModule } from "@angular/core";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from "@angular/platform-browser";
 import { ShelfAppComponent, AboutDialog } from "./shelf.component";
 import { RouterModule } from "@angular/router";
@@ -124,6 +125,7 @@ export class ShelfRequestOptions extends RequestOptions {
         CKEditorModule,
         MaterialModule,
         RouterModule.forRoot(routes),
+        BrowserAnimationsModule,
         Ng2BootstrapModule.forRoot()
     ],
     entryComponents: [
