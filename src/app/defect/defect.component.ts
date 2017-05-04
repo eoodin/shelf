@@ -68,11 +68,15 @@ export class DefectComponent {
     private defects: DefectService,
     private prjs: ProjectService) {
       this.defect = new Defect();
-      // this.defect['severity'] = 'Major';
       this.route.params
         .filter(params => params['id'] && params['id'] != 'new')
         .switchMap((params: Params) => this.defects.single(params['id']))
         .subscribe(item => this.defect = item);
+      this.route.params.filter(params => params['id'] && params['id'] == 'new')
+        .subscribe(() => {
+          this.defect = new Defect(); 
+          this.defect.severity = 'Major';
+        });
   }
 
   save(another) {
