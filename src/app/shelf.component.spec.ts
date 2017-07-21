@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import {ShelfAppComponent} from '../app/shelf.component';
+import { RouterLinkStubDirective, RouterOutletStubComponent } from '../../testing/router-stubs'
+import { ShelfAppComponent } from '../app/shelf.component';
 
 declare var describe, it, expect, beforeEach;
 
@@ -10,9 +10,11 @@ describe('App: ShelfServer', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ShelfAppComponent ]
+      declarations: [ShelfAppComponent,
+        RouterLinkStubDirective, RouterOutletStubComponent
+      ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
