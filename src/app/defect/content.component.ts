@@ -3,6 +3,7 @@ import { Router } from "@angular/router";
 import {MdDialog, MdDialogRef} from '@angular/material';
 import { HttpService } from '../http.service';
 import { DefectService } from '../defect.service';
+import { TeamService } from '../team.service';
 import { ProjectService } from '../project.service';
 import { PlanService } from '../plan.service';
 import { UserService } from '../user.service'
@@ -80,7 +81,14 @@ import { UserService } from '../user.service'
                       <td><a (click)="showItem(item)"> {{item.title}} </a></td>
                       <td><span *ngIf="item.creator">{{item.creator.name}}</span></td>
                       <td><span> {{item.createdAt | date: 'y-MM-dd'}} </span> </td>
-                      <td><span *ngIf="item.owner">{{item.owner.name}}</span><span *ngIf="!item.owner"> Unassigned </span></td>
+                      <td class="changeable">
+                        <button *ngIf="item.owner" md-button [mdMenuTriggerFor]="candidates">{{item.owner.name}}</button>
+                        <button *ngIf="!item.owner" md-button [mdMenuTriggerFor]="candidates"> Unassigned </button>
+                        <md-menu #candidates="mdMenu">
+                            <button *ngFor="let member of members" (click)="assignTo(item, member)" md-menu-item>{{ member.name }}</button>
+                            <button *ngIf="item.owner" md-menu-item>Unassigned</button>
+                        </md-menu>
+                      </td>
                       <td class="changeable">
                         <a *ngIf="item.status == 'Open'" (click)="startFix(item)"  md-button>Start Fix</a>
                         <a *ngIf="item.status == 'Fixed'" (click)="startTest(item)"  md-button>Start Test</a>
@@ -115,6 +123,7 @@ export class ContentComponent implements OnInit, OnDestroy {
     sort = {field: 'id', order: 'desc'};
     loading = false;
     user;
+    members = [];
 
     project;
     hideClosed = true;
@@ -127,9 +136,12 @@ export class ContentComponent implements OnInit, OnDestroy {
         public dialog: MdDialog,
         private router: Router,
         private http: HttpService,
+        private teams: TeamService,
         private defects: DefectService,
         private userService: UserService,
         private projectSerivce: ProjectService) {
+        this.teams.ownTeam.subscribe(t => console.log('team: ', t));
+        this.teams.ownTeam.subscribe(t => this.members = t.members);
     }
 
     ngOnInit(): void {
@@ -191,6 +203,14 @@ export class ContentComponent implements OnInit, OnDestroy {
         });
     }
 
+    assignTo(item, member) {
+        this.loading = true;
+        var change = { 'ownerId': member ? member.id : null };
+        this.defects.save(item.id, change)
+            .finally(() => this.loading = false)
+            .subscribe(resp => this.loadItems());
+    }
+    
     startTest(item) {
         let dialogRef = this.dialog.open(SelectPlanDialog);
         dialogRef.afterClosed().subscribe(result => {
