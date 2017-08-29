@@ -130,7 +130,7 @@ export class ContentComponent implements OnInit, OnDestroy {
     loading = false;
     user;
     members = [];
-    summary = {};
+    summary = {total: 0, open: 0, closed: 0, declined: 0, failed: 0, fixing: 0, testing: 0};
 
     project;
     hideClosed = true;
