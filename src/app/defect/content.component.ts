@@ -18,7 +18,12 @@ import { UserService } from '../user.service'
           </div>
           <div class="panel panel-default">
               <div class="panel-heading work-items-heading">
-                <div class="heading-left"><span>{{total}} defects in table</span></div>
+                <div class="heading-left">
+                    <span >Total:</span><span class="value"> {{summary.total}}</span>
+                    <span >Closed/Declined:</span><span class="value"> {{summary.closed + summary.declined}}</span>
+                    <span >Open/Failed:</span><span class="value"> {{summary.open + summary.failed}}</span>
+                    <span >Fixing/Testing:</span><span class="value"> {{summary.fixing + summary.testing}}</span>
+                </div>
                 <div class="heding-right">
                     <md-checkbox [(ngModel)]="hideClosed" (change)="filterChange($event)">Hide Closed</md-checkbox>
                     <md-checkbox [(ngModel)]="hideDeclined" (change)="filterChange($event)">Hide Declined</md-checkbox>
@@ -105,6 +110,7 @@ import { UserService } from '../user.service'
     .work-items-heading { height: 38px; }
     .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
+    .heading-left .value {font-weight: bold;}
     [ngcontrol='title'] { width: 100%; }
     .plan-head h1 {font-size: 18px; margin: 0;}
     .plan-head ul {padding-left: 0;}
@@ -124,6 +130,7 @@ export class ContentComponent implements OnInit, OnDestroy {
     loading = false;
     user;
     members = [];
+    summary = {};
 
     project;
     hideClosed = true;
@@ -169,6 +176,8 @@ export class ContentComponent implements OnInit, OnDestroy {
         if (this.onlyOwned) search['ownonly'] = 'true';        
         if (this.hideDeclined) search['nodeclined'] = 'true';
 
+        this.defects.summary({project: search['project']})
+            .subscribe(s => this.summary = s);
         this.defects.load(search)
             .subscribe(result => {this.items = result.rows; this.total = result.count;},
                  err => {},
@@ -193,7 +202,7 @@ export class ContentComponent implements OnInit, OnDestroy {
                 return;
 
             this.loading = true;
-            this.http.post('/api/defect/' + item.id + '/fix', JSON.stringify({planId: result}))
+            this.http.post('/api/defects/' + item.id + '/fix', JSON.stringify({planId: result}))
                 .subscribe(
                 () => this.loadItems(),
                 (resp) => {
@@ -218,7 +227,7 @@ export class ContentComponent implements OnInit, OnDestroy {
                 return;
 
             this.loading = true;
-            this.http.post('/api/defect/' + item.id + '/test', JSON.stringify({planId: result}))
+            this.http.post('/api/defects/' + item.id + '/test', JSON.stringify({planId: result}))
                 .subscribe(
                 () => this.loadItems(),
                 (resp) => {

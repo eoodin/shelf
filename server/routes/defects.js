@@ -75,7 +75,28 @@ module.exports = function(router) {
             });
         });
 
-    router.route('/defect/:id')
+    router.route('/defects/summary')
+        .get(function(req, res) {
+            var pid = req.query.project;
+            models.defect.findAndCountAll({
+                attributes: ['status', 'severity'],
+                where: {projectId: req.query.project}
+            }).then(function(ds) {
+                //['Open', 'Analyzing', 'Declined', 'Fixing', 'Fixed', 'Testing', 'Failed', 'Closed']
+                res.json({
+                    total: ds.count,
+                    open: ds.rows.filter(d => d.status == 'Open').length,
+                    closed: ds.rows.filter(d => d.status == 'Closed').length,
+                    declined: ds.rows.filter(d => d.status == 'Declined').length,
+                    fixing: ds.rows.filter(d => d.status == 'Fixing').length,
+                    fixed: ds.rows.filter(d => d.status == 'Fixed').length,
+                    testing: ds.rows.filter(d => d.status == 'Testing').length,
+                    failed: ds.rows.filter(d => d.status == 'Failed').length
+                });
+            });
+        });
+    
+    router.route('/defects/:id')
         .get(function(req, res) {
             models.defect.findById(req.params.id).then(function(d) {
                 res.json(d);
@@ -122,7 +143,7 @@ module.exports = function(router) {
             });
         });
 
-    router.route('/defect/:id/fix')
+    router.route('/defects/:id/fix')
         .post(function(req, res) {
             if (!req.body.planId) {
                 res.sendStatus(404);
@@ -156,7 +177,7 @@ module.exports = function(router) {
             });
         });
 
-    router.route('/defect/:id/test')
+    router.route('/defects/:id/test')
         .post(function(req, res) {
             if (!req.body.planId) {
                 res.sendStatus(404);

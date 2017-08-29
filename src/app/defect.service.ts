@@ -29,13 +29,22 @@ export class DefectService {
         })
       });
   }
+  public summary(search) {
+    let params = new URLSearchParams();
+    for(let key in search) {
+        params.set(key, search[key]);
+    }
+    let options = new RequestOptions({ search: params });
+    return this.http.get('/api/defects/summary', options)
+      .map(resp => resp.json());
+  }
 
   public single(id) {
-    return this.http.get('/api/defect/' + id).map(resp => resp.json()).do(d => this.enrichDefect(d));
+    return this.http.get('/api/defects/' + id).map(resp => resp.json()).do(d => this.enrichDefect(d));
   }
 
   public save(id, changes) {
-    return this.http.patch('/api/defect/' + id, JSON.stringify(changes));
+    return this.http.patch('/api/defects/' + id, JSON.stringify(changes));
   }
 
   public create(data) {
