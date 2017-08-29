@@ -147,7 +147,6 @@ export class ContentComponent implements OnInit, OnDestroy {
         private defects: DefectService,
         private userService: UserService,
         private projectSerivce: ProjectService) {
-        this.teams.ownTeam.subscribe(t => console.log('team: ', t));
         this.teams.ownTeam.subscribe(t => this.members = t.members);
     }
 
