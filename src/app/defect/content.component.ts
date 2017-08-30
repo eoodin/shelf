@@ -83,7 +83,7 @@ import { UserService } from '../user.service'
                         </md-menu>
                       </td>
                       <td> {{item.severity}} </td>
-                      <td><a (click)="showItem(item)"> {{item.title}} </a></td>
+                      <td><a [routerLink]="['.', item.id]"> {{item.title}} </a></td>
                       <td><span *ngIf="item.creator">{{item.creator.name}}</span></td>
                       <td><span> {{item.createdAt | date: 'y-MM-dd'}} </span> </td>
                       <td class="changeable">
@@ -234,10 +234,6 @@ export class ContentComponent implements OnInit, OnDestroy {
                 },
                 () => this.loading = false);
         });
-    }
-
-    showItem(item) {
-        this.router.navigate(['/defects/' + item.id]);
     }
 
     filterChange(e) {
