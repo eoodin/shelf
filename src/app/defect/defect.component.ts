@@ -8,11 +8,15 @@ import { DefectService } from '../defect.service';
 import { Defect } from '../model/defect';
 
 @Component({
-  selector: 'app-defect',
+  selector: '[app-defect]',
   template: `
     <div class="defect-edit">
       <div>
-          <a routerLink=".."> <i class="material-icons">arrow_back</i></a>
+        <a routerLink=".."> <i class="material-icons">arrow_back</i></a>
+        <div class="actions">
+          <a md-button routerLink=".." (click)="save(false)">Save</a>
+          <a md-button *ngIf="!defect.id" [disabled]="saving" (click)="save(true)">Save and New</a>
+        </div>
       </div>
       <div>
           <md-radio-group [(ngModel)]="defect.severity">
@@ -25,16 +29,23 @@ import { Defect } from '../model/defect';
       <div *ngIf="defect.id"><label>Status</label><span class="status">{{defect.status}}</span></div>
       <div *ngIf="defect.id"><label>Reporter</label><span *ngIf="defect.creator">{{defect.creator.name}}</span></div>
       <div *ngIf="defect.id"><label>Reported Time</label><span>{{defect.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span></div>
-      <div>
-          <ckeditor [(ngModel)]="defect.description" [config]="editorConfig" debounce="400"></ckeditor>
+      <div class="description">
+          <ckeditor [(ngModel)]="defect.description" [config]="editorConfig" debounce="200"></ckeditor>
       </div>
+      <!--
       <div>
-          <a md-button routerLink=".." (click)="save(false)">Save</a>
-          <a md-button *ngIf="!defect.id" [disabled]="saving" (click)="save(true)">Save and New</a>
+        <h4>History</h4>
+        <ul>
+          <li></li>
+        </ul>
       </div>
+      -->
   </div>
   `,
   styles: [`
+  :host {flex-grow: 1; display: flex; flex-direction: column;}
+  .defect-edit {flex-grow: 1; display: flex; flex-direction: column; }
+  .defect-edit .actions {display: inline-block; float: right;}
   .defect-edit>div{margin: 7px 0;}
   .defect-edit>div>label{padding-right: 20px;}
   .defect-edit>div>label:after {content: ':';}
@@ -43,6 +54,8 @@ import { Defect } from '../model/defect';
   .title-row {display:flex; flex-direction: row;}
   .title-row input {flex-grow: 1; font-weight: 700;}
   md-radio-button {margin: 0 7px;}
+  .description {flex-grow: 1;display: flex; flex-direction: column;}
+  ckeditor {flex-grow: 1; display: flex; flex-direction: column;}
   `]
 })
 export class DefectComponent {
@@ -52,6 +65,7 @@ export class DefectComponent {
   editorConfig = {
     extraPlugins: 'uploadimage,divarea',
     imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
+    autoGrow_onStartup: true,
     toolbar: [
       {
         name: 'styles',
@@ -75,7 +89,6 @@ export class DefectComponent {
       this.route.params.filter(params => params['id'] && params['id'] == 'new')
         .subscribe(() => {
           this.defect = new Defect(); 
-          this.defect.severity = 'Major';
         });
   }
 

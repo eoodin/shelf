@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router, ActivatedRoute } from "@angular/router";
 
 @Component({
-  selector: 'defect-page',
+  selector: '[defect-page]',
   template: `
     <div class="defect-page">
       <div class="info">
@@ -15,7 +15,8 @@ import { Router, ActivatedRoute } from "@angular/router";
     </div>
   `,
   styles: [`
-  .defect-page {padding: 10px;}
+  :host {flex-grow: 1; display:flex; flex-direction: column;}
+  .defect-page {flex-grow: 1; padding: 10px; display:flex; flex-direction: column;}
   .info { height:40px; padding: 2px 0;}
   .info .project-select{ display: inline-block;}
   .info .operations { float: right;}

@@ -48,7 +48,7 @@ import {MdDialog, MdDialogRef} from '@angular/material';
     styles: [`
     a:hover {cursor: pointer;}
     .app-page {padding-top: 50px; height: 100%;}
-    .workspace {height: 100%; margin: 0; padding: 0;}
+    .workspace {height: 100%; margin: 0; padding: 0; display:flex; flex-direction: column;}
     .nav-logo {width: 32px; height:32px;}
     `]
 })
