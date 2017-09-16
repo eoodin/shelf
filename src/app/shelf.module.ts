@@ -5,22 +5,18 @@ import { ShelfAppComponent, AboutDialog } from "./shelf.component";
 import { RouterModule } from "@angular/router";
 import { HttpModule, RequestOptions, Headers } from "@angular/http";
 import { PlanList } from "./components/plan-list";
-import { ItemDetail } from "./components/item-detail";
-import { ModalDialog } from "./components/modal-dialog";
-import { Projects } from "./pages/projects";
+import { Projects, CreateTeamDialog, CreateProjectDialog} from "./pages/projects";
 import { Backlog } from "./pages/backlog";
 import { Plans } from "./pages/plans";
 import { WorkItems } from "./pages/workitems";
 import { LocationStrategy, HashLocationStrategy } from "@angular/common";
 import { MaterialModule } from "@angular/material";
-import { Ng2BootstrapModule } from "ng2-bootstrap";
 import { FormsModule } from "@angular/forms";
 import { CKEditorModule } from "ng2-ckeditor";
 import { HttpService } from "./http.service";
 import { LoginComponent } from './login.component';
 import { NotifyService } from "./notify.service";
-import { PlanContentComponent } from './plan-content.component';
-import { ItemDetailComponent } from './item-detail.component';
+import { PlanContentComponent, ItemDetailDialog, MoveItemsDialog, RemoveConfirmDialog } from './plan-content.component';
 import { PreferenceService } from "./preference.service";
 import { DefectService } from "./defect.service";
 import { TeamService } from "./team.service";
@@ -53,9 +49,7 @@ let routes = [
     {
         path: 'plans', component: Plans,
         children: [
-            // {path: '', redirectTo: '/', pathMatch: 'full'},
-            { path: '', component: PlanContentComponent },
-            { path: 'item/:id', component: ItemDetailComponent }
+            { path: '', component: PlanContentComponent }
         ]
     },
     {
@@ -81,22 +75,24 @@ export class ShelfRequestOptions extends RequestOptions {
 @NgModule({
     declarations: [
         LoginComponent,
-        ModalDialog,
         PlanList,
-        ItemDetail,
         Projects,
         Backlog,
         Plans,
         WorkItems,
         ShelfAppComponent,
         PlanContentComponent,
-        ItemDetailComponent,
         PlanCreatorComponent,
         StoryComponent,
         BacklogComponent,
         DeleteConfirmDialog,
         SelectPlanDialog,
         AboutDialog,
+        ItemDetailDialog,
+        MoveItemsDialog,
+        RemoveConfirmDialog,
+        CreateProjectDialog,
+        CreateTeamDialog,
         DefectPage,
         DefectDetail,
         DefectContent,
@@ -125,13 +121,17 @@ export class ShelfRequestOptions extends RequestOptions {
         CKEditorModule,
         MaterialModule,
         RouterModule.forRoot(routes),
-        BrowserAnimationsModule,
-        Ng2BootstrapModule.forRoot()
+        BrowserAnimationsModule
     ],
     entryComponents: [
         DeleteConfirmDialog,
         SelectPlanDialog,
-        AboutDialog
+        AboutDialog,
+        ItemDetailDialog,
+        MoveItemsDialog,
+        RemoveConfirmDialog,
+        CreateProjectDialog,
+        CreateTeamDialog
     ],
     bootstrap: [ShelfAppComponent],
 })

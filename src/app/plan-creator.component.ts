@@ -7,7 +7,7 @@ import {PreferenceService} from "./preference.service";
     selector: 'plan-creator',
     template: `
     <div class="modal fade in" [style.display]="_visible ? 'block' : 'none'" role="dialog">
-        <div class="modal-dialog">
+        <div>
             <form>
                 <div class="modal-content">
                     <div class="modal-header">

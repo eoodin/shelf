@@ -13,34 +13,18 @@ import {MdDialog, MdDialogRef} from '@angular/material';
     selector: '[shelf-app]',
     template: `
     <div class="app-page">
-        <nav class="navbar navbar-default navbar-fixed-top">
-          <div class="container-fluid ">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="javascript:void(0);"><img class="nav-logo" src="/app/images/icon-large.png"/></a>
-            </div>
-            <div class="collapse navbar-collapse">
-              <ul class="nav navbar-nav">
-                <li [class.active]="getLinkStyle('/projects')"><a [routerLink]="['/projects']" class="link">Dashboard</a></li>
-                <li [class.active]="getLinkStyle('/backlog')"><a [routerLink]="['/backlog']" class="link">Backlog</a></li>
-                <li [class.active]="getLinkStyle('/plans')"><a [routerLink]="['/plans']" class="link">Plans</a></li>
-                <li [class.active]="getLinkStyle('/defects')"><a [routerLink]="['/defects']" class="link">Defects</a></li>
-              </ul>
-              <ul class="nav navbar-nav navbar-right">
-                <li [class.active]="getLinkStyle('/settings')"><a [routerLink]="['/settings']">Settings</a></li>
-                <li><a (click)="showAbout()">About</a></li>
-                <li><a (click)="logoutApp()" >Logout</a></li>
-              </ul>
-            </div><!--/.nav-collapse -->
-          </div>
+        <nav class="navbar">
+            <a class="navbar-brand" href="javascript:void(0);"><img class="nav-logo" src="/app/images/icon-large.png"/></a>
+            <a class="mat-button" [class.active]="getLinkStyle('/projects')" [routerLink]="['/projects']">Dashboard</a>
+            <a class="mat-button" [class.active]="getLinkStyle('/backlog')" [routerLink]="['/backlog']">Backlog</a>
+            <a class="mat-button" [class.active]="getLinkStyle('/plans')" [routerLink]="['/plans']">Plans</a>
+            <a class="mat-button" [class.active]="getLinkStyle('/defects')" [routerLink]="['/defects']">Defects</a>
+            <div class="flex-spacer"></div>
+            <a class="mat-button" (click)="showAbout()">About</a>
+            <a class="mat-button" (click)="logoutApp()" >Logout</a>
         </nav>
 
-        <div class="container-fluid workspace">
+        <div class="workspace">
             <router-outlet></router-outlet>
         </div>
     </div>

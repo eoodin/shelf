@@ -21,7 +21,6 @@
       "styles": [
         "styles.css",
         "css-spinner.css",
-        "../node_modules/bootstrap/dist/css/bootstrap.min.css",
         "./assets/material-icons.css"
       ],
       "scripts": [],

@@ -1,5 +1,6 @@
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {Http} from '@angular/http';
+import {MdDialog, MdDialogRef, MD_DIALOG_DATA} from '@angular/material';
 import {ProjectService} from "../project.service";
 import {TeamService} from "../team.service";
 import {UserService} from "../user.service";
@@ -26,10 +27,9 @@ class Project {
             </li>
         </ul>
 
-        <button *ngIf="permitSA" class="btn btn-primary" (click)="ui.createProjectDialog.show = true;">New Project</button>
+        <button *ngIf="permitSA" class="btn btn-primary" (click)="showCreateProject()">New Project</button>
        </div>
       </div>
-
 
       <div class="panel panel-default">
        <div class="panel-heading">
@@ -42,49 +42,7 @@ class Project {
                 <button *ngIf="permitSA" class="btn btn-danger btn-sm" (click)="deleteTeam(team)">Delete</button>
             </li>
         </ul>
-        <button *ngIf="permitSA" class="btn btn-primary" (click)="ui.createTeamDialog.show = true;">Add Team...</button>
-
-        <modal-dialog [(show)]="ui.createTeamDialog.show" [title]="'Add New Team'">
-            <div dialog-body>
-                <form #f="ngForm" (ngSubmit)="onCreateTeamSubmit(f.value)">
-                    <div class="row">
-                        <div class="col-sm-3">Team name:</div><div class="col-sm-5"> <input type="text" ngControl="name"></div>
-                    </div>
-    
-                    <div class="row">
-                        <div class="col-sm-3">Scrum master:</div><div class="col-sm-5"> <input type="text" ngControl="scrumMaster"></div>
-                    </div>
-    
-                    <div class="row">
-                        <div class="col-sm-3">Members:</div><div class="col-sm-5"> <input type="text" ngControl="users"></div>
-                    </div>
-                </form>
-            </div>
-            <div dialog-footer>
-                <button (click)="f.onSubmit()" class="btn btn-default" data-dismiss="modal">Add</button>
-            </div>
-        </modal-dialog>
-        
-        <modal-dialog [(show)]="ui.createProjectDialog.show" [title]="'Add New Project'">
-            <div dialog-body>
-                <form #f="ngForm" (ngSubmit)="onCreateProjectSubmit(f.value)">
-                    <div class="row">
-                        <div class="col-sm-3">Project name:</div><div class="col-sm-5"> <input type="text" ngControl="projectName"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-3">Team:</div>
-                        <div class="col-sm-5">
-                           <select class="form-control" required ngControl="teamId">
-                              <option *ngFor="let t of teams" [value]="t.id">{{t.name}}</option>
-                           </select>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div dialog-footer>
-                <button (click)="f.onSubmit()" class="btn btn-default" data-dismiss="modal">Add</button>
-            </div>
-        </modal-dialog>
+        <button *ngIf="permitSA" class="btn btn-primary" (click)="showCreateTeam()">Add Team...</button>
        </div>
       </div>
 
@@ -139,6 +97,7 @@ export class Projects {
     teams = [];
 
     constructor(private http: Http,
+                public dialog: MdDialog,
                 private prjs: ProjectService,
                 private teamService: TeamService,
                 private us: UserService) {
@@ -164,20 +123,86 @@ export class Projects {
             .subscribe(() => this.prjs.load());
     }
 
-    onCreateProjectSubmit(data) {
-        this.http.post('/api/projects/', JSON.stringify(data))
-            .subscribe(() => this.prjs.load());
-
-        this.ui.createProjectDialog.show = false;
+    showCreateProject() {
+        let options = {teams: this.teams, projectName: '', teamId: 0};
+        let dlgRef = this.dialog.open(CreateProjectDialog, {data: options});
+        dlgRef.afterClosed().filter(isCreate => isCreate).subscribe(() => {
+            let project = {projectName: options.projectName, teamId: options.teamId}
+            this.http.post('/api/projects/', JSON.stringify(project))
+                .subscribe(() => this.prjs.load());
+        });
     }
 
-    onCreateTeamSubmit(data) {
-        data.users = data.users.split(',');
-        this.teamService.createTeam(data.name, data.scrumMaster, data.users);
-        this.ui.createTeamDialog.show = false;
+    showCreateTeam() {
+        let options:any = {};
+        let dlgRef = this.dialog.open(CreateTeamDialog, {data: options});
+        dlgRef.afterClosed().filter(isCreate => isCreate).subscribe(() => {
+            options.users = options.users.split(',');
+            this.teamService.createTeam(options.name, options.scrumMaster, options.users);
+            let project = {projectName: options.projectName, teamId: options.teamId}
+            this.http.post('/api/projects/', JSON.stringify(project))
+                .subscribe(() => this.prjs.load());
+        });
     }
 
     deleteTeam(team) {
         this.teamService.deleteTeam(team.id);
     }
+}
+
+@Component({
+    selector: 'confirm-remove-diaolg',
+    template: `
+    <h2 md-dialog-title>Add New Team</h2>
+    <md-dialog-content class="item-details">
+        <div class="row">
+            <div class="col-sm-3">Team name:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="data.name"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3">Scrum master:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="data.scrumMaster"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3">Members:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="data.users"></div>
+        </div>
+    </md-dialog-content>
+    <md-dialog-actions>
+        <button md-button md-dialog-close>Cancel</button>
+        <button md-button [md-dialog-close]="true">Add</button>
+    </md-dialog-actions>`
+})
+export class CreateTeamDialog {
+    constructor(
+        public dialogRef: MdDialogRef<CreateTeamDialog>, 
+        @Inject(MD_DIALOG_DATA) public data: any
+    ) { console.log(data); }
+}
+
+@Component({
+    selector: 'confirm-remove-diaolg',
+    template: `
+    <h2 md-dialog-title>Add New Project</h2>
+    <md-dialog-content class="item-details">
+        <div class="row">
+            <div class="col-sm-3">Project name:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="data.projectName"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3">Team:</div>
+            <div class="col-sm-5">
+            <select class="form-control" required [(ngModel)]="data.teamId">
+                <option *ngFor="let t of data.teams" [value]="t.id">{{t.name}}</option>
+            </select>
+            </div>
+        </div>
+    </md-dialog-content>
+    <md-dialog-actions>
+        <button md-button md-dialog-close>Cancel</button>
+        <button md-button [md-dialog-close]="true">Create</button>
+    </md-dialog-actions>`
+})
+export class
+CreateProjectDialog {
+    constructor(
+        public dialogRef: MdDialogRef<CreateProjectDialog>, 
+        @Inject(MD_DIALOG_DATA) public data: any
+    ) { console.log(data); }
 }

@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Params } from '@angular/router';
 import { HttpService } from '../http.service';
-import { ModalDirective } from 'ng2-bootstrap';
 import { ProjectService } from "../project.service";
 import { DefectService } from '../defect.service';
 import { Defect } from '../model/defect';

@@ -1,9 +1,11 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, Inject, OnInit, ViewChild } from "@angular/core";
+import {MdDialog, MdDialogRef, MD_DIALOG_DATA} from '@angular/material';
 import { PreferenceService } from "./preference.service";
 import * as moment from "moment";
 import { PlanService } from "./plan.service";
 import { TeamService } from "./team.service";
 import { TaskService } from './task.service';
+import { ProjectService } from "./project.service";
 
 @Component({
     selector: 'plan-content',
@@ -22,7 +24,7 @@ import { TaskService } from './task.service';
                     <iframe #downloader style="display:none;"></iframe>
                     <button md-button (click)="exportCsv()"><i class="glyphicon glyphicon-export" aria-hidden="true"></i>Export as CSV</button>
                     <button md-button (click)="showAddItem()">New Task...</button>
-                    <button md-button (click)="ui.mtd.show = true" [disabled]="!selectedIds().length">Move...</button>
+                    <button md-button (click)="showMoveToPlan()" [disabled]="!selectedIds().length">Move...</button>
                 </div>
             </div>
             <div class="plan-body">
@@ -146,32 +148,6 @@ import { TaskService } from './task.service';
                 </div>
             </div>
         </div>
-  
-    <modal-dialog [(show)]="ui.mtd.show" [title]="'Move selected items to plan'">
-        <div dialog-body>
-            <select #moveTo class="form-control" required>
-                <option *ngFor="let p of _plans" [value]="p.id">{{p.name}}</option>
-            </select>
-        </div>
-        <div dialog-footer class="modal-footer">
-            <button (click)="ui.mtd.show=false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button (click)="moveItemsToPlan(moveTo.value)" class="btn btn-default" data-dismiss="modal">Move</button>
-        </div>
-    </modal-dialog>
-
-    <modal-dialog [(show)]="ui.rwd.show" [title]="'Confirm to remove work item'">
-        <div dialog-body>
-            You are about to remove work item <span *ngIf="ui.rwd.item">{{ui.rwd.item.id}}</span>. Are you sure?
-        </div>
-        <div dialog-footer class="modal-footer">
-            <button (click)="ui.rwd.show =false;" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button (click)="removeItem(ui.rwd.item)" class="btn btn-default" data-dismiss="modal">Remove</button>
-        </div>
-    </modal-dialog>
-    <item-detail [item]="ui.awd.item"
-                 [(show)]="ui.awd.show"
-                 (saved)="onWorkSaved();">
-    </item-detail>
     `,
     styles: [`
     .project-info { height:40px; padding: 2px 0;}
@@ -197,7 +173,7 @@ import { TaskService } from './task.service';
     .buttom-row:after {content: ''; height: 0; display: block; clear:both;}
     `]
 })
-export class PlanContentComponent implements OnInit{
+export class PlanContentComponent {
     current;
     workItems = [];
     _plans = [];
@@ -215,7 +191,10 @@ export class PlanContentComponent implements OnInit{
     constructor(private plans: PlanService,
         private tasks: TaskService,
         private teams: TeamService,
-        private pref: PreferenceService) {
+        private pref: PreferenceService,
+        public dialog: MdDialog,
+        private prjs: ProjectService) {
+        prjs.current.subscribe(p => this.project = p);
         this.ui = {
             'loading': { 'show': false },
             'awd': { 'show': false, 'loading': false, 'item': {} },
@@ -238,41 +217,46 @@ export class PlanContentComponent implements OnInit{
             .subscribe(ps => this.hideFinished = ps.hideFinished);
     }
 
-    public ngOnInit() {
-
-    }
-
-    moveItemsToPlan(planId) {
-        var ids = this.selectedIds();
-        if (!ids.length) {
-            alert("No selected work item.");
-            return;
-        }
-
-        this.tasks.moveToPlan(ids, planId)
-            .finally(() => { this.ui.mtd.show = false; })
-            .subscribe(resp => this.loadWorkItems());
+    showMoveToPlan() {
+        let dlgRef = this.dialog.open(MoveItemsDialog, {data: {plans: this._plans}});
+        let ids = this.selectedIds();
+        dlgRef.afterClosed().subscribe(pid => {
+            if (pid) {
+                this.tasks.moveToPlan(ids, pid).subscribe(() => this.loadWorkItems());
+            }
+        });
     }
 
     showAddItem() {
-        this.ui.awd.item = { 'planId': this.current['id'] };
-        this.ui.awd.show = true;
+        this.showItem({ 'planId': this.current['id'] });
     }
 
     showItem(item) {
         this.ui.awd.item = JSON.parse(JSON.stringify(item));
-        this.ui.awd.show = true;
+        let dlgRef = this.dialog.open(ItemDetailDialog, {data: this.ui.awd.item});
+        dlgRef.afterClosed().subscribe(save => {
+            if (save) {
+                let data = this.ui.awd.item;
+                if (!data['id']) {
+                    data.projectId = this.project['id'];
+                    this.tasks.create(data).subscribe(result => this.loadWorkItems());
+                }
+                else {
+                    let id = data['id'];
+                    delete data['id'];
+                    this.tasks.save(id, data).subscribe(result => this.loadWorkItems());
+                }
+            }
+        });
     }
 
     removingItem(item) {
-        this.ui.rwd.item = item;
-        this.ui.rwd.show = true;
-    }
-
-    removeItem(item) {
-        this.tasks.delete(item.id)
+        let dlgRef = this.dialog.open(RemoveConfirmDialog, {data: item});
+        dlgRef.afterClosed().filter(confirmed => confirmed).subscribe(confirmed => {
+            this.tasks.delete(item.id)
             .finally(() => { this.ui.rwd.show = false })
             .subscribe(() => this.loadWorkItems())
+        });
     }
 
     changeStatus(item, status) {
@@ -369,4 +353,104 @@ export class PlanContentComponent implements OnInit{
         this.current = plan;
         this.loadWorkItems();
     }
+}
+
+@Component({
+    selector: 'item-detail-diaolg',
+    template: `
+    <h2 md-dialog-title>Item Details</h2>
+    <md-dialog-content class="item-details">
+        <form (ngSubmit)="saveItem()">
+            <div class="row">
+                <div class="col-sm-12 field-row">
+                    <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="data.title" [ngModelOptions]="{standalone: true}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">Description:</div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <ckeditor [(ngModel)]="data.description" [config]="editorConfig" [ngModelOptions]="{standalone: true}" debounce="400"></ckeditor>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="data.estimation" [ngModelOptions]="{standalone: true}"></div>
+            </div>
+        </form>
+    </md-dialog-content>
+    <md-dialog-actions>
+        <button md-button md-dialog-close>Close</button>
+        <button md-button [md-dialog-close]="true">Save</button>
+    </md-dialog-actions>
+    `,
+    styles: [`
+    .item-details { padding-left: 0;}
+    .item-details li { list-style:none; margin-bottom: 10px;}
+    .item-details li:last-child { margin-bottom: 0;}
+    .item-details li .title { font-weight: 700; }
+    .item-details li .big-section { display: block;}
+    .item-details .row {margin: 8px 0;}
+    .field-row {display: flex; flex-direction: row; flex-wrap: nowrap;}
+    .field-row .field-label { margin-right: 20px;}
+    .field-row input,select {flex-grow: 1;}
+    `]
+})
+export class ItemDetailDialog {
+    private editorConfig = {
+        extraPlugins: 'uploadimage,divarea',
+        imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
+        toolbar: [
+            {
+                name: 'styles',
+                items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']
+            },
+            { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+            { name: 'tools', items: ['Maximize'] }
+        ]
+    };
+    constructor(
+        public dialogRef: MdDialogRef<ItemDetailDialog>, 
+        @Inject(MD_DIALOG_DATA) public data: any
+    ) {}
+}
+
+@Component({
+    selector: 'move-items-diaolg',
+    template: `
+    <h2 md-dialog-title>Move selected items to plan</h2>
+    <md-dialog-content class="item-details">
+        <select #moveTo class="form-control" required>
+            <option *ngFor="let p of data.plans" [value]="p.id">{{p.name}}</option>
+        </select>
+    </md-dialog-content>
+    <md-dialog-actions>
+        <button md-button md-dialog-close>Cancel</button>
+        <button md-button [md-dialog-close]="moveTo.value">Move</button>
+    </md-dialog-actions>`
+})
+export class MoveItemsDialog {
+    constructor(
+        public dialogRef: MdDialogRef<MoveItemsDialog>, 
+        @Inject(MD_DIALOG_DATA) public data: any
+    ) { }
+}
+
+@Component({
+    selector: 'confirm-remove-diaolg',
+    template: `
+    <h2 md-dialog-title>Are you sure?</h2>
+    <md-dialog-content class="item-details">
+        You are about to remove work item {{data.id}}. Are you sure?
+    </md-dialog-content>
+    <md-dialog-actions>
+        <button md-button md-dialog-close>Cancel</button>
+        <button md-button [md-dialog-close]="true">Remove</button>
+    </md-dialog-actions>`
+})
+export class RemoveConfirmDialog {
+    constructor(
+        public dialogRef: MdDialogRef<RemoveConfirmDialog>, 
+        @Inject(MD_DIALOG_DATA) public data: any
+    ) { }
 }
