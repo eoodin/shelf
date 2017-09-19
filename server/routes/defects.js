@@ -82,7 +82,6 @@ module.exports = function(router) {
                 attributes: ['status', 'severity'],
                 where: {projectId: req.query.project}
             }).then(function(ds) {
-                //['Open', 'Analyzing', 'Declined', 'Fixing', 'Fixed', 'Testing', 'Failed', 'Closed']
                 res.json({
                     total: ds.count,
                     open: ds.rows.filter(d => d.status == 'Open').length,

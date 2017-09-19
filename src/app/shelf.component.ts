@@ -10,29 +10,29 @@ import {AppService} from "./app.service";
 import {MdDialog, MdDialogRef} from '@angular/material';
 
 @Component({
-    selector: '[shelf-app]',
+    selector: 'shelf-app',
     template: `
-    <div class="app-page">
-        <nav class="navbar">
+    <div class="navbar">
+        <nav>
             <a class="navbar-brand" href="javascript:void(0);"><img class="nav-logo" src="/app/images/icon-large.png"/></a>
-            <a class="mat-button" [class.active]="getLinkStyle('/projects')" [routerLink]="['/projects']">Dashboard</a>
-            <a class="mat-button" [class.active]="getLinkStyle('/backlog')" [routerLink]="['/backlog']">Backlog</a>
-            <a class="mat-button" [class.active]="getLinkStyle('/plans')" [routerLink]="['/plans']">Plans</a>
-            <a class="mat-button" [class.active]="getLinkStyle('/defects')" [routerLink]="['/defects']">Defects</a>
-            <div class="flex-spacer"></div>
-            <a class="mat-button" (click)="showAbout()">About</a>
-            <a class="mat-button" (click)="logoutApp()" >Logout</a>
+            <button md-button [class.active]="getLinkStyle('/projects')" [routerLink]="['/projects']">Dashboard</button>
+            <button md-button [class.active]="getLinkStyle('/backlog')" [routerLink]="['/backlog']">Backlog</button>
+            <button md-button [class.active]="getLinkStyle('/plans')" [routerLink]="['/plans']">Plans</button>
+            <button md-button [class.active]="getLinkStyle('/defects')" [routerLink]="['/defects']">Defects</button>
+            <div style="flex-grow: 1;"></div>
+            <button md-button><a (click)="showAbout()">About</a></button>
+            <button md-button><a (click)="logoutApp()" >Logout</a></button>
         </nav>
-
-        <div class="workspace">
-            <router-outlet></router-outlet>
-        </div>
     </div>
-`,
+    <div class="workspace">
+        <router-outlet></router-outlet>
+    </div>`,
     styles: [`
-    a:hover {cursor: pointer;}
-    .app-page {padding-top: 50px; height: 100%;}
-    .workspace {height: 100%; margin: 0; padding: 0; display:flex; flex-direction: column;}
+    :host {position: absolute; top: 0; bottom: 0; left: 0; right: 0; display: flex; flex-direction: column;}
+    .navbar {box-shadow: 0 3px 5px -1px rgba(0,0,0,.2), 0 6px 10px 0 rgba(0,0,0,.14), 0 1px 18px 0 rgba(0,0,0,.12);position: relative; z-index: 10;}
+    nav { display: flex; flex-wrap: wrap; align-items: center;padding: 8px 16px;}
+    .workspace {flex: 1 1 auto; display: flex; overflow: auto;}
+    .navbar-brand {padding-right: 16px;}
     .nav-logo {width: 32px; height:32px;}
     `]
 })

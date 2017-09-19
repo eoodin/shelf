@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit  } from '@angular/core';
 import { Router } from "@angular/router";
-import {MdDialog, MdDialogRef} from '@angular/material';
+import { MdDialog, MdDialogRef } from '@angular/material';
 import { HttpService } from '../http.service';
 import { DefectService } from '../defect.service';
 import { TeamService } from '../team.service';
@@ -9,7 +9,7 @@ import { PlanService } from '../plan.service';
 import { UserService } from '../user.service'
 
 @Component({
-  selector: 'app-content',
+  selector: 'defect-content',
   template: `
   <div class="plan-body">
       <div class="item-table">
@@ -30,81 +30,63 @@ import { UserService } from '../user.service'
                     <md-checkbox [(ngModel)]="onlyOwned" (change)="filterChange($event)">Mine Only</md-checkbox>
                 </div>
               </div>
-              <table *ngIf="items" class="table">
-                  <tr>
-                      <th> ID </th>
-                      <th>
-                      <a (click)="sortResult('status')"> Status
-                            <span *ngIf="sort.field=='status'">
-                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                            </span>
-                        </a>
-                      </th>
-                      <th> 
-                        <a (click)="sortResult('severity')">Severity
-                            <span *ngIf="sort.field=='severity'">
-                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                            </span>
-                        </a>
-                      </th>
-                      <th> 
-                        <a (click)="sortResult('title')">Title
-                            <span *ngIf="sort.field=='title'">
-                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                            </span>
-                        </a>
-                      </th>
-                      <th> <a (click)="sortResult('creator')">Reporter
-                            <span *ngIf="sort.field=='creator'">
-                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                            </span>
-                        </a> 
-                      </th>
-                      <th> <a (click)="sortResult('createdAt')">Report Date
-                            <span *ngIf="sort.field=='createdAt'">
-                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                            </span>
-                        </a> 
-                      </th>
-                      <th> <a (click)="sortResult('owner')">Owner
-                            <span *ngIf="sort.field=='owner'">
-                                <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                            </span>
-                        </a> 
-                      </th>
-                      <th> Operations </th>
-                  </tr>
-                  <tr *ngFor="let item of items">
-                      <td> {{item.id}} </td>
-                      <td class="changeable">
-                        <button md-button [mdMenuTriggerFor]="statusMenu">{{item.status}}</button>
-                            <md-menu #statusMenu="mdMenu">
-                            <button *ngFor="let st of settableStatus(item)" (click)="changeStatus(item, st)"  md-menu-item>{{st}}</button>
+            <md-table #table [dataSource]="defects">
+                <ng-container mdColumnDef="id">
+                    <md-header-cell *mdHeaderCellDef> ID </md-header-cell>
+                    <md-cell *mdCellDef="let element"> {{element.id}} </md-cell>
+                </ng-container>
+                <ng-container mdColumnDef="status">
+                    <md-header-cell *mdHeaderCellDef> Status </md-header-cell>
+                    <md-cell *mdCellDef="let element">
+                        <a [mdMenuTriggerFor]="statusSel">{{element.status}}</a>
+                        <md-menu #statusSel="mdMenu">
+                            <button *ngFor="let st of settableStatus(element)" (click)="changeStatus(element, st)"  md-menu-item>{{st}}</button>
                         </md-menu>
-                      </td>
-                      <td> {{item.severity}} </td>
-                      <td><a [routerLink]="['.', item.id]"> {{item.title}} </a></td>
-                      <td><span *ngIf="item.creator">{{item.creator.name}}</span></td>
-                      <td><span> {{item.createdAt | date: 'y-MM-dd'}} </span> </td>
-                      <td class="changeable">
-                        <button *ngIf="item.owner" md-button [mdMenuTriggerFor]="candidates">{{item.owner.name}}</button>
-                        <button *ngIf="!item.owner" md-button [mdMenuTriggerFor]="candidates"> Unassigned </button>
-                        <md-menu #candidates="mdMenu">
-                            <button *ngFor="let member of members" (click)="assignTo(item, member)" md-menu-item>{{ member.name }}</button>
-                            <button *ngIf="item.owner" md-menu-item>Unassigned</button>
-                        </md-menu>
-                      </td>
-                      <td class="changeable">
-                        <a *ngIf="item.status == 'Open'" (click)="startFix(item)"  md-button>Start Fix</a>
-                        <a *ngIf="item.status == 'Fixed'" (click)="startTest(item)"  md-button>Start Test</a>
-                      </td>
-                  </tr>
-              </table>
+                    </md-cell>
+                </ng-container>
+                <ng-container mdColumnDef="severity">
+                    <md-header-cell *mdHeaderCellDef> Severity </md-header-cell>
+                    <md-cell *mdCellDef="let element"> {{element.severity}} </md-cell>
+                </ng-container>
+                <ng-container mdColumnDef="title">
+                    <md-header-cell *mdHeaderCellDef> Title </md-header-cell>
+                    <md-cell *mdCellDef="let element"> <a [routerLink]="['.', element.id]"> {{element.title}} </a>  </md-cell>
+                </ng-container>
+                <ng-container mdColumnDef="owner">
+                    <md-header-cell *mdHeaderCellDef> Owner </md-header-cell>
+                    <md-cell *mdCellDef="let element">
+                     <a *ngIf="element.owner" [mdMenuTriggerFor]="ownerSel"> {{element.owner.name}} </a>
+                     <a *ngIf="!element.owner" [mdMenuTriggerFor]="ownerSel"> Unassigned </a>
+                     <md-menu #ownerSel="mdMenu">
+                         <button *ngFor="let member of members" (click)="assignTo(element, member)"  md-menu-item>{{member.name}}</button>
+                         <button *ngIf="element.owner" (click)="assignTo(element, null)" md-menu-item>Unassigned</button>
+                     </md-menu>
+                    </md-cell>
+                </ng-container>
+                <ng-container mdColumnDef="reporter">
+                    <md-header-cell *mdHeaderCellDef> Reporter </md-header-cell>
+                    <md-cell *mdCellDef="let element"> {{element.creator.name}} </md-cell>
+                </ng-container>
+                <ng-container mdColumnDef="reportedAt">
+                    <md-header-cell *mdHeaderCellDef> Date </md-header-cell>
+                    <md-cell *mdCellDef="let element"> {{element.createdAt | date: 'yyyy-MM-dd hh:mm'}} </md-cell>
+                </ng-container>
+                <ng-container mdColumnDef="operations">
+                    <md-header-cell *mdHeaderCellDef> Operations </md-header-cell>
+                    <md-cell *mdCellDef="let element"> 
+                        <a *ngIf="element.status == 'Open'" (click)="startFix(element)"  md-button>Start Fix</a>
+                        <a *ngIf="element.status == 'Fixed'" (click)="startTest(element)"  md-button>Start Test</a>
+                    </md-cell>
+                </ng-container>
+                <md-header-row *mdHeaderRowDef="displayedColumns"></md-header-row>
+                <md-row *mdRowDef="let row; columns: displayedColumns;"></md-row>
+            </md-table>
           </div>
       </div>
   </div>
   `,
     styles: [`
+    :host {flex-grow: 1;}
    .work-items-heading > .heading-left {float: left}
    .work-items-heading > .heding-right{float:right;}
     .work-items-heading { height: 38px; }
@@ -116,16 +98,18 @@ import { UserService } from '../user.service'
     .plan-head ul {padding-left: 0;}
     .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
     .plan-head ul li span {font-weight: normal}
-    .item-table{position:relative;}
     td.changeable button, td.changeable a {line-height: 1.4em;}
     .material-icons.button {cursor: pointer;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
     .type-and-id input { display: inline-block; }
+    .mat-column-title {min-width: 30%; }
+    table {width: 100%;}
   `]
 })
-export class ContentComponent implements OnInit, OnDestroy {
+export class ContentComponent implements AfterViewInit {
     total = 0;
     items = [];
+    displayedColumns = ['id','status', 'severity', 'title', 'reporter', 'reportedAt', 'owner', 'operations'];
     sort = {field: 'id', order: 'desc'};
     loading = false;
     user;
@@ -136,9 +120,6 @@ export class ContentComponent implements OnInit, OnDestroy {
     hideClosed = true;
     hideDeclined = true;
     onlyOwned = false;
-
-    psubscription;
-
     constructor(
         public dialog: MdDialog,
         private router: Router,
@@ -148,22 +129,19 @@ export class ContentComponent implements OnInit, OnDestroy {
         private userService: UserService,
         private projectSerivce: ProjectService) {
         this.teams.ownTeam.subscribe(t => this.members = t.members);
-    }
-
-    ngOnInit(): void {
         this.userService.currentUser.subscribe(u => this.user = u);
-        this.psubscription = this.projectSerivce.current
+        this.projectSerivce.current
             .filter(p => p && p.id)
             .do(p => this.project = p)
             .subscribe(() => this.loadItems());
     }
 
-    ngOnDestroy(): void {
-        this.psubscription.unsubscribe();
+    ngAfterViewInit(): void {
+        this.loadItems();
     }
 
     loadItems() {
-        this.loading = true;
+        // this.loading = true;
         let search = {};
         if (this.project) search['project'] = this.project.id;
         if (this.sort['field']) {
@@ -177,10 +155,7 @@ export class ContentComponent implements OnInit, OnDestroy {
 
         this.defects.summary({project: search['project']})
             .subscribe(s => this.summary = s);
-        this.defects.load(search)
-            .subscribe(result => {this.items = result.rows; this.total = result.count;},
-                 err => {},
-                 () => this.loading = false);
+        this.defects.update(search);
     }
 
     settableStatus(item) {

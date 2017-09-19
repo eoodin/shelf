@@ -4,16 +4,13 @@ import {ProjectService} from "../project.service";
 @Component({
   selector: 'project-selector',
   template: `
-  <div class="dropdown project-select" dropdown keyboard-nav>
-    <a href="javascript:void(0);" class="dropdown-toggle" dropdownToggle>
-        <h5 style="display:inline-block;" *ngIf="project">{{project.name}}</h5><span class="caret"></span>
-    </a>
-    <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
-      <li *ngFor="let p of projects" role="menuitem">
-        <a (click)="projService.setCurrent(p)">{{p.name}}</a>
-      </li>
-    </ul>
-  </div>
+  <md-menu #projectSelect="mdMenu">
+    <button md-menu-item *ngFor="let p of projects" (click)="projService.setCurrent(p)"> {{p.name}} </button>
+  </md-menu>
+
+  <button md-icon-button [mdMenuTriggerFor]="projectSelect">
+    <md-icon>more_vert</md-icon>{{project.name}}
+  </button>
   `,
   styles: [`.project-select{ display: inline-block;}`]
 })

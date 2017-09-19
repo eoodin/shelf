@@ -8,13 +8,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <style type="text/css">
-    html, body, [shelf-app] {height: 100%; margin: 0; padding: 0; }
+    body {font-family: Roboto,"Helvetica Neue",sans-serif;}
     .loading-icon-large {position: relative; top: 50%; left: 50%; width: 72px; height: 72px; margin-left: -36px;margin-top: -36px;}
   </style>
   <script src="ckeditor/ckeditor.js"></script>
 </head>
 <body>
-  <div shelf-app>
+  <shelf-app>
     <div id="loading-icon" class="loading-icon-large">
       <img src="/spin.gif"/>
     </div>
@@ -27,7 +27,7 @@
         <li>Close the dialog and reload the page if it is not reloading.</li>
       </ol>
     </div>
-  </div>
+  </shelf-app>
     <script type="text/javascript">
       if (typeof(Function.call.bind) == 'undefined') {
         var loading = document.getElementById("loading-icon");

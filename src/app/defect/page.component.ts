@@ -17,7 +17,7 @@ import { Router, ActivatedRoute } from "@angular/router";
   styles: [`
   :host {flex-grow: 1; display:flex; flex-direction: column;}
   .defect-page {flex-grow: 1; padding: 10px; display:flex; flex-direction: column;}
-  .info { height:40px; padding: 2px 0;}
+  .info { padding: 2px 0;}
   .info .project-select{ display: inline-block;}
   .info .operations { float: right;}
   `]
