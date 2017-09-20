@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild } from "@angular/core";
+import { Component, Inject, AfterViewInit, ViewChild } from "@angular/core";
 import {MdDialog, MdDialogRef, MD_DIALOG_DATA} from '@angular/material';
 import { PreferenceService } from "./preference.service";
 import * as moment from "moment";
@@ -10,146 +10,84 @@ import { ProjectService } from "./project.service";
 @Component({
     selector: 'plan-content',
     template: `
-       <div >
-            <div class="plan-head" *ngIf="current.id">
-                <ul class="summary">
-                    <li *ngIf="current.start">Start: <span>{{date(current.start)}}</span></li>
-                    <li *ngIf="current.end">Deadline: <span>{{date(current.end)}}</span></li>
-                    <li *ngIf="current.allocation">Remains/Capacity: <span>{{sumHours()}} H/{{current.allocation.effort}} H</span></li>
-                    <li *ngIf="current.allocation">Total estimation: <span>{{sumOriginalHours()}} H</span></li>
-                </ul>
+    <div class="plan-head" *ngIf="current.id">
+        <span *ngIf="current.start">Start: <span class="key-value">{{date(current.start)}}</span></span>
+        <span *ngIf="current.end">Deadline: <span class="key-value">{{date(current.end)}}</span></span>
+        <span *ngIf="current.allocation">Remains/Capacity: <span class="key-value">{{sumHours()}} H/{{current.allocation.effort}} H</span></span>
+        <span *ngIf="current.allocation">Total estimation: <span class="key-value">{{sumOriginalHours()}} H</span></span>
+    </div>
+    <div class="project-info">
+        <div class="project-operations">
+            <iframe #downloader style="display:none;"></iframe>
+            <button md-button (click)="exportCsv()"><i class="glyphicon glyphicon-export" aria-hidden="true"></i>Export as CSV</button>
+            <button md-button (click)="showAddItem()">New Task...</button>
+            <button md-button (click)="showMoveToPlan()" [disabled]="!selectedIds().length">Move...</button>
+        </div>
+    </div>
+    <div class="plan-body">
+        <div class="item-table">
+            <div class="loading-mask" *ngIf="ui.loading.show">
+                <div class="spinner-loader"></div>
             </div>
-            <div class="project-info">
-                <div class="project-operations">
-                    <iframe #downloader style="display:none;"></iframe>
-                    <button md-button (click)="exportCsv()"><i class="glyphicon glyphicon-export" aria-hidden="true"></i>Export as CSV</button>
-                    <button md-button (click)="showAddItem()">New Task...</button>
-                    <button md-button (click)="showMoveToPlan()" [disabled]="!selectedIds().length">Move...</button>
-                </div>
-            </div>
-            <div class="plan-body">
-                <div class="item-table">
-                    <div class="loading-mask" *ngIf="ui.loading.show">
-                        <div class="spinner-loader"></div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading work-items-heading">
-                            <div>
-                                <md-checkbox [(ngModel)]="hideFinished" (change)="loadWorkItems()">Hide Finished</md-checkbox>
-                                <md-checkbox [(ngModel)]="onlyOwned" (change)="loadWorkItems()">Mine Only</md-checkbox>
-                            </div>
-                        </div>
-                        <table *ngIf="workItems" class="table">
-                            <tr>
-                                <th>
-                                    <label>
-                                        <input type="checkbox" [checked]="allChecked()" (click)="onAllCheck($event.target.checked)" class="checkbox" title="Select/unselect all" />
-                                        <a href="javascript:void(0);" (click)="sortResult('id')">ID
-                                        <span *ngIf="sort.field=='id'">
-                                            <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                                        </span>
-                                        </a>
-                                    </label>
-                                </th>
-                                <th class="header-title">
-                                    <a href="javascript:void(0);" (click)="sortResult('title')">Title
-                                    <span *ngIf="sort.field=='title'">
-                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                                    </span>
-                                    </a>
-                                </th>
-                                <th class="header-title">
-                                    <a (click)="sortResult('priority')">Priority
-                                    <span *ngIf="sort.field=='priority'">
-                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                                    </span>
-                                    </a>
-                                </th>
-                                <th>
-                                    <a href="javascript:void(0);" (click)="sortResult('status')">Status
-                                    <span *ngIf="sort.field=='status'">
-                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                                    </span>
-                                    </a>
-                                </th>
-                                <th><a href="javascript:void(0);" (click)="sortResult('owner')">Owner
-                                    <span *ngIf="sort.field=='owner'">
-                                        <span class="glyphicon glyphicon-triangle-{{sort.order=='desc' ? 'bottom' : 'top'}}"></span>
-                                    </span>
-                                </a>
-                                </th>
-                                <th>Remaining</th>
-                                <th>Operations</th>
-                            </tr>
-                            <tr *ngFor="let item of workItems">
-                                <td class="id">
-                                    <label>
-                                        <input class="checkbox" [(ngModel)]="item.checked" type="checkbox">
-                                        {{item.id}}
-                                    </label>
-                                </td>
-                                <td>
-                                    <span  class="task glyphicon glyphicon-check"></span>
-                                    <a (click)="showItem(item)">{{item.title}}</a>
-                                </td>
-                                <td>
-                                    <div class="btn-group" dropdown keyboardNav>
-                                        <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            {{PRI[item.priority]}} <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li role="menuitem"
-                                                *ngFor="let pri of [0,1,2]"
-                                                [class.hidden]="pri == item.priority">
-                                                <a (click)="changePriority(item, pri)">{{PRI[pri]}}</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="btn-group" dropdown keyboardNav>
-                                        <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            {{item.status}} <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li role="menuitem"
-                                                *ngFor="let st of ['New','InProgress','','Finished','Pending','Dropped']"
-                                                [class.hidden]="st == item.status">
-                                                <a (click)="changeStatus(item, st)">{{st}}</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="btn-group" dropdown keyboardNav>
-                                        <button class="btn btn-default btn-sm dropdown-toggle" dropdownToggle type="button"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <span *ngIf="item.owner">{{item.owner.name}}</span> 
-                                            <span *ngIf="!item.owner">Unassigned</span> <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu" *ngIf="team && team.members">
-                                            <li role="menuitem"><a (click)="assignTo(item, null)">Unassigned</a></li>
-                                            <li role="menuitem"
-                                                *ngFor="let member of team.members"
-                                                [class.hidden]="member == item.owner"><a
-                                                    (click)="assignTo(item, member)">{{member.name}}</a></li>
-                                        </ul>
-                                    </div>
-                                </td>
-                                <td>{{item.estimation}}</td>
-                                <td>
-                                    <a title="Remove this work item" (click)="removingItem(item)"><span class="glyphicon glyphicon-remove"></span></a>
-                                </td>
-                            </tr>
-                        </table>
+            <div class="panel panel-default">
+                <div class="panel-heading work-items-heading">
+                    <div>
+                        <md-checkbox [(ngModel)]="hideFinished" (change)="loadWorkItems()">Hide Finished</md-checkbox>
+                        <md-checkbox [(ngModel)]="onlyOwned" (change)="loadWorkItems()">Mine Only</md-checkbox>
                     </div>
                 </div>
+                <md-table [dataSource]="tasks">
+                    <ng-container mdColumnDef="id">
+                        <md-header-cell *mdHeaderCellDef> ID </md-header-cell>
+                        <md-cell *mdCellDef="let task"> {{task.id}} </md-cell>
+                    </ng-container>
+                    <ng-container mdColumnDef="status">
+                        <md-header-cell *mdHeaderCellDef> Status </md-header-cell>
+                        <md-cell *mdCellDef="let task">
+                            <a [mdMenuTriggerFor]="statusSel">{{task.status}}</a>
+                            <md-menu #statusSel="mdMenu">
+                                <button *ngFor="let st of STATES" [class.hidden]="st == task.status" (click)="changeStatus(task, st)" md-menu-item>{{st}}</button>
+                            </md-menu>
+                        </md-cell>
+                    </ng-container>
+                    <ng-container mdColumnDef="title">
+                        <md-header-cell *mdHeaderCellDef> <span class="task glyphicon glyphicon-check"></span> Title </md-header-cell>
+                        <md-cell *mdCellDef="let task"> <a (click)="showItem(task)">{{task.title}}</a> </md-cell>
+                    </ng-container>
+                    <ng-container mdColumnDef="priority">
+                        <md-header-cell *mdHeaderCellDef> Priority </md-header-cell>
+                        <md-cell *mdCellDef="let task"> {{PRI[task.priority]}} </md-cell>
+                    </ng-container>
+                    <ng-container mdColumnDef="owner">
+                        <md-header-cell *mdHeaderCellDef> Owner </md-header-cell>
+                        <md-cell *mdCellDef="let task">
+                        <a *ngIf="task.owner" [mdMenuTriggerFor]="ownerSel"> {{task.owner.name}} </a>
+                        <a *ngIf="!task.owner" [mdMenuTriggerFor]="ownerSel"> Unassigned </a>
+                        <md-menu #ownerSel="mdMenu">
+                            <button *ngFor="let member of team.members" (click)="assignTo(task, member)"  md-menu-item>{{member.name}}</button>
+                            <button *ngIf="task.owner" (click)="assignTo(task, null)" md-menu-item>Unassigned</button>
+                        </md-menu>
+                        </md-cell>
+                    </ng-container>
+                    <ng-container mdColumnDef="remaining">
+                        <md-header-cell *mdHeaderCellDef> Remaining </md-header-cell>
+                        <md-cell *mdCellDef="let task"> {{task.estimation}} </md-cell>
+                    </ng-container>
+                    <ng-container mdColumnDef="operations">
+                        <md-header-cell *mdHeaderCellDef> Operations </md-header-cell>
+                        <md-cell *mdCellDef="let task"> 
+                            <a title="Remove this work item" (click)="removingItem(task)" md-button>Delete</a>
+                        </md-cell>
+                    </ng-container>
+                    <md-header-row *mdHeaderRowDef="displayedColumns"></md-header-row>
+                    <md-row *mdRowDef="let row; columns: displayedColumns;"></md-row>
+                </md-table>
             </div>
         </div>
+    </div>
     `,
     styles: [`
+    :host{width: 100%; outline: 1px dotted red;}
     .project-info { height:40px; padding: 2px 0;}
     .project-operations { float: right;}
     .work-items-heading > div{float:right;}
@@ -158,22 +96,19 @@ import { ProjectService } from "./project.service";
     .awd .modal-body .row {padding: 5px 0;}
     a:hover {cursor: pointer;}
     [ngcontrol='title'] { width: 100%; }
-    .plan-head h1 {font-size: 18px; margin: 0;}
-    .plan-head ul {padding-left: 0;}
-    .plan-head ul li {list-style: none; font-weight: bold; display:inline-block; width: 218px}
-    .plan-head ul li span {font-weight: normal}
-    .item-table label { margin: 0;}
-    .item-table label input[type="checkbox"] { vertical-align: bottom;}
-    .item-table table .checkbox{ display: inline-block; margin:0; width: 22px; height: 22px;}
+    .key-value {font-weight: 800;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
     .id .glyphicon {margin-right: 8px;}
     .us.glyphicon{color: #050;}
     .defect.glyphicon{color: #500;}
     .task.glyphicon{color: #333;}
     .buttom-row:after {content: ''; height: 0; display: block; clear:both;}
+    .mat-column-title {flex-grow: 8;}
     `]
 })
-export class PlanContentComponent {
+export class PlanContentComponent implements AfterViewInit {
+    displayedColumns = ['id','title', 'priority', 'status', 'owner', 'remaining', 'operations'];
+    
     current;
     workItems = [];
     _plans = [];
@@ -183,6 +118,7 @@ export class PlanContentComponent {
     hideFinished = false;
     onlyOwned = false;
     PRI = ['High', 'Medium', 'Low'];
+    STATES = ['New','InProgress','Finished','Pending','Dropped'];
 
     project = null;
 
@@ -215,6 +151,11 @@ export class PlanContentComponent {
         pref.values
             .filter(prefs => typeof (prefs['hideFinished']) != 'undefined')
             .subscribe(ps => this.hideFinished = ps.hideFinished);
+    }
+
+    ngAfterViewInit(): void {
+        // TODO: other data loading should be removed and use this one..
+        // this.loadWorkItems();
     }
 
     showMoveToPlan() {
@@ -309,8 +250,9 @@ export class PlanContentComponent {
         if (this.hideFinished) search['nofinished'] = 'true';
         if (this.onlyOwned) search['ownonly'] = 'true';
 
-        this.tasks.fetch(search)
-            .subscribe(tasks => this.setWorkItems(tasks));
+        this.tasks.update(search);
+        // this.tasks.fetch(search)
+        //     .subscribe(tasks => this.setWorkItems(tasks));
     }
 
     setWorkItems(items) {
@@ -362,9 +304,7 @@ export class PlanContentComponent {
     <md-dialog-content class="item-details">
         <form (ngSubmit)="saveItem()">
             <div class="row">
-                <div class="col-sm-12 field-row">
-                    <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="data.title" [ngModelOptions]="{standalone: true}">
-                </div>
+                <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="data.title" [ngModelOptions]="{standalone: true}">
             </div>
             <div class="row">
                 <div class="col-sm-12">Description:</div>
@@ -385,15 +325,8 @@ export class PlanContentComponent {
     </md-dialog-actions>
     `,
     styles: [`
-    .item-details { padding-left: 0;}
-    .item-details li { list-style:none; margin-bottom: 10px;}
-    .item-details li:last-child { margin-bottom: 0;}
-    .item-details li .title { font-weight: 700; }
-    .item-details li .big-section { display: block;}
-    .item-details .row {margin: 8px 0;}
-    .field-row {display: flex; flex-direction: row; flex-wrap: nowrap;}
-    .field-row .field-label { margin-right: 20px;}
-    .field-row input,select {flex-grow: 1;}
+    .row {margin: 5px; auto; display: flex;}
+    .work-item-title {flex-grow: 1;}
     `]
 })
 export class ItemDetailDialog {

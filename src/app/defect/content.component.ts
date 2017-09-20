@@ -103,7 +103,7 @@ import { UserService } from '../user.service'
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
     .type-and-id input { display: inline-block; }
     .mat-column-title {min-width: 30%; }
-    table {width: 100%;}
+    .mat-column-title {flex-grow: 8;}
   `]
 })
 export class ContentComponent implements AfterViewInit {

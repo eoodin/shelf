@@ -1,23 +1,35 @@
 import {Injectable} from '@angular/core';
-import {Subject, BehaviorSubject} from "rxjs";
+import {Subject, BehaviorSubject, Observable} from "rxjs";
+import { DataSource, CollectionViewer } from '@angular/cdk/collections';
+
 import {PreferenceService} from "./preference.service";
 import {TeamService} from "./team.service";
 import {HttpService} from "./http.service";
 
-@Injectable()
-export class PlanService {
+export interface Plan {
+}
 
+@Injectable()
+export class PlanService extends DataSource<Plan> {
     private _plans: BehaviorSubject<any> = new BehaviorSubject<any>([]);
     private _current: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
     constructor(private pref: PreferenceService,
                 private http: HttpService,
                 private teams: TeamService) {
+        super();
         this._plans
             .subscribe(plans => this.planUpdated(plans));
 
         this.teams.ownTeam
             .subscribe(team => this.loadPlans(team));
+    }
+
+    connect(collectionViewer: CollectionViewer): Observable<Plan[]> {
+        throw new Error("Method not implemented.");
+    }
+    disconnect(collectionViewer: CollectionViewer): void {
+        throw new Error("Method not implemented.");
     }
 
     public all() {

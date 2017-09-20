@@ -1,12 +1,37 @@
 import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { DataSource, CollectionViewer } from '@angular/cdk/collections';
+
 import { HttpService } from './http.service';
 import { UserService } from './user.service';
 import { RequestOptions, URLSearchParams } from '@angular/http';
 
-@Injectable()
-export class TaskService {
+export interface Task {
+  id: number;
+  title: string;
+  priority: string;
+  status: string;
+  owner: string;
+}
 
-  constructor(private http: HttpService, private users: UserService) { }
+@Injectable()
+export class TaskService extends DataSource<Task>{
+  private criteria:Subject<Object> = new Subject<Object>();
+
+  constructor(private http: HttpService, private users: UserService) {
+    super();
+  }
+
+  connect(collectionViewer: CollectionViewer): Observable<Task[]> {
+    return this.criteria.switchMap(criteria => this.fetch(criteria));
+  }
+
+  disconnect(collectionViewer: CollectionViewer): void { }
+
+  public update(criteria) {
+    // optimize: check if it is the same?
+    this.criteria.next(criteria);
+  }
 
   public delete(id) {
     return this.http.delete('/api/task/' + id);

@@ -27,6 +27,7 @@ import {TeamService} from '../team.service';
     <plan-creator [(show)]="showCreator" ></plan-creator>
     `,
     styles: [`
+    :host {width: 100%;}
     h3 > a {cursor: pointer;}
     .team-switch {float: right;}
     .workspace{height: 100%;}
