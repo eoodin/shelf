@@ -63,7 +63,7 @@ import { UserService } from '../user.service'
                      </md-menu>
                     </md-cell>
                 </ng-container>
-                <ng-container mdColumnDef="reporter">
+                <ng-container mdColumnDef="creator">
                     <md-header-cell *mdHeaderCellDef md-sort-header> Reporter </md-header-cell>
                     <md-cell *mdCellDef="let element"> {{element.creator.name}} </md-cell>
                 </ng-container>
@@ -110,7 +110,7 @@ export class ContentComponent implements OnInit, AfterViewInit {
     @ViewChild(MdSort) sorts: MdSort;
     total = 0;
     items = [];
-    displayedColumns = ['id','status', 'severity', 'title', 'reporter', 'createdAt', 'owner', 'operations'];
+    displayedColumns = ['id','status', 'severity', 'title', 'creator', 'createdAt', 'owner', 'operations'];
     loading = false;
     user;
     members = [];

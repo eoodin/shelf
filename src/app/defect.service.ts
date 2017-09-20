@@ -13,8 +13,8 @@ export interface Defect {
   status: string;
   severity: string;
   title: string;
-  reporter: string;
-  reportedAt; string;
+  creator: string;
+  createdAt; string;
   owner: string
 }
 
