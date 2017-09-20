@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { RequestOptions, URLSearchParams } from '@angular/http';
 import { DataSource } from '@angular/cdk/collections';
 import { Observable } from 'rxjs';
-import { Subject } from "rxjs/Subject";
+import { BehaviorSubject } from "rxjs";
 
 import { HttpService } from './http.service';
 import { UserService } from './user.service';
@@ -20,7 +20,9 @@ export interface Defect {
 
 @Injectable()
 export class DefectService extends DataSource<any> {
-  private query: Subject<Object> = new Subject<Object>();
+  private query: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
+  private sortter;
+
   constructor(
     private http: HttpService,
     private users: UserService,
@@ -30,20 +32,32 @@ export class DefectService extends DataSource<any> {
   }
 
   connect(): Observable<Defect[]> {
-    return this.query.switchMap(search => this.load(search))
+    var c = {};
+    return Observable.merge(this.query.do(search => c = search), this.sortter.mdSortChange)
+      .switchMap(() => this.load())
   }
 
   disconnect() {
+  }
+
+  public setSorter(sortter) {
+    this.sortter = sortter;
   }
 
   public update(search) {
     this.query.next(search);
   }
 
-  private load(search) {
+  private load() {
+    let search = this.query.getValue();
     let params = new URLSearchParams();
     for (let key in search) {
       params.set(key, search[key]);
+    }
+    if (this.sortter.active && this.sortter.direction) {
+      params.set('sortBy', this.sortter.active);
+      if(this.sortter.direction == 'desc')
+        params.set('desc', 'true');
     }
     let options = new RequestOptions({ search: params });
     return this.http.get('/api/defects/', options)

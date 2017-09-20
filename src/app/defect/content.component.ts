@@ -1,6 +1,6 @@
-import { Component, OnInit, AfterViewInit  } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit  } from '@angular/core';
 import { Router } from "@angular/router";
-import { MdDialog, MdDialogRef } from '@angular/material';
+import { MdDialog, MdDialogRef, MdSort } from '@angular/material';
 import { HttpService } from '../http.service';
 import { DefectService } from '../defect.service';
 import { TeamService } from '../team.service';
@@ -30,13 +30,13 @@ import { UserService } from '../user.service'
                     <md-checkbox [(ngModel)]="onlyOwned" (change)="filterChange($event)">Mine Only</md-checkbox>
                 </div>
               </div>
-            <md-table #table [dataSource]="defects">
+            <md-table #table [dataSource]="defects" mdSort>
                 <ng-container mdColumnDef="id">
-                    <md-header-cell *mdHeaderCellDef> ID </md-header-cell>
+                    <md-header-cell *mdHeaderCellDef md-sort-header> ID </md-header-cell>
                     <md-cell *mdCellDef="let element"> {{element.id}} </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="status">
-                    <md-header-cell *mdHeaderCellDef> Status </md-header-cell>
+                    <md-header-cell *mdHeaderCellDef md-sort-header> Status </md-header-cell>
                     <md-cell *mdCellDef="let element">
                         <a [mdMenuTriggerFor]="statusSel">{{element.status}}</a>
                         <md-menu #statusSel="mdMenu">
@@ -45,7 +45,7 @@ import { UserService } from '../user.service'
                     </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="severity">
-                    <md-header-cell *mdHeaderCellDef> Severity </md-header-cell>
+                    <md-header-cell *mdHeaderCellDef md-sort-header> Severity </md-header-cell>
                     <md-cell *mdCellDef="let element"> {{element.severity}} </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="title">
@@ -53,7 +53,7 @@ import { UserService } from '../user.service'
                     <md-cell *mdCellDef="let element"> <a [routerLink]="['.', element.id]"> {{element.title}} </a>  </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="owner">
-                    <md-header-cell *mdHeaderCellDef> Owner </md-header-cell>
+                    <md-header-cell *mdHeaderCellDef md-sort-header> Owner </md-header-cell>
                     <md-cell *mdCellDef="let element">
                      <a *ngIf="element.owner" [mdMenuTriggerFor]="ownerSel"> {{element.owner.name}} </a>
                      <a *ngIf="!element.owner" [mdMenuTriggerFor]="ownerSel"> Unassigned </a>
@@ -64,11 +64,11 @@ import { UserService } from '../user.service'
                     </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="reporter">
-                    <md-header-cell *mdHeaderCellDef> Reporter </md-header-cell>
+                    <md-header-cell *mdHeaderCellDef md-sort-header> Reporter </md-header-cell>
                     <md-cell *mdCellDef="let element"> {{element.creator.name}} </md-cell>
                 </ng-container>
-                <ng-container mdColumnDef="reportedAt">
-                    <md-header-cell *mdHeaderCellDef> Date </md-header-cell>
+                <ng-container mdColumnDef="createdAt">
+                    <md-header-cell *mdHeaderCellDef md-sort-header> Date </md-header-cell>
                     <md-cell *mdCellDef="let element"> {{element.createdAt | date: 'yyyy-MM-dd hh:mm'}} </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="operations">
@@ -106,11 +106,11 @@ import { UserService } from '../user.service'
     .mat-column-title {flex-grow: 8;}
   `]
 })
-export class ContentComponent implements AfterViewInit {
+export class ContentComponent implements OnInit, AfterViewInit {
+    @ViewChild(MdSort) sorts: MdSort;
     total = 0;
     items = [];
-    displayedColumns = ['id','status', 'severity', 'title', 'reporter', 'reportedAt', 'owner', 'operations'];
-    sort = {field: 'id', order: 'desc'};
+    displayedColumns = ['id','status', 'severity', 'title', 'reporter', 'createdAt', 'owner', 'operations'];
     loading = false;
     user;
     members = [];
@@ -136,6 +136,10 @@ export class ContentComponent implements AfterViewInit {
             .subscribe(() => this.loadItems());
     }
 
+    ngOnInit(): void {
+        this.defects.setSorter(this.sorts);
+    }
+
     ngAfterViewInit(): void {
         this.loadItems();
     }
@@ -144,11 +148,6 @@ export class ContentComponent implements AfterViewInit {
         // this.loading = true;
         let search = {};
         if (this.project) search['project'] = this.project.id;
-        if (this.sort['field']) {
-            search['sortBy'] = this.sort.field;
-            if (this.sort.order == 'desc') 
-                search['desc'] = 'true';
-        }
         if (this.hideClosed) search['noclosed'] = 'true';
         if (this.onlyOwned) search['ownonly'] = 'true';        
         if (this.hideDeclined) search['nodeclined'] = 'true';
@@ -219,16 +218,6 @@ export class ContentComponent implements AfterViewInit {
         if (item.status == status) return;
         this.defects.save(item.id, {status: status})
             .subscribe(() => this.loadItems());
-    }
-
-    sortResult(field) {
-        if (field == this.sort.field)
-            this.sort.order = this.sort.order == 'desc' ? 'asc' : 'desc';
-        else
-            this.sort.order = 'asc';
-
-        this.sort.field = field;
-        this.loadItems();
     }
 }
 
