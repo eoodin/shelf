@@ -1,19 +1,40 @@
 import { Injectable } from '@angular/core';
 import { RequestOptions, URLSearchParams } from '@angular/http';
+import { DataSource, CollectionViewer } from '@angular/cdk/collections';
+
+import {Subject, BehaviorSubject, Observable} from "rxjs";
 import { HttpService } from './http.service';
 import { UserService } from './user.service';
 
+
+export interface UserStory {
+  id: number;
+  priority: string; 
+  status: string;
+  title: string; 
+  creator: string;
+}
+
 @Injectable()
-export class StoryService {
+export class StoryService extends DataSource<any> {
+  private criteria = new BehaviorSubject<Object>({});
 
   constructor(
     private http: HttpService,
-    private users: UserService) { }
+    private users: UserService) {
+      super();
+    }
 
   public getStory(id) {
     return this.http.get('/api/stories/' + id)
         .map(resp => resp.json())
         .do(story => this.enrich(story));
+  }
+
+  connect(collectionViewer: CollectionViewer): Observable<any[]> {
+    return this.criteria.switchMap(search => this.load(search));
+  }
+  disconnect(collectionViewer: CollectionViewer): void {
   }
 
   public create(data, params) {
@@ -36,6 +57,10 @@ export class StoryService {
       .map(resp => resp.json());
   }
 
+  public update(search) {
+    this.criteria.next(search);
+  }
+
   public load(search) {
     let params = new URLSearchParams();
     for(let key in search) {
@@ -50,7 +75,7 @@ export class StoryService {
   }
 
   private enrich(story) {
-      this.users.getUser(story.creatorId).subscribe(u => story.creator = u);
+      this.users.getUser(story.creatorId).subscribe(u => story.creator = u || {});
       this.users.getUser(story.ownerId).subscribe(u => story.owner = u);
   }
 }

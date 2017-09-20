@@ -13,81 +13,37 @@ class Project {
 @Component({
     selector: 'projects',
     template: `
-    <div class="row">
-     <div class="col-sm-3">
-      <div class="panel panel-default">
-       <div class="panel-heading">
-         <h3 class="panel-title">Projects</h3>
-       </div>
-       <div class="panel-body">
-        <ul class="sidebar-item-list">
+    <div >
+        <h4>Projects</h4>
+        <ul>
             <li *ngFor="let project of projects" >
-                <a href="#/plans?pid={{project.id}}"><span class="main-title">{{project.name}}</span></a>
-                <button *ngIf="permitSA" class="btn btn-danger btn-sm" (click)="deleteProject(project)">Delete</button>
+                <a href="#/plans?pid={{project.id}}">{{project.name}}</a>
+                <button *ngIf="permitSA" md-icon-button (click)="deleteProject(project)">
+                    <md-icon class="md-24" aria-label="Delete project">delete</md-icon>
+                </button>
             </li>
         </ul>
+        <button *ngIf="permitSA" md-raised-button color="primary" (click)="showCreateProject()">New Project</button>
+    </div>
 
-        <button *ngIf="permitSA" class="btn btn-primary" (click)="showCreateProject()">New Project</button>
-       </div>
-      </div>
-
-      <div class="panel panel-default">
-       <div class="panel-heading">
-         <h3 class="panel-title">Teams</h3>
-       </div>
-       <div class="panel-body">
+    <div>
+        <h4 >Teams</h4>
         <ul class="sidebar-item-list">
             <li *ngFor="let team of teams" >
-                <span class="main-title">{{team.name}}</span>
-                <button *ngIf="permitSA" class="btn btn-danger btn-sm" (click)="deleteTeam(team)">Delete</button>
+                {{team.name}}
+                <button *ngIf="permitSA" md-icon-button (click)="deleteTeam(team)">
+                    <md-icon class="md-24" aria-label="Delete team">delete</md-icon>
+                </button>
             </li>
         </ul>
-        <button *ngIf="permitSA" class="btn btn-primary" (click)="showCreateTeam()">Add Team...</button>
-       </div>
-      </div>
+        <button *ngIf="permitSA" md-raised-button color="primary" (click)="showCreateTeam()">Add Team...</button>
 
-      <div class="panel panel-default">
-       <div class="panel-heading">
-         <h3 class="panel-title">References</h3>
-       </div>
-       <div class="panel-body">
-        <ul class="project-list">
-            <li *ngFor="let ref of [1,2,3,4]" > Reference #{{ref}}</li>
-        </ul>
-       </div>
-      </div>
-     </div> <!-- col-sm-3 -->
-
-     <div class="col-sm-offset-3">
-      <div class="panel panel-default">
-       <div class="panel-heading">
-         <h3 class="panel-title">Project description</h3>
-       </div>
-       <div class="panel-body" class="project-description">
-        <p>This is description for the project TODO: add more meaningful description here.</p>
-       </div>
-      </div>
-
-      <div class="panel panel-default">
-       <div class="panel-heading">
-         <h3 class="panel-title">Plans</h3>
-       </div>
-       <div class="panel-body project-plans">
-        <ul class="project-list">
-            <li *ngFor="let plan of ['Product backlog', 'Sprint 1', 'Sprint 2', 'Sprint 3']" > &gt;&gt; {{plan}}</li>
-        </ul>
-       </div>
-      </div>
-
-     </div>
     </div>
     `,
     styles: [`
-    h1 {font-color: #aaa;}
-    .sidebar-item-list {padding: 0;}
-    .sidebar-item-list li { list-style: none; margin: 5px 0;}
-    .sidebar-item-list li button {float: right; }
-    .main-title { font-size: 1.6em; }
+    ul {width: 300px; }
+    ul li {list-style: none; line-height: 40px; margin: 5px 0;}
+    ul li button {float: right;}
     `]
 })
 export class Projects {

@@ -6,18 +6,16 @@ import {Router, ActivatedRoute} from "@angular/router";
 @Component({
     selector: 'backlog-page',
     template: `
-    <div class="backlog-page">
-        <div class="project-info">
-            <project-selector></project-selector>
-            <div class="project-operations">
-                <a md-button routerLink="./new" (click)="newStory()">New Story</a>
-            </div>
+    <div class="project-info">
+        <project-selector></project-selector>
+        <div class="project-operations">
+            <a md-button routerLink="./new" (click)="newStory()">New Story</a>
         </div>
-        <router-outlet></router-outlet>
     </div>
+    <router-outlet></router-outlet>
     `,
     styles: [`
-    .backlog-page {padding: 10px;}
+    :host {flex: 1 1;}
     .project-info { height:40px; padding: 2px 0;}
     .project-operations { float: right;}
     `]

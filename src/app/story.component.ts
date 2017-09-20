@@ -16,7 +16,7 @@ declare var CKEDITOR;
             <button (click)="goBack()" md-button> <i class="material-icons">arrow_back</i> Back</button>
         </div>
         <div>
-            <h4 *ngIf="parent.id"> Adding child to: #{{parent.id}} {{parent.title}} </h4>
+            <h4 *ngIf="parent && parent.id"> Adding child to: #{{parent.id}} {{parent.title}} </h4>
         </div>
         <div>
             <span>Points:</span> <input type="text" [(ngModel)]="_item.points" [ngModelOptions]="{standalone: true}" value="0">
@@ -43,7 +43,7 @@ declare var CKEDITOR;
     changeDetection: ChangeDetectionStrategy.Default
 })
 export class StoryComponent implements OnDestroy {
-    _item;
+    _item = {};
     saving = false;
     parent;
     editorConfig = {
@@ -104,7 +104,6 @@ export class StoryComponent implements OnDestroy {
     }
 
     onSaved(data) {
-
     }
 
     goBack() {
