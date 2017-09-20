@@ -15,41 +15,6 @@ import {MdDialog, MdDialogRef} from '@angular/material';
                 <md-checkbox [(ngModel)]="hideFinished" (change)="filterChange($event)">Hide Finished</md-checkbox>
             </div>
             </div>
-            <!--
-            <table *ngIf="items" class="table">
-                <tr *ngFor="let item of visibleItems()">
-                    <td class="tree-control">
-                    <div class="tree" [ngClass]="{
-                            collapse: item.children.length && item.treeState != 'expand',
-                            expand: item.children.length && item.treeState == 'expand',
-                            child: item.parentId,
-                            last: item.treeState == 'last',
-                            na: item.children.length == 0 && !item.parentId}">
-                        <div class="v-line"></div>
-                        <div (click)="toggleExpand(item)" *ngIf="!item.parentId" class="icon">
-                            <div class="h-cross"></div>
-                            <div class="v-cross"></div>
-                        </div>
-                        <div class="child-h-line"></div>
-                    </div>
-                    </td>
-                    <td> {{item.id}} </td>
-                    <td > 
-                    <button md-button [mdMenuTriggerFor]="priorityMenu">{{PRI[item.priority]}}</button>
-                        <md-menu #priorityMenu="mdMenu">
-                        <button *ngFor="let pr of [0, 1, 2]" (click)="changePriority(item, pr)"  md-menu-item>{{PRI[pr]}}</button>
-                    </md-menu>
-                    </td>
-                    <td > {{item.status}} </td>
-                    <td><a (click)="showItem(item)"> {{item.title}} </a></td>
-                    <td><span *ngIf="item.creator">{{item.creator.name}}</span></td>
-                    <td>
-                        <i *ngIf="!item.parentId" (click)="addChild(item)" class="material-icons button">add</i>
-                        <i (click)="confirmDelete(item)" class="material-icons button">remove</i>
-                    </td>
-                </tr>
-            </table>
-            -->
             <md-table #table [dataSource]="stories" mdSort>
                 <ng-container mdColumnDef="id">
                     <md-header-cell *mdHeaderCellDef md-sort-header> ID </md-header-cell>
@@ -80,7 +45,6 @@ import {MdDialog, MdDialogRef} from '@angular/material';
                 <ng-container mdColumnDef="operations">
                     <md-header-cell *mdHeaderCellDef> Operations </md-header-cell>
                     <md-cell *mdCellDef="let us"> 
-                        <i *ngIf="!us.parentId" (click)="addChild(us)" class="material-icons button">add</i>
                         <i (click)="confirmDelete(us)" class="material-icons button">remove</i>
                     </md-cell>
                 </ng-container>
@@ -164,11 +128,6 @@ export class BacklogComponent {
         this.router.navigate(['/backlog/story/' + item.id]);
     }
 
-    private addChild(us) {
-        this.router.navigate(['story', 'new'], 
-            {relativeTo: this.route,  queryParams: { type: 'UserStory', parent: us.id }});
-    }
-
     private confirmDelete(item) {
         let dialogRef = this.dialog.open(DeleteConfirmDialog);
         dialogRef.afterClosed().subscribe(result => {
@@ -181,42 +140,6 @@ export class BacklogComponent {
 
     filterChange(e) {
         this.loadItems();
-    }
-
-    private toggleExpand(item) {
-        if (item.treeState != 'expand')
-            this.expand(item);
-        else 
-            this.collapse(item);
-    }
-
-    private expand(item) {
-        this.stories.load({parent: item.id})
-            .filter(children => children.length > 0)
-            .subscribe(stories => {
-                let i = this.items.indexOf(item);
-                if (i != -1) {
-                    let last;
-                    for (let it of stories) {
-                        it.treeState = 'middle';
-                        this.items.splice(++i, 0, it);
-                        last = it;
-                    }
-                    if (last) {
-                        last.treeState = 'last';
-                    }
-                    item.treeState = 'expand';
-                }
-            });
-    }
-    private collapse(item) {
-        let i = this.items.indexOf(item);
-        while(i >= 0 && i + 1 < this.items.length) {
-            if (this.items[i+1].parentId != item.id) break;
-            this.items.splice(i + 1, 1);
-        }
-
-        item.treeState = '';
     }
 
     sortResult(field) {

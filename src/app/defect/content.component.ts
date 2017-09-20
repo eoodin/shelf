@@ -69,7 +69,7 @@ import { UserService } from '../user.service'
                 </ng-container>
                 <ng-container mdColumnDef="createdAt">
                     <md-header-cell *mdHeaderCellDef md-sort-header> Date </md-header-cell>
-                    <md-cell *mdCellDef="let element"> {{element.createdAt | date: 'yyyy-MM-dd hh:mm'}} </md-cell>
+                    <md-cell *mdCellDef="let element"> {{element.createdAt | date: 'yyyy-MM-dd'}} </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="operations">
                     <md-header-cell *mdHeaderCellDef> Operations </md-header-cell>
@@ -102,7 +102,6 @@ import { UserService } from '../user.service'
     .material-icons.button {cursor: pointer;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
     .type-and-id input { display: inline-block; }
-    .mat-column-title {min-width: 30%; }
     .mat-column-title {flex-grow: 8;}
   `]
 })
@@ -145,7 +144,6 @@ export class ContentComponent implements OnInit, AfterViewInit {
     }
 
     loadItems() {
-        // this.loading = true;
         let search = {};
         if (this.project) search['project'] = this.project.id;
         if (this.hideClosed) search['noclosed'] = 'true';
