@@ -2,14 +2,6 @@
   "name": "shelf-backend",
   "version": "0.1.1",
   "license": "MIT",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve --proxy-config=server/wds-proxy.json",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
-  },
   "private": true,
   "dependencies": {
     "ckeditor": "^4.7.3",
