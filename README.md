@@ -5,7 +5,7 @@ Shelf is aiming to provide basic management interface for SCRUM.
 TODOs
 =====
 
-- [ ] split client and server
+- [x] split client and server
 - [ ] add sequelize migration setup for database
 - [ ] unify items
 - [ ] add tag system

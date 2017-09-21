@@ -11,16 +11,13 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.ENUM,
             values: ['New', 'Working', 'Done', 'Dropped']
         }
-    }, {
-            classMethods: {
-              associate: function(models) {
-                story.belongsTo(models.project);
-                story.belongsTo(story, {as: 'parent'});
-                story.belongsTo(models.user, {as: 'creator'});
-                story.hasMany(models.story, {as: 'children', foreignKey: 'parentId'});
-              }
-            }
-        });
-
+    });
+    story.associate = function(models) {
+        story.belongsTo(models.project);
+        story.belongsTo(story, {as: 'parent'});
+        story.belongsTo(models.user, {as: 'creator'});
+        story.hasMany(models.story, {as: 'children', foreignKey: 'parentId'});
+    };
+    
     return story;
 };

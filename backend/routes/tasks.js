@@ -3,12 +3,9 @@ module.exports = function(router) {
     var csv = require('../modules/csv');
     router.route('/tasks')
         .get(function(req, res) {
-            var ob = req.query.sortBy ? req.query.sortBy : 'id';
-            if (ob == 'owner') ob = 'ownerId';
+            var orderField = req.query.sortBy ? req.query.sortBy : 'id';
+            if (orderField == 'owner') orderField = 'ownerId';
 
-            if (req.query.desc) {
-                ob = [[ob, 'desc']]
-            }
             let where = {};
 
             if (req.query.planId) {
@@ -25,7 +22,7 @@ module.exports = function(router) {
             models.task.findAll({
                 attributes: {exclude: ex},
                 where: where,
-                order: ob
+                order: [[orderField, (req.query.desc ? 'desc' : 'asc')]]
             }).then(function(tasks) {   
                 if ('csv' == req.query.format) {
                     res.set('Content-disposition', 'attachment; filename=plan' + (req.query.planId ? req.query.planId : '') + '.csv');

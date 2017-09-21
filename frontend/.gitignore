@@ -1,15 +1,12 @@
-/target/**
+**/target/**
 *.iml
-/.idea/**
-/src/main/webapp/WEB-INF/security.xml
+.idea/**
 **/.DS_Store
 .vscode/**
 
-# See http://help.github.com/ignore-files/ for more about ignoring files.
-
 # compiled output
-/dist
-/tmp
+dist/
+tmp/
 
 # typescript generated files
 /src/**/*.js
@@ -40,7 +37,5 @@ testem.log
 Thumbs.db
 
 # Sensitive file
-/config/security.json
-
 # Temporary files
-/**/*.log
+**/*.log

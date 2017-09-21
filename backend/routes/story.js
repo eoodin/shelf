@@ -3,12 +3,9 @@ module.exports = function(router) {
     var csv = require('../modules/csv');
     router.route('/stories')
         .get(function(req, res) {
-            var ob = req.query.sortBy ? req.query.sortBy : 'id';
-            if (ob == 'owner') ob = 'ownerId';
-
-            if (req.query.desc) {
-                ob = [[ob, 'desc']]
-            }
+            var orderField = req.query.sortBy ? req.query.sortBy : 'id';
+            if (orderField == 'owner') orderField = 'ownerId';
+            
             let where = {};
             if (req.query.projectId) {
                 where = {projectId: req.query.projectId};
@@ -27,7 +24,7 @@ module.exports = function(router) {
             models.story.findAll({
                 attributes: {exclude: ex},
                 where: where,
-                order: ob,
+                order: [[orderField, (req.query.desc ? 'desc' : 'asc')]],
                 include: [
                     {model: models.story, as: 'children'}
                 ],

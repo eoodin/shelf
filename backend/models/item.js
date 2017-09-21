@@ -25,18 +25,14 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.ENUM,
             values: ['Created','Analyzing','Analyzed','Fixing','Fixed','Testing','Tested','Failed']
         }
-    }, {
-            classMethods: {
-              associate: function(models) {
-                item.belongsTo(models.plan);
-                item.belongsTo(item, {as: 'parent'});
-                item.belongsTo(models.user, {as: 'owner'});
-                item.belongsTo(models.user, {as: 'creator'});
-                item.hasMany(models.change);
-                item.hasMany(models.item, {as: 'children', foreignKey: 'parentId'});
-              }
-            }
-        });
-
+    });
+    item.associate = function(models) {
+        item.belongsTo(models.plan);
+        item.belongsTo(item, {as: 'parent'});
+        item.belongsTo(models.user, {as: 'owner'});
+        item.belongsTo(models.user, {as: 'creator'});
+        item.hasMany(models.change);
+        item.hasMany(models.item, {as: 'children', foreignKey: 'parentId'});
+    };
     return item;
 };

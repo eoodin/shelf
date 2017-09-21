@@ -1,16 +1,6 @@
 module.exports = function(router) {
     var models = require('../models');
-    function composeOrder(req) {
-        var ob = req.query.sortBy ? req.query.sortBy : 'id';
-        // TODO: rename this field to eleminate the code.
-        if (ob == 'owner') ob = 'ownerId';
-        if (ob == 'creator') ob = 'creatorId';
 
-        if (req.query.desc) {
-            ob = [[ob, 'desc']]
-        }
-        return ob;
-    };
     function composeWhere(req) {
         let where = {};
         let excludeStatus = [];
@@ -38,11 +28,15 @@ module.exports = function(router) {
 
     router.route('/defects')
         .get(function(req, res) {
-            let ex = (req.query.exclude) ? req.query.exclude : [];    
+            let ex = (req.query.exclude) ? req.query.exclude : [];
+            var orderField = req.query.sortBy ? req.query.sortBy : 'id';
+            if (orderField == 'owner') orderField = 'ownerId';
+            else if (orderField == 'creator') orderField = 'creatorId';
+
             models.defect.findAndCountAll({
                 attributes: {exclude: ex},
                 where: composeWhere(req),
-                order: composeOrder(req)
+                order: [[orderField, (req.query.desc ? 'desc' : 'asc')]]
             }).then(function(defects) {   
                 res.json(defects);
             })

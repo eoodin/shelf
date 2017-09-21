@@ -1,12 +1,12 @@
-import {Component, ViewContainerRef} from "@angular/core";
-import {Router} from "@angular/router";
-import {Http} from "@angular/http";
-import {Location} from "@angular/common";
-import {NotifyService} from "./notify.service";
-import {Observable} from "rxjs/Rx";
-import {LoginService} from "./login.service";
-import {ProjectService} from "./project.service";
-import {AppService} from "./app.service";
+import {Component, ViewContainerRef} from '@angular/core';
+import {Router} from '@angular/router';
+import {Http} from '@angular/http';
+import {Location} from '@angular/common';
+import {NotifyService} from './notify.service';
+import {Observable} from 'rxjs/Rx';
+import {LoginService} from './login.service';
+import {ProjectService} from './project.service';
+import {AppService} from './app.service';
 import {MdDialog, MdDialogRef} from '@angular/material';
 
 @Component({

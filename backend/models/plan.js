@@ -7,16 +7,13 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.STRING,
         start: DataTypes.DATE,
         end: DataTypes.DATE
-    }, {
-            timestamps: false,
-            classMethods: {
-              associate: function(models) {
-                plan.belongsTo(models.team);
-                plan.hasMany(models.item);
-                plan.hasOne(models.allocation);
-              }
-            }
-        });
+    }, {timestamps: false});
+
+    plan.associate = function(models) {
+        plan.belongsTo(models.team);
+        plan.hasMany(models.item);
+        plan.hasOne(models.allocation);
+    };
 
     return plan;
 };

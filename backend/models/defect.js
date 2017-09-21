@@ -13,15 +13,12 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.ENUM,
             values: ['Open', 'Analyzing', 'Declined', 'Fixing', 'Fixed', 'Testing', 'Failed', 'Closed']
         }
-    }, {
-            classMethods: {
-                associate: function (models) {
-                    defect.belongsTo(models.project);
-                    defect.belongsTo(models.user, { as: 'owner' });
-                    defect.belongsTo(models.user, { as: 'creator' });
-                }
-            }
-        });
-
+    });
+    defect.associate = function (models) {
+        defect.belongsTo(models.project);
+        defect.belongsTo(models.user, { as: 'owner' });
+        defect.belongsTo(models.user, { as: 'creator' });
+    };
+    
     return defect;
 };
