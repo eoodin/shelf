@@ -5,17 +5,18 @@ Shelf is aiming to provide basic management interface for SCRUM.
 TODOs
 =====
 
-[ ] split client and server
-[ ] add sequelize migration setup for database
-[ ] unify items
-[ ] add tag system
-[ ] redesign history of items
-[ ] show history in item details
-[ ] \(Optional) add search engine
-[ ] add filters for defect
-[ ] code track system
-[ ] ci track system
-[ ] task automation
+- [ ] split client and server
+- [ ] add sequelize migration setup for database
+- [ ] unify items
+- [ ] add tag system
+- [ ] redesign history of items
+- [ ] show history in item details
+- [ ] \(Optional) add search engine
+- [ ] add filters for defect
+- [ ] code track system
+- [ ] ci track system
+- [ ] task automation
+- [ ] effort statistics
 
 Runtime setup
 =============
