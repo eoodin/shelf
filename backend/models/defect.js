@@ -18,6 +18,7 @@ module.exports = function (sequelize, DataTypes) {
         defect.belongsTo(models.project);
         defect.belongsTo(models.user, { as: 'owner' });
         defect.belongsTo(models.user, { as: 'creator' });
+        defect.belongsToMany(model.history, {through: 'defect_changes'});
     };
     
     return defect;
