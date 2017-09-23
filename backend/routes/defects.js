@@ -106,15 +106,31 @@ module.exports = function(router) {
                     if (f == 'updatedAt' || f == 'createdAt') {
                         continue;
                     }
-
-                    if (d[f] != req.body[f]) {
+                    if (f == 'changes' || f == 'children') 
+                        continue;
+        
+                    let value = req.body[f];
+                    if (f == 'creator' || f == 'createdBy')  {
+                        f = 'creatorId';
+                        value = value ? value.id : null;
+                    } else if (f == 'owner') {
+                        f = 'ownerId',
+                        value = value ? value.id : null;
+                    }
+                    if (value && typeof(value) === 'object') {
+                        console.log("unrecongnized change.", f, value);
+                        continue;
+                    }
+                    if (d[f] != value) {
                         origin[f] = d[f];
-                        changes[f] = req.body[f];
+                        changes[f] = value;
                     }
                 }
 
-                d.update(changes).then(function(d) {
+                return d.update(changes).then(function(d) {
                     res.json(d);
+                }).then(() => {
+                    models.defectHistory.saveFor(d, changes, req.user.id);
                 });
             }).catch(function(errors){
                 logger.error(errors);

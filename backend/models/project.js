@@ -7,7 +7,7 @@ module.exports = function (sequelize, DataTypes) {
     }, {timestamps: false});
     project.associate = function(models) {
         project.belongsTo(models.team);
-        project.hasMany(models.item); //  cascade = CascadeType.REMOVE
+        project.hasMany(models.story); //  cascade = CascadeType.REMOVE
     };
     
     return project;

@@ -17,7 +17,8 @@
     "password": "123456",
     "database": "shelf_test",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "defeine": {"underscored": true}
   },
   "production": {
     "username": "root",

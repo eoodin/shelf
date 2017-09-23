@@ -7,7 +7,7 @@ module.exports = function (sequelize, DataTypes) {
         priority: { type:   DataTypes.INTEGER, defaultValue: 1 },
         originalEstimation: { type: DataTypes.INTEGER, defaultValue: 0 },
         estimation: { type: DataTypes.INTEGER, defaultValue: 0 },
-        description: { type: DataTypes.STRING, length: 'long' /*524288*/ },
+        description: { type: DataTypes.TEXT, length: 'long' /*524288*/ },
         status: {
             type: DataTypes.ENUM,
             values: ['New', 'InProgress', 'Finished', 'Pending', 'Dropped', 'Removed']
@@ -17,7 +17,8 @@ module.exports = function (sequelize, DataTypes) {
         task.belongsTo(models.plan);
         task.belongsTo(models.user, {as: 'owner'});
         task.belongsTo(models.user, {as: 'creator'});
-        task.hasMany(models.change);
+
+        // task.hasMany(models.change);
     };
     
     return task;

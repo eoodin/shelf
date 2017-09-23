@@ -4,7 +4,7 @@ module.exports = function (sequelize, DataTypes) {
     var defect = sequelize.define("defect", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         title: DataTypes.STRING,
-        description: { type: DataTypes.STRING, length: 'long' /*524288*/ },
+        description: { type: DataTypes.TEXT, length: 'long' /*524288*/ },
         severity: {
             type: DataTypes.ENUM,
             values: ['Blocker', 'Critical', 'Major', 'Minor']
@@ -18,8 +18,8 @@ module.exports = function (sequelize, DataTypes) {
         defect.belongsTo(models.project);
         defect.belongsTo(models.user, { as: 'owner' });
         defect.belongsTo(models.user, { as: 'creator' });
-        defect.belongsToMany(model.history, {through: 'defect_changes'});
+        defect.hasMany(models.defectHistory, {as: 'histories'});
     };
-    
+
     return defect;
 };

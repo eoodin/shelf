@@ -11,7 +11,7 @@ module.exports = function (sequelize, DataTypes) {
 
     plan.associate = function(models) {
         plan.belongsTo(models.team);
-        plan.hasMany(models.item);
+        plan.hasMany(models.task);
         plan.hasOne(models.allocation);
     };
 

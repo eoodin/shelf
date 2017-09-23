@@ -6,7 +6,7 @@ module.exports = function (sequelize, DataTypes) {
         title: DataTypes.STRING,
         priority: { type:   DataTypes.INTEGER, defaultValue: 1 },
         points: { type: DataTypes.INTEGER, defaultValue: 0 },
-        description: { type: DataTypes.STRING, length: 'long' /*524288*/ },
+        description: { type: DataTypes.TEXT, length: 'long' /*524288*/ },
         status: {
             type: DataTypes.ENUM,
             values: ['New', 'Working', 'Done', 'Dropped']
