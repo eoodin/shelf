@@ -31,14 +31,21 @@ import { Defect } from '../model/defect';
       <div class="description">
           <ckeditor [(ngModel)]="defect.description" [config]="editorConfig" debounce="200"></ckeditor>
       </div>
-      <!--
-      <div>
+      <div *ngIf="defect.id" class="history">
         <h4>History</h4>
+        <p *ngIf="!defect.histories.length">No history</p>
         <ul>
-          <li></li>
+          <li *ngFor="let h of defect.histories" >
+            <span class="hist-time"> {{h.history.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span>
+            <span class="user"> <strong>{{h.history.userId}}</strong> changes</span>
+            <ul>
+              <li *ngFor="let c of h.history.changes" >
+                <strong> {{c.field}}</strong> => <i>{{c.value | slice:0:20}}</i>
+              </li>
+            </ul>
+          </li>
         </ul>
       </div>
-      -->
   </div>
   `,
   styles: [`
@@ -53,7 +60,6 @@ import { Defect } from '../model/defect';
   .title-row {display:flex; flex-direction: row;}
   .title-row input {flex-grow: 1; font-weight: 700;}
   md-radio-button {margin: 0 7px;}
-  .description {flex-grow: 1;display: flex; flex-direction: column;}
   ckeditor {flex-grow: 1; display: flex; flex-direction: column;}
   `]
 })

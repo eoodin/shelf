@@ -91,7 +91,28 @@ module.exports = function(router) {
     
     router.route('/defects/:id')
         .get(function(req, res) {
-            models.defect.findById(req.params.id).then(function(d) {
+            models.defect.findOne({
+                where: { id: req.params.id },
+                include: [{
+                    model: models.defectHistory, 
+                    as: 'histories', 
+                    attributes: ['historyId'], /* any way to exlcude all attributes */
+                    order:  [['createdAt', 'asc']],
+                    include: [{
+                        model: models.history, 
+                        include: [{
+                            model: models.change, 
+                            attributes: ['field', 'value'],
+                        }]
+                    }]
+                }]
+            }).then(function(d) {
+                //TODO sort history in db instead of this code:
+                if(d.histories) {
+                    d.histories = d.histories.sort(
+                        (a, b) => a.history.createdAt > b.history.createdAt
+                    );
+                }
                 res.json(d);
             }).catch(function(errors){
                 logger.error(errors);

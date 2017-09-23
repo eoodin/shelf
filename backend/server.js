@@ -7,7 +7,7 @@ app.set('IP', '0.0.0.0');
 logger = require('winston');
 logger.configure({
     transports: [
-      new (logger.transports.Console)(),
+      // new (logger.transports.Console)(),
       new (logger.transports.File)({ filename: 'shelf.log' })
     ]
   });

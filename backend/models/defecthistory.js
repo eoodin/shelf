@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, { tableName: 'defect_histories', updatedAt: false });
   defectHistory.associate = function (models) {
-    // associations can be defined here
+    defectHistory.belongsTo(models.history);
   };
   defectHistory.saveFor = function(defect, changes, userId) {
     return sequelize.model('history').create({
