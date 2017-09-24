@@ -37,7 +37,7 @@ import { Defect } from '../model/defect';
         <ul>
           <li *ngFor="let h of defect.histories" >
             <span class="hist-time"> {{h.history.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span>
-            <span class="user"> <strong>{{h.history.userId}}</strong> changes</span>
+            <span class="user"> <strong>{{h.history.userId}}</strong></span>
             <ul>
               <li *ngFor="let c of h.history.changes" >
                 <strong> {{c.field}}</strong> => <i>{{c.value | slice:0:20}}</i>
