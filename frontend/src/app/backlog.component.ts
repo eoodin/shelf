@@ -95,7 +95,7 @@ export class BacklogComponent {
     constructor(
         public dialog: MdDialog,
         private ele: ElementRef,
-        private stories: StoryService,
+        public stories: StoryService,
         private prs: ProjectService,
         private router: Router,
         private route: ActivatedRoute,

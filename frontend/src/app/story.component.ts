@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ViewChild, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Params } from '@angular/router';
 import { HttpService } from './http.service';
-import { ProjectService } from "./project.service";
+import { ProjectService } from './project.service';
 import { StoryService } from './story.service';
 
 declare var CKEDITOR;
@@ -38,15 +38,13 @@ declare var CKEDITOR;
     .item-details>form>div>span {display: inline-block; width: 50px;}
     .title-row {display:flex; flex-direction: row;}
     .title-row input {flex-grow: 1; font-weight: 800;}
-    `],
-    encapsulation: ViewEncapsulation.Emulated,
-    changeDetection: ChangeDetectionStrategy.Default
+    `]
 })
 export class StoryComponent implements OnDestroy {
-    _item = {};
     saving = false;
-    parent;
-    editorConfig = {
+    public _item = {title: '', points: 0, description: ''};
+    public parent;
+    public editorConfig = {
         extraPlugins: 'uploadimage',
         imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
         toolbar: [
@@ -94,12 +92,11 @@ export class StoryComponent implements OnDestroy {
             this.storyService.save(data)
                 .finally(() => this.saving = false)
                 .subscribe(() => this.goBack())
-        }
-        else {
+        } else {
             this.saving = true;
             this.storyService.create(data, {parent: this.parent})
                 .finally(() => this.saving = false)
-                .subscribe(() => this.goBack())
+                .subscribe(() => this.goBack());
         }
     }
 

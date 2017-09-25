@@ -1,11 +1,11 @@
-import { Component, Inject, AfterViewInit, ViewChild } from "@angular/core";
+import { Component, Inject, AfterViewInit, ViewChild } from '@angular/core';
 import {MdDialog, MdDialogRef, MD_DIALOG_DATA} from '@angular/material';
-import { PreferenceService } from "./preference.service";
-import * as moment from "moment";
-import { PlanService } from "./plan.service";
-import { TeamService } from "./team.service";
+import { PreferenceService } from './preference.service';
+import * as moment from 'moment';
+import { PlanService } from './plan.service';
+import { TeamService } from './team.service';
 import { TaskService } from './task.service';
-import { ProjectService } from "./project.service";
+import { ProjectService } from './project.service';
 
 @Component({
     selector: 'plan-content',
@@ -107,8 +107,7 @@ import { ProjectService } from "./project.service";
     `]
 })
 export class PlanContentComponent implements AfterViewInit {
-    displayedColumns = ['id','title', 'priority', 'status', 'owner', 'remaining', 'operations'];
-    
+    displayedColumns = ['id', 'title', 'priority', 'status', 'owner', 'remaining', 'operations'];
     current;
     workItems = [];
     _plans = [];
@@ -118,14 +117,14 @@ export class PlanContentComponent implements AfterViewInit {
     hideFinished = false;
     onlyOwned = false;
     PRI = ['High', 'Medium', 'Low'];
-    STATES = ['New','InProgress','Finished','Pending','Dropped'];
+    STATES = ['New', 'InProgress', 'Finished', 'Pending', 'Dropped'];
 
     project = null;
 
     @ViewChild('downloader') downloader;
 
     constructor(private plans: PlanService,
-        private tasks: TaskService,
+        public tasks: TaskService,
         private teams: TeamService,
         private pref: PreferenceService,
         public dialog: MdDialog,
@@ -181,8 +180,7 @@ export class PlanContentComponent implements AfterViewInit {
                 if (!data['id']) {
                     data.projectId = this.project['id'];
                     this.tasks.create(data).subscribe(result => this.loadWorkItems());
-                }
-                else {
+                } else {
                     let id = data['id'];
                     delete data['id'];
                     this.tasks.save(id, data).subscribe(result => this.loadWorkItems());
@@ -264,7 +262,7 @@ export class PlanContentComponent implements AfterViewInit {
         if (!epoch && epoch !== 0)
             return '----------';
 
-        return moment(epoch).format("YYYY-MM-DD");
+        return moment(epoch).format('YYYY-MM-DD');
     }
 
     sumHours() {
@@ -302,22 +300,23 @@ export class PlanContentComponent implements AfterViewInit {
     template: `
     <h2 md-dialog-title>Item Details</h2>
     <md-dialog-content class="item-details">
-        <form (ngSubmit)="saveItem()">
-            <div class="row">
-                <span class="field-label">Title:</span> <input type="text" class="work-item-title" [(ngModel)]="data.title" [ngModelOptions]="{standalone: true}">
+        <div class="row">
+            <span class="field-label">Title:</span>
+            <input type="text" class="work-item-title" [(ngModel)]="data.title">
+        </div>
+        <div class="row">
+            <div class="col-sm-12">Description:</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <ckeditor [(ngModel)]="data.description" [config]="editorConfig" [ngModelOptions]="{standalone: true}" debounce="400"></ckeditor>
             </div>
-            <div class="row">
-                <div class="col-sm-12">Description:</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+            Effort Estimation: <input type="text" [(ngModel)]="data.estimation">
             </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <ckeditor [(ngModel)]="data.description" [config]="editorConfig" [ngModelOptions]="{standalone: true}" debounce="400"></ckeditor>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12">Effort Estimation: <input type="text" [(ngModel)]="data.estimation" [ngModelOptions]="{standalone: true}"></div>
-            </div>
-        </form>
+        </div>
     </md-dialog-content>
     <md-dialog-actions>
         <button md-button md-dialog-close>Close</button>
@@ -330,7 +329,7 @@ export class PlanContentComponent implements AfterViewInit {
     `]
 })
 export class ItemDetailDialog {
-    private editorConfig = {
+    public editorConfig = {
         extraPlugins: 'uploadimage,divarea',
         imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
         toolbar: [
@@ -343,7 +342,7 @@ export class ItemDetailDialog {
         ]
     };
     constructor(
-        public dialogRef: MdDialogRef<ItemDetailDialog>, 
+        public dialogRef: MdDialogRef<ItemDetailDialog>,
         @Inject(MD_DIALOG_DATA) public data: any
     ) {}
 }
@@ -364,7 +363,7 @@ export class ItemDetailDialog {
 })
 export class MoveItemsDialog {
     constructor(
-        public dialogRef: MdDialogRef<MoveItemsDialog>, 
+        public dialogRef: MdDialogRef<MoveItemsDialog>,
         @Inject(MD_DIALOG_DATA) public data: any
     ) { }
 }
@@ -383,7 +382,7 @@ export class MoveItemsDialog {
 })
 export class RemoveConfirmDialog {
     constructor(
-        public dialogRef: MdDialogRef<RemoveConfirmDialog>, 
+        public dialogRef: MdDialogRef<RemoveConfirmDialog>,
         @Inject(MD_DIALOG_DATA) public data: any
     ) { }
 }

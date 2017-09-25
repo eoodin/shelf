@@ -124,7 +124,7 @@ export class ContentComponent implements OnInit, AfterViewInit {
         private router: Router,
         private http: HttpService,
         private teams: TeamService,
-        private defects: DefectService,
+        public defects: DefectService,
         private userService: UserService,
         private projectSerivce: ProjectService) {
         this.teams.ownTeam.subscribe(t => this.members = t.members);
