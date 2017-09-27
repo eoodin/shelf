@@ -1,3 +1,9 @@
+2017-09-23
+==========
+Add defect history at defect details page, database migration needed, use `node_modules/.bin/sequelize db:migrate` to do so
+
+The UI now is purely based on angular material, bootstrap is removed.
+
 2016-10-17
 ==========
 
