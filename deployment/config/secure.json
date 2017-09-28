@@ -1,0 +1,10 @@
+{
+    "server": {
+        "url": "ldap://{ldap name}:389",
+        "bindDn": "{bind dn}",
+        "bindCredentials": "{password}",
+        "searchBase":"",
+        "searchFilter": "(uid={{username}})",
+        "searchAttributes": ["displayName", "mail", "employeeNumber", "uid"]
+      }
+}

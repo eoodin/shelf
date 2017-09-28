@@ -1,0 +1,22 @@
+[Unit]
+Description=Backend server for Shelf
+
+[Service]
+#ExecStartPre=/usr/bin/grunt
+
+# Start the js-file starting the express server
+ExecStart=/usr/bin/node server.js
+WorkingDirectory=/var/local/shelf/backend
+Restart=always
+RestartSec=10
+StandardOutput=/var/log/shelf/stdout.log
+StandardError=/var/log/shelf/stderr.log
+#SyslogIdentifier=Express
+# Change to a non-root user (optional, but recommended)
+#User=<alternate user>
+#Group=<alternate group>
+# Set environment options
+Environment=NODE_ENV=production PORT=4201 LOGDIR=/var/log/shelf
+
+[Install]
+WantedBy=multi-user.target
