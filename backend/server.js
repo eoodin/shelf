@@ -11,7 +11,7 @@ if (cluster.isMaster) {
     worker.on('exit', startWorkerProcess);
   }
 
-  let production = process.env.NODE_ENV != 'production';
+  let production = process.env.NODE_ENV == 'production';
   if (!production) 
     startWorkerProcess();
 
