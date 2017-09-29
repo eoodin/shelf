@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, AfterViewInit  } from '@angular/core';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 import { MdDialog, MdDialogRef, MdSort } from '@angular/material';
 import { HttpService } from '../http.service';
 import { DefectService } from '../defect.service';
 import { TeamService } from '../team.service';
 import { ProjectService } from '../project.service';
 import { PlanService } from '../plan.service';
-import { UserService } from '../user.service'
+import { UserService } from '../user.service';
 
 @Component({
   selector: 'defect-content',
@@ -40,7 +40,8 @@ import { UserService } from '../user.service'
                     <md-cell *mdCellDef="let element">
                         <a [mdMenuTriggerFor]="statusSel">{{element.status}}</a>
                         <md-menu #statusSel="mdMenu">
-                            <button *ngFor="let st of settableStatus(element)" (click)="changeStatus(element, st)"  md-menu-item>{{st}}</button>
+                            <button *ngFor="let st of settableStatus(element)"
+                            (click)="changeStatus(element, st)"  md-menu-item>{{st}}</button>
                         </md-menu>
                     </md-cell>
                 </ng-container>
@@ -50,7 +51,9 @@ import { UserService } from '../user.service'
                 </ng-container>
                 <ng-container mdColumnDef="title">
                     <md-header-cell *mdHeaderCellDef> Title </md-header-cell>
-                    <md-cell *mdCellDef="let element"> <a [routerLink]="['.', element.id]"> {{element.title}} </a>  </md-cell>
+                    <md-cell *mdCellDef="let element">
+                        <a [routerLink]="['.', element.id]"> {{element.title}} </a>
+                    </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="owner">
                     <md-header-cell *mdHeaderCellDef md-sort-header> Owner </md-header-cell>
@@ -58,8 +61,10 @@ import { UserService } from '../user.service'
                      <a *ngIf="element.owner" [mdMenuTriggerFor]="ownerSel"> {{element.owner.name}} </a>
                      <a *ngIf="!element.owner" [mdMenuTriggerFor]="ownerSel"> Unassigned </a>
                      <md-menu #ownerSel="mdMenu">
-                         <button *ngFor="let member of members" (click)="assignTo(element, member)"  md-menu-item>{{member.name}}</button>
-                         <button *ngIf="element.owner" (click)="assignTo(element, null)" md-menu-item>Unassigned</button>
+                         <button *ngFor="let member of members"
+                            (click)="assignTo(element, member)"  md-menu-item>{{member.name}}</button>
+                         <button *ngIf="element.owner"
+                            (click)="assignTo(element, null)" md-menu-item>Unassigned</button>
                      </md-menu>
                     </md-cell>
                 </ng-container>
@@ -73,7 +78,7 @@ import { UserService } from '../user.service'
                 </ng-container>
                 <ng-container mdColumnDef="operations">
                     <md-header-cell *mdHeaderCellDef> Operations </md-header-cell>
-                    <md-cell *mdCellDef="let element"> 
+                    <md-cell *mdCellDef="let element">
                         <a *ngIf="element.status == 'Open'" (click)="startFix(element)"  md-button>Start Fix</a>
                         <a *ngIf="element.status == 'Fixed'" (click)="startTest(element)"  md-button>Start Test</a>
                     </md-cell>
@@ -100,7 +105,7 @@ import { UserService } from '../user.service'
     .plan-head ul li span {font-weight: normal}
     td.changeable button, td.changeable a {line-height: 1.4em;}
     .material-icons.button {cursor: pointer;}
-    .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; background-color: rgba(0,0,0,0.07);}
+    .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; opacity: 0.07;}
     .type-and-id input { display: inline-block; }
     .mat-column-title {flex-grow: 8;}
   `]
@@ -109,7 +114,7 @@ export class ContentComponent implements OnInit, AfterViewInit {
     @ViewChild(MdSort) sorts: MdSort;
     total = 0;
     items = [];
-    displayedColumns = ['id','status', 'severity', 'title', 'creator', 'createdAt', 'owner', 'operations'];
+    displayedColumns = ['id', 'status', 'severity', 'title', 'creator', 'createdAt', 'owner', 'operations'];
     loading = false;
     user;
     members = [];
@@ -147,7 +152,7 @@ export class ContentComponent implements OnInit, AfterViewInit {
         let search = {};
         if (this.project) search['project'] = this.project.id;
         if (this.hideClosed) search['noclosed'] = 'true';
-        if (this.onlyOwned) search['ownonly'] = 'true';        
+        if (this.onlyOwned) search['ownonly'] = 'true';
         if (this.hideDeclined) search['nodeclined'] = 'true';
 
         this.defects.summary({project: search['project']})
@@ -169,8 +174,7 @@ export class ContentComponent implements OnInit, AfterViewInit {
     startFix(item) {
         let dialogRef = this.dialog.open(SelectPlanDialog);
         dialogRef.afterClosed().subscribe(result => {
-            if (!result) 
-                return;
+            if (!result) return;
 
             this.loading = true;
             this.http.post('/api/defects/' + item.id + '/fix', JSON.stringify({planId: result}))
@@ -190,11 +194,11 @@ export class ContentComponent implements OnInit, AfterViewInit {
             .finally(() => this.loading = false)
             .subscribe(resp => this.loadItems());
     }
-    
+
     startTest(item) {
         let dialogRef = this.dialog.open(SelectPlanDialog);
         dialogRef.afterClosed().subscribe(result => {
-            if (!result) 
+            if (!result)
                 return;
 
             this.loading = true;

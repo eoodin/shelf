@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Params } from '@angular/router';
 import { HttpService } from '../http.service';
-import { ProjectService } from "../project.service";
+import { ProjectService } from '../project.service';
 import { DefectService } from '../defect.service';
 import { Defect } from '../model/defect';
 
@@ -23,7 +23,7 @@ import { Defect } from '../model/defect';
           </md-radio-group>
       </div>
       <div class="title-row">
-          <input type="text" [(ngModel)]="defect.title"> 
+          <input type="text" [(ngModel)]="defect.title">
       </div>
       <div *ngIf="defect.id"><label>Status</label><span class="status">{{defect.status}}</span></div>
       <div *ngIf="defect.id"><label>Reporter</label><span *ngIf="defect.creator">{{defect.creator.name}}</span></div>
@@ -57,8 +57,7 @@ import { Defect } from '../model/defect';
   .defect-edit>div>label:after {content: ':';}
   .defect-edit>div>span {display: inline-block;}
   .status {font-weight: 700;}
-  .title-row {display:flex; flex-direction: row;}
-  .title-row input {flex-grow: 1; font-weight: 700;}
+  .title-row input {width: 100%; font-size: 16px;}
   md-radio-button {margin: 0 7px;}
   ckeditor {flex-grow: 1; display: flex; flex-direction: column;}
   `]

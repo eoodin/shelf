@@ -1,17 +1,26 @@
 /*jshint node:true*/
 var cluster = require('cluster');
+const DEFAULT_PORT = 4201;
+
 if (cluster.isMaster) {
   var cpuCount = require('os').cpus().length;
   console.log('master process started', new Date());
-  for (var i = 0; i < cpuCount; i += 1) {
-    console.log('start worker ' + (i+1), new Date());
-    cluster.fork();
+  function startWorkerProcess(id) {
+    console.log('start worker ', new Date(), id);
+    let worker = cluster.fork();
+    worker.on('exit', startWorkerProcess);
   }
+
+  let production = process.env.NODE_ENV != 'production';
+  if (!production) 
+    startWorkerProcess();
+
+  for (var i = 0; production && i < cpuCount; i += 1)
+    startWorkerProcess(i+1);
 } else {
   let workerId = cluster.worker.id;
   var express = require("express");
   const app = express();
-  const DEFAULT_PORT = 4201;
   var httpPort = process.env.PORT || DEFAULT_PORT;
   var logFolder = process.env.LOGDIR || '.';
   
@@ -47,7 +56,7 @@ if (cluster.isMaster) {
     }
   
     res.status(500);
-    res.render('error', { error: err });
+    res.json({ error: err });
   })
   
   app.listen(httpPort);

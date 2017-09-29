@@ -5,13 +5,19 @@ module.exports = function(app) {
     var passport = require('passport');
     var LocalStrategy = require('passport-local').Strategy;
     var models = require('./models');
-
+    var SequelizeStore = require('connect-session-sequelize')(session.Store);
+    
     app.use(cookieParser());
-    app.use(session({secret: 'supernova', saveUninitialized: true, resave: true}));
+    app.use(session({
+        secret: 'supernova', 
+        saveUninitialized: true, 
+        resave: false,
+        store: new SequelizeStore({db: models.sequelize})
+        }));
     app.use(passport.initialize());
     app.use(passport.session());
 
-    var securityConfig = __dirname + '/../config/security.json';
+    var securityConfig = __dirname + '/config/security.json';
 
     var usingLdap = fs.existsSync(securityConfig);
     if(usingLdap) {
@@ -20,6 +26,7 @@ module.exports = function(app) {
         passport.use(new LdapStrategy(require(securityConfig)));
     }
     else {
+        logger.info('No ldap config, abbvertery password allowed');
         passport.use('local', new LocalStrategy(function(username, password, done) {
             return models.user.find({where: {id: username}}).then(function(u) {
                 done(null, u);
