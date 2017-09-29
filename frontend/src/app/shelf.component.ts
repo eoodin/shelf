@@ -1,24 +1,26 @@
-import {Component, ViewContainerRef} from '@angular/core';
-import {Router} from '@angular/router';
-import {Http} from '@angular/http';
-import {Location} from '@angular/common';
-import {NotifyService} from './notify.service';
-import {Observable} from 'rxjs/Rx';
-import {LoginService} from './login.service';
-import {ProjectService} from './project.service';
-import {AppService} from './app.service';
-import {MdDialog, MdDialogRef} from '@angular/material';
+import { Component, ViewContainerRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { Http } from '@angular/http';
+import { Location } from '@angular/common';
+import { NotifyService } from './notify.service';
+import { Observable } from 'rxjs/Rx';
+import { LoginService } from './login.service';
+import { ProjectService } from './project.service';
+import { AppService } from './app.service';
+import { UserService } from './user.service';
+import { MdDialog, MdDialogRef } from '@angular/material';
 
 @Component({
     selector: 'shelf-app',
     template: `
     <div class="navbar">
         <nav>
-            <a class="navbar-brand" href="javascript:void(0);"><img class="nav-logo" src="/app/images/icon-large.png"/></a>
-            <button md-button [class.active]="getLinkStyle('/projects')" [routerLink]="['/projects']">Dashboard</button>
+            <a class="brand" href="javascript:void(0);"><img class="nav-logo" src="/app/images/icon-large.png"/></a>
             <button md-button [class.active]="getLinkStyle('/backlog')" [routerLink]="['/backlog']">Backlog</button>
             <button md-button [class.active]="getLinkStyle('/plans')" [routerLink]="['/plans']">Plans</button>
             <button md-button [class.active]="getLinkStyle('/defects')" [routerLink]="['/defects']">Defects</button>
+            <button md-button *ngIf="user.super"
+                [class.active]="getLinkStyle('/admin')" [routerLink]="['/admin']">Admin</button>
             <div style="flex-grow: 1;"></div>
             <button md-button><a (click)="showAbout()">About</a></button>
             <button md-button><a (click)="logoutApp()" >Logout</a></button>
@@ -29,11 +31,12 @@ import {MdDialog, MdDialogRef} from '@angular/material';
     </div>`,
     styles: [`
     :host {position: absolute; top: 0; bottom: 0; left: 0; right: 0; display: flex; flex-direction: column;}
-    .navbar {box-shadow: 0 3px 5px -1px rgba(0,0,0,.2), 0 6px 10px 0 rgba(0,0,0,.14), 0 1px 18px 0 rgba(0,0,0,.12);position: relative; z-index: 10;}
+    .navbar {box-shadow: 0 3px 5px -1px rgba(0,0,0,.2), 0 6px 10px 0 rgba(0,0,0,.14), 0 1px 18px 0 rgba(0,0,0,.12);
+        position: relative; z-index: 10;}
     nav { display: flex; flex-wrap: wrap; align-items: center;padding: 8px 16px;}
     button.mat-button.active { background: #ddd; }
     .workspace {flex: 1 1 auto; display: flex; overflow: auto;}
-    .navbar-brand {padding-right: 16px;}
+    .brand {padding-right: 16px;}
     .nav-logo {width: 32px; height:32px;}
     `]
 })
@@ -41,12 +44,14 @@ export class ShelfAppComponent {
     private viewContainerRef: ViewContainerRef;
     private app = {};
     private ui;
+    user = {};
 
     constructor(private dialog: MdDialog,
                 private router: Router,
                 private location: Location,
                 private notify: NotifyService,
                 private loginService: LoginService,
+                public userService: UserService,
                 rootView: ViewContainerRef) {
         this.viewContainerRef = rootView;
         Observable.interval(1000 * 60)
@@ -54,13 +59,13 @@ export class ShelfAppComponent {
             .filter(now => now.getMinutes() == 0)
             .filter(now => now.getHours() == 10 || now.getHours() == 17)
             .subscribe(() => this.notify.notify('Update task status', 'Please contentChange task status.'));
+        userService.currentUser.subscribe(u => this.user = u);
     }
 
     getLinkStyle(path) {
         if (path === this.location.path()) {
             return true;
-        }
-        else if (path.length > 0) {
+        } else if (path.length > 0) {
             return this.location.path().indexOf(path) > -1;
         }
     }

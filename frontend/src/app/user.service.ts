@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {Subject, Observable} from "rxjs";
-import {HttpService} from "./http.service";
+import {Subject, Observable} from 'rxjs';
+import {HttpService} from './http.service';
 
 @Injectable()
 export class UserService {
@@ -16,8 +16,11 @@ export class UserService {
          Observable.of(1).flatMap(() => this.http.get('/api/users/me'))
             .retry(1)
             .map(res => res.json())
-            .subscribe(user => this._currentUser.next(user));
-            
+            .subscribe(user => {
+                user.super = user.roles && user.roles.map(u => u.id).includes(1);
+                this._currentUser.next(user);
+            });
+
         this.usersCache = {};
         this.http.get('/api/users')
             .map(resp => resp.json())

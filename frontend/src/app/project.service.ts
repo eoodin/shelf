@@ -40,6 +40,10 @@ export class ProjectService {
         this.load();
     }
 
+    public create(project) {
+        return this.http.post('/api/projects/', JSON.stringify(project));
+    }
+
     setCurrent(p) {
         this._current.next(p);
     }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {Observable, BehaviorSubject} from "rxjs";
-import {HttpService} from "./http.service";
+import {Observable, BehaviorSubject} from 'rxjs';
+import {HttpService} from './http.service';
 
 @Injectable()
 export class AppService {
@@ -10,7 +10,7 @@ export class AppService {
         Observable.of(1).flatMap(() => http.get('api/app/info'))
         .retry(1)
         .map(resp => resp.json())
-        .subscribe(info => this._info.next(info));;
+        .subscribe(info => this._info.next(info));
     }
 
     public get info() {

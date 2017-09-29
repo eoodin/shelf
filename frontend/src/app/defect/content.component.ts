@@ -107,7 +107,7 @@ import { UserService } from '../user.service';
     .material-icons.button {cursor: pointer;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; opacity: 0.07;}
     .type-and-id input { display: inline-block; }
-    .mat-column-title {flex-grow: 8;  white-space: nowrap; overflow:hidden; text-overflow: ellipsis;}
+    .mat-column-title {flex-grow: 5;  white-space: nowrap; overflow:hidden; text-overflow: ellipsis;}
   `]
 })
 export class ContentComponent implements OnInit, AfterViewInit {
