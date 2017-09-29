@@ -13,7 +13,7 @@ if (cluster.isMaster) {
 
   let production = process.env.NODE_ENV == 'production';
   if (!production) 
-    startWorkerProcess();
+    startWorkerProcess('dev');
 
   for (var i = 0; production && i < cpuCount; i += 1)
     startWorkerProcess(i+1);
