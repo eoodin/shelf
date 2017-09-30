@@ -16,44 +16,53 @@ class Project {
 @Component({
   selector: 'admin-project',
   template: `
-<div class="project">
+  <div class="projects">
     <h3> projects </h3>
-    <ul>
-        <li *ngFor="let project of projects" >
-            <span>{{project.name}}</span>
-            <!--
-            <button md-icon-button (click)="deleteProject(project)">
-                <md-icon class="md-24" aria-label="Delete project">delete</md-icon>
-            </button>
-            -->
-        </li>
-    </ul>
-    <div>
+    <div class="projects-operation">
         <button md-raised-button color="primary" (click)="onCreate()">New Project</button>
     </div>
-</div>
+    <md-select placeholder="Manage project" class="project-selector" [(ngModel)]="project">
+        <md-option *ngFor="let p of projects" [value]="p"> {{ p.name }} </md-option>
+    </md-select>
+
+      <dl *ngIf="project.id">
+        <dt>Team</dt> <dd> {{ project.team.name }} </dd>
+        <dt>Releases</dt>
+        <dd>
+            <ul>
+              <li *ngFor="let release of project.releases">{{release.name}}</li>
+            </ul>
+        </dd>
+      </dl>
+    </div>
   `,
     styles: [`
-    .project {padding: 10px 40px;}
+    .projects {padding: 10px 40px;}
+    .projects-operation button { float: right; }
+    .projects-operation:after {content: '', width: 0: height: 0; clear: both;}
+    .project-selector {width: 220px;}
   `]
 })
 export class AdminProjectComponent {
     projects: any[];
+    project = {};
     teams;
 
     constructor(
         public dialog: MdDialog,
         private prjs: ProjectService,
         private teamService: TeamService) {
-        teamService.teams.subscribe(teams => this.teams = teams);
-        prjs.projects.subscribe((ps) => this.projects = ps);
+            teamService.teams.subscribe(teams => this.teams = teams);
+            prjs.projects.subscribe((ps) => {
+            this.projects = ps;
+            this.project = ps.length ? ps[0] : {};
+         });
     }
 
     onCreate() {
         let options = {teams: this.teams, projectName: '', teamId: 0};
         let dlgRef = this.dialog.open(CreateProjectDialog, {data: options});
         dlgRef.afterClosed().filter(isCreate => isCreate).subscribe(() => {
-
             this.prjs.create({projectName: options.projectName, teamId: options.teamId})
                 .subscribe(() => this.prjs.load());
         });
@@ -83,8 +92,7 @@ export class AdminProjectComponent {
     </md-dialog-actions>`
 })
 export class CreateProjectDialog {
-    constructor(
-        public dialogRef: MdDialogRef<CreateProjectDialog>, 
+    constructor(public dialogRef: MdDialogRef<CreateProjectDialog>,
         @Inject(MD_DIALOG_DATA) public data: any
     ) {}
 }
