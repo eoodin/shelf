@@ -9,7 +9,7 @@ import { Backlog } from './pages/backlog';
 import { Plans } from './pages/plans';
 import { WorkItems } from './pages/workitems';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
-import { MaterialModule } from '@angular/material';
+import { MaterialModule, MdNativeDateModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 import { CKEditorModule } from 'ng2-ckeditor';
 import { HttpService } from './http.service';
@@ -132,7 +132,8 @@ export class ShelfRequestOptions extends RequestOptions {
         CKEditorModule,
         MaterialModule,
         RouterModule.forRoot(routes),
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        MdNativeDateModule
     ],
     entryComponents: [
         DeleteConfirmDialog,

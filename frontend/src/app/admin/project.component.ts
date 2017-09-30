@@ -7,6 +7,7 @@ import { TeamService } from '../team.service';
 import { ProjectService } from '../project.service';
 import { PlanService } from '../plan.service';
 import { UserService } from '../user.service';
+import { BehaviorSubject } from 'rxjs';
 
 class Project {
     public id;
@@ -21,11 +22,12 @@ class Project {
     <div class="projects-operation">
         <button md-raised-button color="primary" (click)="onCreate()">New Project</button>
     </div>
-    <md-select placeholder="Manage project" class="project-selector" [(ngModel)]="project">
+    <md-select placeholder="Manage project"
+        (change)="switchProject($event.value)" class="project-selector">
         <md-option *ngFor="let p of projects" [value]="p"> {{ p.name }} </md-option>
     </md-select>
 
-      <dl *ngIf="project.id">
+      <dl *ngIf="project && project.id">
         <dt>Team</dt> <dd> {{ project.team.name }} </dd>
         <dt>Releases</dt>
         <dd>
@@ -34,6 +36,21 @@ class Project {
             </ul>
         </dd>
       </dl>
+      <button md-icon-button>
+        <md-icon (click)="scr = !scr" aria-label="Create a release">create</md-icon>
+      </button>
+      <form *ngIf="scr" #f="ngForm" (ngSubmit)="addRelease(name.value, target.value); scr = false">
+        <md-form-field>
+            <input #name mdInput required placeholder="Release name">
+        </md-form-field>
+
+        <md-form-field>
+            <input #target mdInput [mdDatepicker]="picker" placeholder="Choose a date">
+            <md-datepicker-toggle mdSuffix [for]="picker"></md-datepicker-toggle>
+            <md-datepicker #picker></md-datepicker>
+        </md-form-field>
+        <button type="submit" md-icon-button> <md-icon aria-label="Add">check</md-icon> </button>
+      </form>
     </div>
   `,
     styles: [`
@@ -45,18 +62,25 @@ class Project {
 })
 export class AdminProjectComponent {
     projects: any[];
-    project = {};
+    project: any = {};
     teams;
+
+    private po = new BehaviorSubject({});
 
     constructor(
         public dialog: MdDialog,
         private prjs: ProjectService,
         private teamService: TeamService) {
             teamService.teams.subscribe(teams => this.teams = teams);
+            this.po.subscribe(p => {
+                this.prjs.details(p['id']).subscribe(prj => this.project = prj );
+            });
             prjs.projects.subscribe((ps) => {
-            this.projects = ps;
-            this.project = ps.length ? ps[0] : {};
-         });
+                this.projects = ps;
+                if (ps.length && !this.po.getValue()['id']) {
+                    this.po.next(ps[0]);
+                }
+            });
     }
 
     onCreate() {
@@ -65,6 +89,17 @@ export class AdminProjectComponent {
         dlgRef.afterClosed().filter(isCreate => isCreate).subscribe(() => {
             this.prjs.create({projectName: options.projectName, teamId: options.teamId})
                 .subscribe(() => this.prjs.load());
+        });
+    }
+
+    switchProject(p) {
+        this.po.next(p);
+    }
+
+    addRelease(name, targetDate) {
+        let value = {name: name, targetDate: new Date(targetDate)};
+        this.prjs.addRelease(this.project, value).subscribe(() => {
+            this.prjs.details(this.project['id']).subscribe(p => this.project = p);
         });
     }
 }

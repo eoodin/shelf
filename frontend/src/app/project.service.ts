@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Subject, BehaviorSubject} from 'rxjs';
-import {HttpService} from "./http.service";
-import {PreferenceService} from "./preference.service";
+import {HttpService} from './http.service';
+import {PreferenceService} from './preference.service';
 
 @Injectable()
 export class ProjectService {
-    private loading: boolean = false;
+    private loading = false;
     private lastProjectId;
     private _current: BehaviorSubject<any> = new BehaviorSubject<any>({});
     private _projects = new BehaviorSubject<any>([]);
@@ -17,7 +17,7 @@ export class ProjectService {
             .filter(p => p != null)
             .map(p => p.id)
             .filter(p => !this.loading)
-            .subscribe(id => this.prf.setPreference("lastProjectId", id));
+            .subscribe(id => this.prf.setPreference('lastProjectId', id));
 
         this.prf.values
             .filter(prefs => prefs['lastProjectId'])
@@ -67,5 +67,13 @@ export class ProjectService {
                 },
                 () => this.loading = false,
                 () => this.loading = false);
+    }
+
+    addRelease(p, release) {
+        return this.http.post('/api/project/' + p.id + '/release', release).map(resp => resp.json());
+    }
+
+    details(pid) {
+        return this.http.get('/api/project/' + pid + '/details').map(resp => resp.json());
     }
 }

@@ -8,6 +8,7 @@ module.exports = function (sequelize, DataTypes) {
     project.associate = function(models) {
         project.belongsTo(models.team);
         project.hasMany(models.story); //  cascade = CascadeType.REMOVE
+        project.hasMany(models.release);
     };
     
     return project;

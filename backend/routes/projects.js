@@ -7,4 +7,25 @@ module.exports = function(router) {
                 res.json(projects);
         });
     });
+
+    router.route('/project/:id/release').post((req, res) => {
+        return models.project.findById(req.params.id).then(p => {
+            let r = { projectId: p.id, name: req.body.name, targetDate: req.body.targetDate };
+            logger.info("creating release", r);
+            return models.release.create(r).then(() => {
+                res.json({"result": "created"});
+                logger.info("release created.");
+            });
+        });
+    });
+
+    router.route('/project/:id/details').get((req, res) => {
+        return models.project.findById(req.params.id, 
+                {include: [
+                    {model: models.team},
+                    {model: models.release}
+                ]}).then(p => {
+            res.json(p);
+        });
+    });
 };
