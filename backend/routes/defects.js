@@ -33,12 +33,19 @@ module.exports = function(router) {
             if (orderField == 'owner') orderField = 'ownerId';
             else if (orderField == 'creator') orderField = 'creatorId';
 
-            models.defect.findAndCountAll({
+            return models.defect.findAndCountAll({
                 attributes: {exclude: ex},
                 where: composeWhere(req),
-                order: [[orderField, (req.query.desc ? 'desc' : 'asc')]]
-            }).then(function(defects) {   
-                res.json(defects);
+                order: [
+                    [orderField, (req.query.desc ? 'desc' : 'asc')]],
+                include: [{
+                    model: models.defectComment, 
+                    limit: 1,
+                    order: [['commentId', 'desc']],
+                    include: [{model: models.comment}]
+                }]
+            }).then(function(defects) {
+                 res.json(defects);
             })
         })
         .post(function(req, res) {
@@ -232,6 +239,39 @@ module.exports = function(router) {
                 });
             }).then(function(){
                 res.end();
+            }).catch(function(errors) {
+                logger.error(errors);
+                res.sendStatus(500);
+            });
+        });
+
+    // '/api/defects/' + defect.id + '/comments'
+    router.route('/defects/:id/comments')
+        .post(function(req, res) {
+            models.sequelize.transaction(function(t) {
+                return models.defect.findById(req.params.id).then(defect => {
+                    let comment = { content: req.body.message, userId: req.user.id };
+                    return models.comment.create(comment).then((c) => {
+                        let dc = {defectId: defect.id, commentId: c.id};
+                        return models.defectComment.create(dc).then(() => {
+                            res.json({"result": "created"});
+                        })
+                    });
+                })
+            }).then(function(){
+                res.end();
+            }).catch(function(errors) {
+                logger.error(errors);
+                res.sendStatus(500);
+            });
+        })
+        .get(function(req, res) {
+            return models.defect.findById(req.params.id).then(defect => {
+                return models.defectComment.findAll({where: {defectId: defect.id}, include: [{model: models.comment}]})
+                    .then(cms => {
+                        let comments = cms.map(c => c.comment).sort((a, b) => a.createdAt > b.createdAt);
+                        res.json(comments);
+                    });
             }).catch(function(errors) {
                 logger.error(errors);
                 res.sendStatus(500);

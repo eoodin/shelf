@@ -5,7 +5,7 @@
     "database": "shelf",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "logging": false,
+    "logging": true,
     "pool": {
       "max": 2,
       "min": 2,

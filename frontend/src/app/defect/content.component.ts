@@ -73,8 +73,18 @@ import { UserService } from '../user.service';
                     <md-cell *mdCellDef="let element"> {{element.creator.name}} </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="createdAt">
-                    <md-header-cell *mdHeaderCellDef md-sort-header> Date </md-header-cell>
+                    <md-header-cell *mdHeaderCellDef md-sort-header> Report date </md-header-cell>
                     <md-cell *mdCellDef="let element"> {{element.createdAt | date: 'yyyy-MM-dd'}} </md-cell>
+                </ng-container>
+                <ng-container mdColumnDef="comment">
+                    <md-header-cell *mdHeaderCellDef md-sort-header> Last comment </md-header-cell>
+                    <md-cell *mdCellDef="let element"> 
+                        <span class="last-comment" 
+                            *ngIf="element.defectComments && element.defectComments.length"
+                            title="{{element.defectComments[0].comment.userId}}: {{element.defectComments[0].comment.content}}" >
+                            {{element.defectComments[0].comment.content}}
+                        </span>
+                    </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="operations">
                     <md-header-cell *mdHeaderCellDef> Operations </md-header-cell>
@@ -107,14 +117,22 @@ import { UserService } from '../user.service';
     .material-icons.button {cursor: pointer;}
     .loading-mask {position: absolute; width: 100%; height: 100%; z-index: 1001; padding: 50px 50%; opacity: 0.07;}
     .type-and-id input { display: inline-block; }
+    .mat-column-id {max-width: 60px;}
+    .mat-column-status {max-width: 90px;}
+    .mat-column-sevrity {max-width: 70px;}
+    .mat-column-creator {max-width: 90px;}
+    .mat-column-createdAt {max-width: 80px;}
+    .mat-column-owner {max-width: 93px;}
+    .mat-column-operations {max-width: 90px;}
     .mat-column-title {flex-grow: 5;  white-space: nowrap; overflow:hidden; text-overflow: ellipsis;}
+    .last-comment {display: inline-block;width:80px; white-space: nowrap; overflow:hidden; text-overflow: ellipsis; }
   `]
 })
 export class ContentComponent implements OnInit, AfterViewInit {
     @ViewChild(MdSort) sorts: MdSort;
     total = 0;
     items = [];
-    displayedColumns = ['id', 'status', 'severity', 'title', 'creator', 'createdAt', 'owner', 'operations'];
+    displayedColumns = ['id', 'status', 'severity', 'title', 'creator', 'createdAt', 'comment', 'owner', 'operations'];
     loading = false;
     user;
     members = [];
@@ -134,10 +152,7 @@ export class ContentComponent implements OnInit, AfterViewInit {
         private projectSerivce: ProjectService) {
         this.teams.ownTeam.subscribe(t => this.members = t.members);
         this.userService.currentUser.subscribe(u => this.user = u);
-        this.projectSerivce.current
-            .filter(p => p && p.id)
-            .do(p => this.project = p)
-            .subscribe(() => this.loadItems());
+        
     }
 
     ngOnInit(): void {
@@ -145,7 +160,10 @@ export class ContentComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.loadItems();
+        this.projectSerivce.current
+        .filter(p => p && p.id)
+        .do(p => this.project = p)
+        .subscribe(() => this.loadItems());
     }
 
     loadItems() {

@@ -89,6 +89,14 @@ export class DefectService extends DataSource<any> {
     return this.http.patch('/api/defects/' + id, JSON.stringify(changes));
   }
 
+  public loadComments(defect) {
+    return this.http.get('/api/defects/' + defect.id + '/comments').map(resp => resp.json());
+  }
+
+  public addComment(defect, message) {
+    return this.http.post('/api/defects/' + defect.id + '/comments', {message: message}).map(resp => resp.json());
+  }
+
   public create(data) {
     return this.http.post('/api/defects/', JSON.stringify(data)).map(resp => resp.json());
   }
