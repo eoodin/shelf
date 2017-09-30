@@ -1,7 +1,7 @@
 import {Component, ElementRef} from '@angular/core';
-import {ProjectService} from "../project.service";
-import {PreferenceService} from "../preference.service";
-import {Router, ActivatedRoute} from "@angular/router";
+import {ProjectService} from '../project.service';
+import {PreferenceService} from '../preference.service';
+import {Router, ActivatedRoute} from '@angular/router';
 
 @Component({
     selector: 'backlog-page',

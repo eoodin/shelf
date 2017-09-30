@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
 import { HttpModule, RequestOptions, Headers } from '@angular/http';
 import { PlanList } from './components/plan-list';
 import { Backlog } from './pages/backlog';
-import { Plans } from './pages/plans';
+import { Plans, CreatePlanDlg } from './pages/plans';
 import { WorkItems } from './pages/workitems';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { MaterialModule, MdNativeDateModule } from '@angular/material';
@@ -26,7 +26,6 @@ import { UserService } from './user.service';
 import { TaskService } from './task.service';
 import { AppService } from './app.service';
 import { LoginService } from './login.service';
-import { PlanCreatorComponent } from './plan-creator.component';
 import { StoryComponent } from './story.component';
 import { BacklogComponent, DeleteConfirmDialog } from './backlog.component';
 import { PageComponent as DefectPage } from './defect/page.component';
@@ -90,7 +89,6 @@ export class ShelfRequestOptions extends RequestOptions {
         WorkItems,
         ShelfAppComponent,
         PlanContentComponent,
-        PlanCreatorComponent,
         StoryComponent,
         BacklogComponent,
         DeleteConfirmDialog,
@@ -101,6 +99,7 @@ export class ShelfRequestOptions extends RequestOptions {
         RemoveConfirmDialog,
         CreateProjectDialog,
         CreateTeamDialog,
+        CreatePlanDlg,
         DefectPage,
         AdminPageComponent,
         AdminProjectComponent,
@@ -143,7 +142,8 @@ export class ShelfRequestOptions extends RequestOptions {
         MoveItemsDialog,
         RemoveConfirmDialog,
         CreateProjectDialog,
-        CreateTeamDialog
+        CreateTeamDialog,
+        CreatePlanDlg
     ],
     bootstrap: [ShelfAppComponent],
 })

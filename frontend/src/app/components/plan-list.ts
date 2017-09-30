@@ -1,33 +1,38 @@
-import {Component, Input, Output, EventEmitter} from '@angular/core';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/filter';
-import {PreferenceService} from "../preference.service";
-import {PlanService} from "../plan.service";
+import {Component, ViewEncapsulation, ChangeDetectionStrategy, Input, Output, EventEmitter} from '@angular/core';
+import {PreferenceService} from '../preference.service';
+import {PlanService} from '../plan.service';
+import {TeamService} from '../team.service';
 
 
 @Component({
     selector: 'plan-list',
     template: `
-    <div class="list-group">
-      <a class="list-group-item" *ngFor="let plan of visiblePlans()" [class.active]="plan == selected" (click)="clickedPlan(plan)"> {{plan.name}} </a>
-      <a class="list-group-item" *ngIf="_plans.length > 10" (click)="toggleAll();">{{showAll ? "Collapse" : "Show All"}}</a>
-    </div>
+<ul>
+    <li *ngFor="let plan of visiblePlans()">
+        <a [class.active]="plan == selected" (click)="clickedPlan(plan)"> {{plan.name}} </a>
+    </li>
+    <li *ngIf="_plans.length > 10" class="toggle">
+        <a (click)="toggleAll()"> {{showAll ? "Collapse" : "Show All"}} </a>
+    </li>
+</ul>
     `,
     styles: [`
-    ul li { list-style: none; font-size: 1.4em;}
+    ul {padding: 5px; }
+    ul li { list-style: none; font-size: 1.2em; padding: 5px 0;}
+    li:hover { background-color: #747474; color: #fff;}
+    li>a {cursor: pointer;}
+    li.toggle {background-color: #dfdfdf;}
     `]
 })
 export class PlanList {
     _plans: Array<any> = [];
     showAll: boolean;
     selected: any;
-    
+
     @Output() public select: EventEmitter<PlanList> = new EventEmitter<PlanList>();
 
     constructor(private pref: PreferenceService,
                 private plans: PlanService) {
-        
         this.plans.all()
             .filter(plans => plans)
             .subscribe(plans => this._plans = plans);
@@ -58,3 +63,4 @@ export class PlanList {
         }
     }
 }
+
