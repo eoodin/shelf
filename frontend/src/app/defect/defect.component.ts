@@ -57,7 +57,7 @@ import { Defect } from '../model/defect';
   .defect-edit>div>label:after {content: ':';}
   .defect-edit>div>span {display: inline-block;}
   .status {font-weight: 700;}
-  .title-row input {width: 100%; font-size: 16px;}
+  .title-row input {width: 100%; font-size: 16px; min-height: 26px;}
   md-radio-button {margin: 0 7px;}
   ckeditor {flex-grow: 1; display: flex; flex-direction: column;}
   `]
@@ -73,7 +73,8 @@ export class DefectComponent {
     toolbar: [
       {
         name: 'styles',
-        items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']
+        items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format',
+            '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']
       },
       { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
       { name: 'tools', items: ['Maximize'] }
@@ -92,7 +93,7 @@ export class DefectComponent {
         .subscribe(item => this.defect = item);
       this.route.params.filter(params => params['id'] && params['id'] == 'new')
         .subscribe(() => {
-          this.defect = new Defect(); 
+          this.defect = new Defect();
         });
   }
 
@@ -105,8 +106,7 @@ export class DefectComponent {
       this.defects.save([data['id']], data)
         .finally(() => this.saving = false)
         .subscribe(() => this.defect = {});
-    }
-    else {
+    } else {
       this.defects.create(data)
         .finally(() => this.saving = false)
         .subscribe(() => this.defect = {});
