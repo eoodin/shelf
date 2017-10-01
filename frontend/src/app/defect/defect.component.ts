@@ -28,7 +28,7 @@ import { Defect } from '../model/defect';
     <div class="description">
         <ckeditor [(ngModel)]="defect.description" [config]="editorConfig" debounce="200"></ckeditor>
     </div>
-    <div *ngIf="defect.id" class="history">
+    <div *ngIf="defect.id" class="comments">
       <h4>Comments</h4>
       <ul *ngIf="!defect.comments || !defect.comments.length">
         <li >No comment</li>
@@ -48,11 +48,11 @@ import { Defect } from '../model/defect';
     </div>
   </div>
 
-  <div class="side-info">
-    <div *ngIf="defect.id"><label>Status</label><span>{{defect.status}}</span></div>
-    <div *ngIf="defect.id"><label>Reported by</label><span *ngIf="defect.creator">{{defect.creator.name}}</span></div>
-    <div *ngIf="defect.id"><label>Reported at</label><span>{{defect.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span></div>
-    <div *ngIf="defect.id" class="history">
+  <div *ngIf="defect.id" class="side-info">
+    <div> <label>Status</label><span>{{defect.status}}</span></div>
+    <div> <label>Reported by</label><span *ngIf="defect.creator">{{defect.creator.name}}</span></div>
+    <div> <label>Reported at</label><span>{{defect.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span></div>
+    <div class="history">
       <h4>History</h4>
       <p *ngIf="!defect.histories.length">No history</p>
       <ul>
@@ -97,9 +97,8 @@ export class DefectComponent {
       {
         name: 'styles',
         items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format',
-            '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']
+            '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent',]
       },
-      { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
       { name: 'tools', items: ['Maximize'] }
     ],
     toolbarCanCollapse: true
