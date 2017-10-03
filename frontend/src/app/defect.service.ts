@@ -18,9 +18,16 @@ export interface Defect {
   owner: string
 }
 
+interface Sorting {
+  by: string;
+  direction: string;
+}
+
 @Injectable()
 export class DefectService extends DataSource<any> {
-  private query: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
+  private query = new Subject<Object>();
+  private sorting = new Subject<Sorting>();
+
   private totalMatches: Subject<number> = new Subject<number>();
   private sortter;
 
@@ -33,19 +40,26 @@ export class DefectService extends DataSource<any> {
   }
 
   connect(): Observable<Defect[]> {
-    var c = {};
-    return Observable.merge(this.query.do(search => c = search), this.sortter.mdSortChange)
-      .switchMap(() => this.load())
+    var search = {};
+    var sorting = {};
+    return Observable.merge(
+        this.query.do(s => search = s), 
+        this.sorting.do(s => sorting = s))
+      .switchMap(() => this.load(search, sorting))
   }
 
   disconnect() {
   }
 
-  public setSorter(sortter) {
-    this.sortter = sortter;
+  public sort(sorting) {
+    this.sorting.next(sorting);
   }
 
-  public update(search) {
+  public page(option) {
+    // TODO
+  }
+
+  public search(search) {
     this.query.next(search);
   }
 
@@ -53,17 +67,18 @@ export class DefectService extends DataSource<any> {
     return this.totalMatches;
   }
 
-  private load() {
-    let search = this.query.getValue();
+  private load(search, sorting) {
     let params = new URLSearchParams();
     for (let key in search) {
       params.set(key, search[key]);
     }
-    if (this.sortter.active && this.sortter.direction) {
-      params.set('sortBy', this.sortter.active);
-      if(this.sortter.direction == 'desc')
+
+    if(sorting.by) {
+      params.set('sortBy',sorting.by);
+      if(sorting.direction != 'desc') // TODO: why?
         params.set('desc', 'true');
     }
+    
     let options = new RequestOptions({ search: params });
     return this.http.get('/api/defects/', options)
       .map(resp => resp.json())

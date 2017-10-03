@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, AfterViewInit  } from '@angular/core';
 import { Router } from '@angular/router';
-import { MdDialog, MdDialogRef, MdSort, MdPaginator } from '@angular/material';
+import { MdDialog, MdDialogRef, MdSort, MdPaginator, Sort } from '@angular/material';
 import { HttpService } from '../http.service';
 import { DefectService } from '../defect.service';
 import { TeamService } from '../team.service';
@@ -30,7 +30,7 @@ import { UserService } from '../user.service';
                     <md-checkbox [(ngModel)]="onlyOwned" (change)="filterChange($event)">Mine Only</md-checkbox>
                 </div>
               </div>
-            <md-table #table [dataSource]="defects" mdSort>
+            <md-table [dataSource]="defects" mdSort (mdSortChange)="sort($event)">
                 <ng-container mdColumnDef="id">
                     <md-header-cell *mdHeaderCellDef md-sort-header> ID </md-header-cell>
                     <md-cell *mdCellDef="let element"> {{element.id}} </md-cell>
@@ -131,8 +131,8 @@ import { UserService } from '../user.service';
     .last-comment {display: inline-block;width:80px; white-space: nowrap; overflow:hidden; text-overflow: ellipsis; }
   `]
 })
-export class ContentComponent implements OnInit, AfterViewInit {
-    @ViewChild(MdSort) sorts: MdSort;
+export class ContentComponent implements AfterViewInit {
+    // @ViewChild(MdSort) sorts: MdSort;
     @ViewChild(MdPaginator) paginator: MdPaginator;
 
     items = [];
@@ -159,16 +159,15 @@ export class ContentComponent implements OnInit, AfterViewInit {
         this.defects.total().subscribe(t => this.paginator.length = t)
     }
 
-    ngOnInit(): void {
-        // TODO: remove this dependency?
-        this.defects.setSorter(this.sorts);
+    sort(sort: Sort) {
+        this.defects.sort({by: sort.active, direction: sort.direction});
     }
 
     ngAfterViewInit(): void {
         this.projectSerivce.current
-        .filter(p => p && p.id)
-        .do(p => this.project = p)
-        .subscribe(() => this.loadItems());
+            .filter(p => p && p.id && this.project != p)
+            .do(p => this.project = p)
+            .subscribe(() => this.loadItems());
     }
 
     loadItems() {
@@ -181,7 +180,8 @@ export class ContentComponent implements OnInit, AfterViewInit {
 
         this.defects.summary({project: search['project']})
             .subscribe(s => this.summary = s);
-        this.defects.update(search);
+
+        this.defects.search(search);
     }
 
     settableStatus(item) {
