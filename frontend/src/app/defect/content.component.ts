@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, AfterViewInit  } from '@angular/core';
 import { Router } from '@angular/router';
-import { MdDialog, MdDialogRef, MdSort } from '@angular/material';
+import { MdDialog, MdDialogRef, MdSort, MdPaginator } from '@angular/material';
 import { HttpService } from '../http.service';
 import { DefectService } from '../defect.service';
 import { TeamService } from '../team.service';
@@ -96,6 +96,9 @@ import { UserService } from '../user.service';
                 <md-header-row *mdHeaderRowDef="displayedColumns"></md-header-row>
                 <md-row *mdRowDef="let row; columns: displayedColumns;"></md-row>
             </md-table>
+
+            <md-paginator [pageSize]="10" [pageSizeOptions]="[10, 25, 50, 100]" (page)="loadItems()">
+            </md-paginator>
           </div>
       </div>
   </div>
@@ -130,7 +133,8 @@ import { UserService } from '../user.service';
 })
 export class ContentComponent implements OnInit, AfterViewInit {
     @ViewChild(MdSort) sorts: MdSort;
-    total = 0;
+    @ViewChild(MdPaginator) paginator: MdPaginator;
+
     items = [];
     displayedColumns = ['id', 'status', 'severity', 'title', 'creator', 'createdAt', 'comment', 'owner', 'operations'];
     loading = false;
@@ -152,10 +156,11 @@ export class ContentComponent implements OnInit, AfterViewInit {
         private projectSerivce: ProjectService) {
         this.teams.ownTeam.subscribe(t => this.members = t.members);
         this.userService.currentUser.subscribe(u => this.user = u);
-        
+        this.defects.total().subscribe(t => this.paginator.length = t)
     }
 
     ngOnInit(): void {
+        // TODO: remove this dependency?
         this.defects.setSorter(this.sorts);
     }
 
@@ -167,7 +172,8 @@ export class ContentComponent implements OnInit, AfterViewInit {
     }
 
     loadItems() {
-        let search = {};
+        let p = this.paginator;
+        let search = {offset: p.pageIndex * p.pageSize, size: p.pageSize};
         if (this.project) search['project'] = this.project.id;
         if (this.hideClosed) search['noclosed'] = 'true';
         if (this.onlyOwned) search['ownonly'] = 'true';

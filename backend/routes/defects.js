@@ -33,9 +33,14 @@ module.exports = function(router) {
             if (orderField == 'owner') orderField = 'ownerId';
             else if (orderField == 'creator') orderField = 'creatorId';
 
+            let size = req.query.size || 100;
+            let offset = req.query.offset || 0;
+
             return models.defect.findAndCountAll({
                 attributes: {exclude: ex},
                 where: composeWhere(req),
+                limit: Number(size),
+                offset: Number(offset),
                 order: [
                     [orderField, (req.query.desc ? 'desc' : 'asc')]],
                 include: [{

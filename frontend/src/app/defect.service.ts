@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { RequestOptions, URLSearchParams } from '@angular/http';
 import { DataSource } from '@angular/cdk/collections';
 import { Observable } from 'rxjs';
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 
 import { HttpService } from './http.service';
 import { UserService } from './user.service';
@@ -21,6 +21,7 @@ export interface Defect {
 @Injectable()
 export class DefectService extends DataSource<any> {
   private query: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
+  private totalMatches: Subject<number> = new Subject<number>();
   private sortter;
 
   constructor(
@@ -48,6 +49,10 @@ export class DefectService extends DataSource<any> {
     this.query.next(search);
   }
 
+  public total() {
+    return this.totalMatches;
+  }
+
   private load() {
     let search = this.query.getValue();
     let params = new URLSearchParams();
@@ -62,6 +67,7 @@ export class DefectService extends DataSource<any> {
     let options = new RequestOptions({ search: params });
     return this.http.get('/api/defects/', options)
       .map(resp => resp.json())
+      .do(result => this.totalMatches.next(result.count))
       .map(result => result.rows)
       .do(rows => {
         rows.forEach(defect => {
