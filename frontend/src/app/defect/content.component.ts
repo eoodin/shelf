@@ -78,8 +78,8 @@ import { UserService } from '../user.service';
                 </ng-container>
                 <ng-container mdColumnDef="comment">
                     <md-header-cell *mdHeaderCellDef md-sort-header> Last comment </md-header-cell>
-                    <md-cell *mdCellDef="let element"> 
-                        <span class="last-comment" 
+                    <md-cell *mdCellDef="let element">
+                        <span class="last-comment"
                             *ngIf="element.defectComments && element.defectComments.length"
                             title="{{element.defectComments[0].comment.userId}}: {{element.defectComments[0].comment.content}}" >
                             {{element.defectComments[0].comment.content}}
@@ -128,7 +128,7 @@ import { UserService } from '../user.service';
     .mat-column-owner {max-width: 93px;}
     .mat-column-operations {max-width: 90px;}
     .mat-column-title {flex-grow: 5;  white-space: nowrap; overflow:hidden; text-overflow: ellipsis;}
-    .last-comment {display: inline-block;width:80px; white-space: nowrap; overflow:hidden; text-overflow: ellipsis; }
+    .mat-column-comment{ white-space: nowrap; overflow:hidden; text-overflow: ellipsis;}
   `]
 })
 export class ContentComponent implements AfterViewInit {
