@@ -25,12 +25,12 @@ import { UserService } from '../user.service';
                     <span >Fixing/Testing:</span><span class="value"> {{summary.fixing + summary.testing}}</span>
                 </div>
                 <div class="heding-right">
-                    <md-checkbox [(ngModel)]="hideClosed" (change)="filterChange($event)">Hide Closed</md-checkbox>
-                    <md-checkbox [(ngModel)]="hideDeclined" (change)="filterChange($event)">Hide Declined</md-checkbox>
-                    <md-checkbox [(ngModel)]="onlyOwned" (change)="filterChange($event)">Mine Only</md-checkbox>
+                    <md-checkbox [(ngModel)]="filters.noclosed" (change)="filterChange($event)">Hide Closed</md-checkbox>
+                    <md-checkbox [(ngModel)]="filters.nodeclined" (change)="filterChange($event)">Hide Declined</md-checkbox>
+                    <md-checkbox [(ngModel)]="filters.ownonly" (change)="filterChange($event)">Mine Only</md-checkbox>
                 </div>
               </div>
-            <md-table [dataSource]="defects" mdSort (mdSortChange)="sort($event)">
+            <md-table [dataSource]="defectSource" mdSort (mdSortChange)="sort($event)">
                 <ng-container mdColumnDef="id">
                     <md-header-cell *mdHeaderCellDef md-sort-header> ID </md-header-cell>
                     <md-cell *mdCellDef="let element"> {{element.id}} </md-cell>
@@ -77,9 +77,9 @@ import { UserService } from '../user.service';
                     <md-cell *mdCellDef="let element"> {{element.createdAt | date: 'yyyy-MM-dd'}} </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="comment">
-                    <md-header-cell *mdHeaderCellDef md-sort-header> Last comment </md-header-cell>
-                    <md-cell *mdCellDef="let element">
-                        <span class="last-comment"
+                    <md-header-cell *mdHeaderCellDef> Last comment </md-header-cell>
+                    <md-cell *mdCellDef="let element"> 
+                        <span class="last-comment" 
                             *ngIf="element.defectComments && element.defectComments.length"
                             title="{{element.defectComments[0].comment.userId}}: {{element.defectComments[0].comment.content}}" >
                             {{element.defectComments[0].comment.content}}
@@ -97,7 +97,9 @@ import { UserService } from '../user.service';
                 <md-row *mdRowDef="let row; columns: displayedColumns;"></md-row>
             </md-table>
 
-            <md-paginator [pageSize]="10" [pageSizeOptions]="[10, 25, 50, 100]" (page)="loadItems()">
+            <md-paginator [length]="totalDefects" [pageSize]="defectSource.paging.getValue().pageSize"
+                [pageIndex]="defectSource.paging.getValue().pageIndex" 
+                [pageSizeOptions]="[10, 25, 50, 100]" (page)="defectSource.paging.next($event)">
             </md-paginator>
           </div>
       </div>
@@ -132,20 +134,17 @@ import { UserService } from '../user.service';
   `]
 })
 export class ContentComponent implements AfterViewInit {
-    // @ViewChild(MdSort) sorts: MdSort;
-    @ViewChild(MdPaginator) paginator: MdPaginator;
+    @ViewChild(MdSort) sorter: MdSort;
 
-    items = [];
     displayedColumns = ['id', 'status', 'severity', 'title', 'creator', 'createdAt', 'comment', 'owner', 'operations'];
     loading = false;
     user;
     members = [];
     summary = {total: 0, open: 0, closed: 0, declined: 0, failed: 0, fixing: 0, testing: 0};
+    filters = {noclosed: true, nodeclined: true, ownonly: false};
+    defectSource;
+    totalDefects;
 
-    project;
-    hideClosed = true;
-    hideDeclined = true;
-    onlyOwned = false;
     constructor(
         public dialog: MdDialog,
         private router: Router,
@@ -156,32 +155,27 @@ export class ContentComponent implements AfterViewInit {
         private projectSerivce: ProjectService) {
         this.teams.ownTeam.subscribe(t => this.members = t.members);
         this.userService.currentUser.subscribe(u => this.user = u);
-        this.defects.total().subscribe(t => this.paginator.length = t)
+        this.defectSource = this.defects.getPage();
+        this.defectSource.total.subscribe(t => this.totalDefects = t);
     }
 
     sort(sort: Sort) {
-        this.defects.sort({by: sort.active, direction: sort.direction});
+        this.defectSource.sorting.next({by: sort.active, direction: sort.direction});
     }
 
     ngAfterViewInit(): void {
         this.projectSerivce.current
-            .filter(p => p && p.id && this.project != p)
-            .do(p => this.project = p)
-            .subscribe(() => this.loadItems());
+            .filter(p => p && p.id)
+            .subscribe(p => {
+                this.defects.summary({project: p['id']})
+                    .subscribe(s => this.summary = s);
+            });
+        this.defectSource.sorting.next({by: this.sorter.active, direction: this.sorter.direction});
+        this.defectSource.search.next(this.filters);
     }
 
     loadItems() {
-        let p = this.paginator;
-        let search = {offset: p.pageIndex * p.pageSize, size: p.pageSize};
-        if (this.project) search['project'] = this.project.id;
-        if (this.hideClosed) search['noclosed'] = 'true';
-        if (this.onlyOwned) search['ownonly'] = 'true';
-        if (this.hideDeclined) search['nodeclined'] = 'true';
-
-        this.defects.summary({project: search['project']})
-            .subscribe(s => this.summary = s);
-
-        this.defects.search(search);
+        this.defectSource.search.next(this.filters);
     }
 
     settableStatus(item) {
@@ -237,7 +231,7 @@ export class ContentComponent implements AfterViewInit {
     }
 
     filterChange(e) {
-        this.loadItems();
+        this.defectSource.search.next(this.filters);
     }
 
     changeStatus(item, status) {

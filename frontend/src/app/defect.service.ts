@@ -23,30 +23,55 @@ interface Sorting {
   direction: string;
 }
 
-@Injectable()
-export class DefectService extends DataSource<any> {
-  private query = new Subject<Object>();
-  private sorting = new Subject<Sorting>();
+export class DefectPage  extends DataSource<Defect>{
+  public total  = new BehaviorSubject<number>(0);
+  public project = new BehaviorSubject<Object>({});
+  public sorting = new BehaviorSubject<Object>({});
+  public paging = new BehaviorSubject<Object>({pageSize: 10, pageIndex: 0});
+  public search = new BehaviorSubject<Object>({});
+  
+  private defects = new BehaviorSubject<Defect[]>([]);
+  private defectsSub;
 
-  private totalMatches: Subject<number> = new Subject<number>();
-  private sortter;
-
-  constructor(
-    private http: HttpService,
-    private users: UserService,
-    private projects: ProjectService,
-  ) {
+  constructor(private defectService: DefectService) {
     super();
   }
 
   connect(): Observable<Defect[]> {
-    var search = {};
-    var sorting = {};
-    return Observable.merge(
-        this.query.do(s => search = s), 
-        this.sorting.do(s => sorting = s))
-      .switchMap(() => this.load(search, sorting))
+    this.defectsSub = Observable.combineLatest(
+      this.project.filter(p => p['id']).distinct(),
+      this.search,
+      this.sorting.distinct(),
+      this.paging.distinct())
+    .debounceTime(50)
+    .subscribe(criteria => {
+      let [proj, search, sort, page] = criteria;
+      this.defectService.loadDefects(proj['id'], search, sort, page)
+        .subscribe(results => {
+          this.total.next(results.count);
+          this.defects.next(results.rows);
+        });
+    });
+
+    return this.defects;
   }
+
+  disconnect(): void {
+    this.defectsSub.unsubscribe();
+  }
+}
+
+@Injectable()
+export class DefectService{
+  private query = new Subject<Object>();
+  private sorting = new Subject<Sorting>();
+  private page;
+
+  constructor(
+    private http: HttpService,
+    private users: UserService,
+    public projects: ProjectService,
+  ) { }
 
   disconnect() {
   }
@@ -55,20 +80,23 @@ export class DefectService extends DataSource<any> {
     this.sorting.next(sorting);
   }
 
-  public page(option) {
-    // TODO
-  }
-
   public search(search) {
     this.query.next(search);
   }
 
-  public total() {
-    return this.totalMatches;
+  public getPage(): DefectPage {
+    if (!this.page) {
+      this.page = new DefectPage(this);
+      this.projects.current.subscribe(p => this.page.project.next(p));
+    }
+
+    return this.page;
   }
 
-  private load(search, sorting) {
+  public loadDefects(pid, search, sorting, paging) {
     let params = new URLSearchParams();
+
+    params.set('project', pid);
     for (let key in search) {
       params.set(key, search[key]);
     }
@@ -79,13 +107,14 @@ export class DefectService extends DataSource<any> {
         params.set('desc', 'true');
     }
     
+    params.set('offset',  '' + (paging.pageIndex * paging.pageSize));
+    params.set('size', paging.pageSize);
+
     let options = new RequestOptions({ search: params });
     return this.http.get('/api/defects/', options)
       .map(resp => resp.json())
-      .do(result => this.totalMatches.next(result.count))
-      .map(result => result.rows)
-      .do(rows => {
-        rows.forEach(defect => {
+      .do(result => {
+        result.rows.forEach(defect => {
           this.users.getUser(defect.creatorId).subscribe(u => defect.creator = u || {});
           this.users.getUser(defect.ownerId).subscribe(u => defect.owner = u);
         })
