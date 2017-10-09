@@ -44,7 +44,7 @@ export class ShelfAppComponent {
     private viewContainerRef: ViewContainerRef;
     private app = {};
     private ui;
-    user = {};
+    user = {super: false};
 
     constructor(private dialog: MdDialog,
                 private router: Router,

@@ -37,9 +37,10 @@ class Project {
         </dd>
       </dl>
       <button md-icon-button>
-        <md-icon (click)="scr = !scr" aria-label="Create a release">create</md-icon>
+        <md-icon (click)="showCreateRelease = !showCreateRelease" aria-label="Create a release">create</md-icon>
       </button>
-      <form *ngIf="scr" #f="ngForm" (ngSubmit)="addRelease(name.value, target.value); scr = false">
+      <form *ngIf="showCreateRelease" #f="ngForm"
+        (ngSubmit)="addRelease(name.value, target.value); showCreateRelease = false">
         <md-form-field>
             <input #name mdInput required placeholder="Release name">
         </md-form-field>
@@ -61,6 +62,7 @@ class Project {
   `]
 })
 export class AdminProjectComponent {
+    showCreateRelease;
     projects: any[];
     project: any = {};
     teams;
