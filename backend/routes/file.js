@@ -26,7 +26,7 @@ module.exports = function(router) {
 
             res.json(file.id);  
         }).catch(function(errors){
-            console.log('Unable to save file: ' + JSON.stringify(errors));
+            logger.log('info', 'Unable to save file: ' + JSON.stringify(errors));
             res.sendStatus(500);
         });
     });

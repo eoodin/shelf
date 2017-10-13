@@ -224,7 +224,7 @@ export class ContentComponent implements AfterViewInit {
                 .subscribe(
                 () => this.loadItems(),
                 (resp) => {
-                    window.alert('Error occurred: ' + resp.json()['error'])
+                    window.alert('Error occurred: ' + resp.json()['error']);
                 },
                 () => this.loading = false);
         });

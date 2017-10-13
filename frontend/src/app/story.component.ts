@@ -25,7 +25,7 @@ declare var CKEDITOR;
             <span>Title:</span> <input type="text" [(ngModel)]="_item.title" [ngModelOptions]="{standalone: true}"> 
         </div>
         <div>
-            <ckeditor [(ngModel)]="_item.description" [config]="editorConfig" [ngModelOptions]="{standalone: true}" debounce="400"></ckeditor>
+            <rich-editor [(model)]="_item.description"></rich-editor>
         </div>
         <div>
             <button [disabled]="saving" md-button>Save</button>
@@ -44,19 +44,6 @@ export class StoryComponent implements OnDestroy {
     saving = false;
     public _item = {title: '', points: 0, description: ''};
     public parent;
-    public editorConfig = {
-        extraPlugins: 'uploadimage',
-        imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
-        toolbar: [
-            {
-                name: 'styles',
-                items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']
-            },
-            { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
-            { name: 'tools', items: ['Maximize'] }
-        ],
-        toolbarCanCollapse: true
-    };
 
     constructor(private http: HttpService,
         private route: ActivatedRoute,

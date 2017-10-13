@@ -27,7 +27,6 @@
     "@angular/cdk": "2.0.0-beta.10",
     "@angular/material": "2.0.0-beta.10",
     "moment": "^2.13.0",
-    "ng2-ckeditor": "^1.1.6",
     "ng2-file-upload": "^1.2.0",
     "reflect-metadata": "0.1.3"
   },

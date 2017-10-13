@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
-import {RequestOptionsArgs, Response, Http} from "@angular/http";
+import {RequestOptionsArgs, Response, Http} from '@angular/http';
 import {Location} from '@angular/common';
-import {ActivatedRoute} from "@angular/router";
-import 'rxjs/operator/onErrorResumeNext'
-import {Observable, Subject, ReplaySubject} from "rxjs";
+import {ActivatedRoute} from '@angular/router';
+import {Observable, Subject, ReplaySubject} from 'rxjs/Rx';
 import {LoginService } from './login.service';
 
 @Injectable()
@@ -13,7 +12,7 @@ export class HttpService {
     private pausers = [];
 
     constructor(
-        private http: Http, 
+        private http: Http,
         private route: ActivatedRoute,
         private loginService: LoginService) {
         loginService.authenticated.subscribe(v => {
@@ -42,7 +41,7 @@ export class HttpService {
         return this.go(this.http.patch(url, body, options));
     }
 
-    go(operation) {
+    go(operation: Observable<Response>): Observable<Response> {
         const pauser = new ReplaySubject(1);
         let request = operation
             .do(() => {if (!this.authenticated) {this.loginService.authenticated.next(true);}},
@@ -55,7 +54,7 @@ export class HttpService {
                     pauser.complete();
             }).share();
 
-        const pausable = pauser.switchMap(paused => paused ? Observable.never() : request);
+        const pausable = pauser.switchMap(paused => paused ? Observable.never<Response>() : request);
         this.pausers.push(pauser);
         pauser.next(this.pausers.length > 1 && !this.authenticated);
 

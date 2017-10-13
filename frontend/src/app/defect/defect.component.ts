@@ -26,7 +26,7 @@ import { Defect } from '../model/defect';
         <input type="text" [(ngModel)]="defect.title">
     </div>
     <div class="description">
-        <ckeditor [(ngModel)]="defect.description" [config]="editorConfig" debounce="200"></ckeditor>
+      <rich-editor [model]="defect.description" (modelChange)="descriptionChange($event);" ></rich-editor>
     </div>
     <div *ngIf="defect.id" class="comments">
       <h4>Comments</h4>
@@ -75,8 +75,8 @@ import { Defect } from '../model/defect';
   .defect-edit .actions {display: inline-block; float: right;}
   .defect-edit>div{margin: 7px 0;}
   .title-row input {width: 100%; font-size: 16px; min-height: 26px;}
+  .description{flex-grow: 1; display: flex; min-height: 300px;}
   md-radio-button {margin: 0 7px;}
-  ckeditor {flex-grow: 1; display: flex; flex-direction: column;}
   .comment-field {display: flex;}
   .comment-field md-form-field {flex-grow: 1;}
   .side-info { padding: 10px; width: 300px; }
@@ -88,23 +88,6 @@ import { Defect } from '../model/defect';
 export class DefectComponent {
   defect;
   saving;
-
-  editorConfig = {
-    extraPlugins: 'uploadimage,divarea',
-    imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
-    autoGrow_onStartup: true,
-    toolbar: [
-      {
-        name: 'styles',
-        items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format',
-            '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']
-      },
-      { name: 'insert', items: ['Image', 'Table'] },
-      { name: 'tools', items: ['Maximize'] }
-    ],
-    toolbarCanCollapse: true
-  };
-
   constructor(private http: HttpService,
     private route: ActivatedRoute,
     private defects: DefectService,
@@ -135,6 +118,11 @@ export class DefectComponent {
         .finally(() => this.saving = false)
         .subscribe(() => this.defect = {});
     }
+  }
+
+  descriptionChange(d) {
+    console.log(d);
+    this.defect.description = d;
   }
 
   comment(message) {

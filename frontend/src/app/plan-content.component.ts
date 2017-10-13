@@ -309,7 +309,7 @@ export class PlanContentComponent implements AfterViewInit {
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <ckeditor [(ngModel)]="data.description" [config]="editorConfig" [ngModelOptions]="{standalone: true}" debounce="400"></ckeditor>
+                <rich-editor [(model)]="data.description" ></rich-editor>
             </div>
         </div>
         <div class="row">
@@ -329,18 +329,6 @@ export class PlanContentComponent implements AfterViewInit {
     `]
 })
 export class ItemDetailDialog {
-    public editorConfig = {
-        extraPlugins: 'uploadimage,divarea',
-        imageUploadUrl: '/api/file?type=image&api=ckeditor-uploadimage',
-        toolbar: [
-            {
-                name: 'styles',
-                items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote']
-            },
-            { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
-            { name: 'tools', items: ['Maximize'] }
-        ]
-    };
     constructor(
         public dialogRef: MdDialogRef<ItemDetailDialog>,
         @Inject(MD_DIALOG_DATA) public data: any

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { RequestOptions, URLSearchParams } from '@angular/http';
 import { DataSource } from '@angular/cdk/collections';
 import { Observable } from 'rxjs';
-import { BehaviorSubject, Subject } from "rxjs";
+import { BehaviorSubject, Subject } from 'rxjs';
 
 import { HttpService } from './http.service';
 import { UserService } from './user.service';
@@ -15,7 +15,7 @@ export interface Defect {
   title: string;
   creator: string;
   createdAt; string;
-  owner: string
+  owner: string;
 }
 
 interface Sorting {
@@ -23,13 +23,13 @@ interface Sorting {
   direction: string;
 }
 
-export class DefectPage  extends DataSource<Defect>{
+export class DefectPage  extends DataSource<Defect> {
   public total  = new BehaviorSubject<number>(0);
   public project = new BehaviorSubject<Object>({});
   public sorting = new BehaviorSubject<Object>({});
   public paging = new BehaviorSubject<Object>({pageSize: 10, pageIndex: 0});
   public search = new BehaviorSubject<Object>({});
-  
+
   private defects = new BehaviorSubject<Defect[]>([]);
   private defectsSub;
 
@@ -62,7 +62,7 @@ export class DefectPage  extends DataSource<Defect>{
 }
 
 @Injectable()
-export class DefectService{
+export class DefectService {
   private query = new Subject<Object>();
   private sorting = new Subject<Sorting>();
   private page;
@@ -101,12 +101,12 @@ export class DefectService{
       params.set(key, search[key]);
     }
 
-    if(sorting.by) {
-      params.set('sortBy',sorting.by);
-      if(sorting.direction != 'desc') // TODO: why?
+    if (sorting.by) {
+      params.set('sortBy', sorting.by);
+      if (sorting.direction != 'desc') // TODO: why?
         params.set('desc', 'true');
     }
-    
+
     params.set('offset',  '' + (paging.pageIndex * paging.pageSize));
     params.set('size', paging.pageSize);
 
@@ -117,7 +117,7 @@ export class DefectService{
         result.rows.forEach(defect => {
           this.users.getUser(defect.creatorId).subscribe(u => defect.creator = u || {});
           this.users.getUser(defect.ownerId).subscribe(u => defect.owner = u);
-        })
+        });
       });
   }
 

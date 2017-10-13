@@ -11,7 +11,6 @@ import { WorkItems } from './pages/workitems';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { MaterialModule, MdNativeDateModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
-import { CKEditorModule } from 'ng2-ckeditor';
 import { HttpService } from './http.service';
 import { LoginComponent } from './login.component';
 import { NotifyService } from './notify.service';
@@ -35,6 +34,7 @@ import { ProjectSelectorComponent } from './components/project-selector.componen
 import { AdminPageComponent } from './admin/page.component';
 import { AdminProjectComponent, CreateProjectDialog } from './admin/project.component';
 import { AdminTeamComponent, CreateTeamDialog } from './admin/team.component';
+import { EditorComponent } from './editor/editor.component';
 
 let routes = [
     { path: '', pathMatch: 'full', redirectTo: 'plans' },
@@ -106,7 +106,8 @@ export class ShelfRequestOptions extends RequestOptions {
         AdminTeamComponent,
         DefectDetail,
         DefectContent,
-        ProjectSelectorComponent
+        ProjectSelectorComponent,
+        EditorComponent
     ],
     providers: [
         NotifyService,
@@ -128,7 +129,6 @@ export class ShelfRequestOptions extends RequestOptions {
         BrowserModule,
         HttpModule,
         FormsModule,
-        CKEditorModule,
         MaterialModule,
         RouterModule.forRoot(routes),
         BrowserAnimationsModule,
