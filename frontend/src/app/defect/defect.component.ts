@@ -97,8 +97,9 @@ export class DefectComponent {
       {
         name: 'styles',
         items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat', '-', 'Styles', 'Format',
-            '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent',]
+            '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']
       },
+      { name: 'insert', items: ['Image', 'Table'] },
       { name: 'tools', items: ['Maximize'] }
     ],
     toolbarCanCollapse: true
