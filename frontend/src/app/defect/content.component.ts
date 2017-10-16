@@ -25,9 +25,12 @@ import { UserService } from '../user.service';
                     <span >Fixing/Testing:</span><span class="value"> {{summary.fixing + summary.testing}}</span>
                 </div>
                 <div class="heding-right">
-                    <md-checkbox [(ngModel)]="filters.noclosed" (change)="filterChange($event)">Hide Closed</md-checkbox>
-                    <md-checkbox [(ngModel)]="filters.nodeclined" (change)="filterChange($event)">Hide Declined</md-checkbox>
-                    <md-checkbox [(ngModel)]="filters.ownonly" (change)="filterChange($event)">Mine Only</md-checkbox>
+                    <md-checkbox [ngModel]="defectSource.filters.getValue().noclosed"
+                     (change)="filterChange('noclosed', $event.checked)">Hide Closed</md-checkbox>
+                    <md-checkbox [ngModel]="defectSource.filters.getValue().nodeclined"
+                     (change)="filterChange('nodeclined', $event.checked)">Hide Declined</md-checkbox>
+                    <md-checkbox [ngModel]="defectSource.filters.getValue().ownonly"
+                     (change)="filterChange('ownonly', $event.checked)">Mine Only</md-checkbox>
                 </div>
               </div>
             <md-table [dataSource]="defectSource" mdSort (mdSortChange)="sort($event)">
@@ -78,8 +81,8 @@ import { UserService } from '../user.service';
                 </ng-container>
                 <ng-container mdColumnDef="comment">
                     <md-header-cell *mdHeaderCellDef> Last comment </md-header-cell>
-                    <md-cell *mdCellDef="let element"> 
-                        <span class="last-comment" 
+                    <md-cell *mdCellDef="let element">
+                        <span class="last-comment"
                             *ngIf="element.defectComments && element.defectComments.length"
                             title="{{element.defectComments[0].comment.userId}}: {{element.defectComments[0].comment.content}}" >
                             {{element.defectComments[0].comment.content}}
@@ -98,7 +101,7 @@ import { UserService } from '../user.service';
             </md-table>
 
             <md-paginator [length]="totalDefects" [pageSize]="defectSource.paging.getValue().pageSize"
-                [pageIndex]="defectSource.paging.getValue().pageIndex" 
+                [pageIndex]="defectSource.paging.getValue().pageIndex"
                 [pageSizeOptions]="[10, 25, 50, 100]" (page)="defectSource.paging.next($event)">
             </md-paginator>
           </div>
@@ -170,12 +173,12 @@ export class ContentComponent implements AfterViewInit {
                 this.defects.summary({project: p['id']})
                     .subscribe(s => this.summary = s);
             });
-        this.defectSource.sorting.next({by: this.sorter.active, direction: this.sorter.direction});
-        this.defectSource.search.next(this.filters);
     }
 
     loadItems() {
-        this.defectSource.search.next(this.filters);
+        // TODO:
+        let f = this.defectSource.filters.getValue();
+        this.defectSource.filters.next(f);
     }
 
     settableStatus(item) {
@@ -230,8 +233,10 @@ export class ContentComponent implements AfterViewInit {
         });
     }
 
-    filterChange(e) {
-        this.defectSource.search.next(this.filters);
+    filterChange(fn, checked) {
+        let f = this.defectSource.filters.getValue();
+        f[fn] = checked;
+        this.defectSource.filters.next(f);
     }
 
     changeStatus(item, status) {

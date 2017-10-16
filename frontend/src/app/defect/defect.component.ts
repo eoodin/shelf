@@ -11,7 +11,7 @@ import { Defect } from '../model/defect';
   template: `
   <div class="defect-edit">
     <div>
-      <a routerLink=".."> <i class="material-icons">arrow_back</i></a>
+      <button md-icon-button (click)="location.back()"> <i class="material-icons">arrow_back</i></button>
       <div class="actions">
         <a md-button routerLink=".." (click)="save(false)">Save</a>
         <a md-button *ngIf="!defect.id" [disabled]="saving" (click)="save(true)">Save and New</a>
@@ -89,6 +89,7 @@ export class DefectComponent {
   defect;
   saving;
   constructor(private http: HttpService,
+    private location: Location,
     private route: ActivatedRoute,
     private defects: DefectService,
     private prjs: ProjectService) {

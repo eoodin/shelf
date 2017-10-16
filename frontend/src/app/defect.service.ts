@@ -28,7 +28,7 @@ export class DefectPage  extends DataSource<Defect> {
   public project = new BehaviorSubject<Object>({});
   public sorting = new BehaviorSubject<Object>({});
   public paging = new BehaviorSubject<Object>({pageSize: 10, pageIndex: 0});
-  public search = new BehaviorSubject<Object>({});
+  public filters = new BehaviorSubject<Object>({noclosed: true, nodeclined: true});
 
   private defects = new BehaviorSubject<Defect[]>([]);
   private defectsSub;
@@ -38,27 +38,24 @@ export class DefectPage  extends DataSource<Defect> {
   }
 
   connect(): Observable<Defect[]> {
-    this.defectsSub = Observable.combineLatest(
+    return this.defectsSub = Observable.combineLatest(
       this.project.filter(p => p['id']).distinct(),
-      this.search,
       this.sorting.distinct(),
-      this.paging.distinct())
+      this.paging.distinct(),
+      this.filters)
     .debounceTime(50)
-    .subscribe(criteria => {
-      let [proj, search, sort, page] = criteria;
-      this.defectService.loadDefects(proj['id'], search, sort, page)
-        .subscribe(results => {
+    .switchMap(criteria => {
+      let [proj, sort, page, f] = criteria;
+      return this.defectService.loadDefects(proj['id'], f, sort, page)
+        .do(results => {
           this.total.next(results.count);
           this.defects.next(results.rows);
-        });
+        })
+        .map(results => this.defects.getValue());
     });
-
-    return this.defects;
   }
 
-  disconnect(): void {
-    this.defectsSub.unsubscribe();
-  }
+  disconnect(): void { }
 }
 
 @Injectable()
@@ -93,12 +90,13 @@ export class DefectService {
     return this.page;
   }
 
-  public loadDefects(pid, search, sorting, paging) {
+  public loadDefects(pid, filter, sorting, paging) {
     let params = new URLSearchParams();
 
     params.set('project', pid);
-    for (let key in search) {
-      params.set(key, search[key]);
+
+    for (let key in filter) {
+      params.set(key, filter[key]);
     }
 
     if (sorting.by) {
