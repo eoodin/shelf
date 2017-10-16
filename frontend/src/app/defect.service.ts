@@ -26,7 +26,7 @@ interface Sorting {
 export class DefectPage  extends DataSource<Defect> {
   public total  = new BehaviorSubject<number>(0);
   public project = new BehaviorSubject<Object>({});
-  public sorting = new BehaviorSubject<Object>({});
+  public sorting = new BehaviorSubject<Sorting>({by: 'id', direction: 'desc'});
   public paging = new BehaviorSubject<Object>({pageSize: 10, pageIndex: 0});
   public filters = new BehaviorSubject<Object>({noclosed: true, nodeclined: true});
 

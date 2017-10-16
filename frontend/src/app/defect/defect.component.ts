@@ -88,8 +88,9 @@ import { Defect } from '../model/defect';
 export class DefectComponent {
   defect;
   saving;
+
   constructor(private http: HttpService,
-    private location: Location,
+    public location: Location,
     private route: ActivatedRoute,
     private defects: DefectService,
     private prjs: ProjectService) {
