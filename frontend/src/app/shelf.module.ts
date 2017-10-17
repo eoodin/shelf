@@ -35,6 +35,7 @@ import { AdminPageComponent } from './admin/page.component';
 import { AdminProjectComponent, CreateProjectDialog } from './admin/project.component';
 import { AdminTeamComponent, CreateTeamDialog } from './admin/team.component';
 import { EditorComponent } from './editor/editor.component';
+import { NamePipe } from './user/name.pipe';
 
 let routes = [
     { path: '', pathMatch: 'full', redirectTo: 'plans' },
@@ -107,7 +108,8 @@ export class ShelfRequestOptions extends RequestOptions {
         DefectDetail,
         DefectContent,
         ProjectSelectorComponent,
-        EditorComponent
+        EditorComponent,
+        NamePipe
     ],
     providers: [
         NotifyService,

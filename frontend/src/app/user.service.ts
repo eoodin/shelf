@@ -20,11 +20,6 @@ export class UserService {
                 user.super = user.roles && user.roles.map(u => u.id).includes(1);
                 this._currentUser.next(user);
             });
-
-        this.usersCache = {};
-        this.http.get('/api/users')
-            .map(resp => resp.json())
-            .subscribe(users => users.forEach(u => this.usersCache[u.id] = u));
     }
 
     public get currentUser(): Observable<any> {
@@ -32,7 +27,16 @@ export class UserService {
     }
 
     public getUser(id) {
-        if (!this.usersCache) return Observable.of(null);
+        if (!this.usersCache) {
+            this.usersCache = {};
+            return this.http.get('/api/users')
+                .map(resp => resp.json())
+                .do(users => users.forEach(u =>
+                    this.usersCache[u.id] = u
+                ))
+                .map(users => this.usersCache[id]);
+        }
+
         return Observable.of(this.usersCache[id]);
     }
 }

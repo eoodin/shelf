@@ -85,7 +85,7 @@ import { UserService } from '../user.service';
                     <md-cell *mdCellDef="let element">
                         <span class="last-comment"
                             *ngIf="element.defectComments && element.defectComments.length"
-                            title="{{element.defectComments[0].comment.userId}}: {{element.defectComments[0].comment.content}}" >
+                            title="{{element.defectComments[0].comment.userId | username}}: {{element.defectComments[0].comment.content}}" >
                             {{element.defectComments[0].comment.content}}
                         </span>
                     </md-cell>

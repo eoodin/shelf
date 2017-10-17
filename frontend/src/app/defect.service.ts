@@ -101,7 +101,7 @@ export class DefectService {
 
     if (sorting.by) {
       params.set('sortBy', sorting.by);
-      if (sorting.direction != 'desc') // TODO: why?
+      if (sorting.direction == 'desc') // TODO: why?
         params.set('desc', 'true');
     }
 
@@ -134,10 +134,6 @@ export class DefectService {
   }
 
   public save(id, changes) {
-    if (!changes.projectId) {
-      changes.projectId = this.projects.current.getValue()['id'];
-    }
-
     return this.http.patch('/api/defects/' + id, JSON.stringify(changes));
   }
 
@@ -150,6 +146,7 @@ export class DefectService {
   }
 
   public create(data) {
+    data['projectId'] = this.projects.current.getValue()['id'];
     return this.http.post('/api/defects/', JSON.stringify(data)).map(resp => resp.json());
   }
 

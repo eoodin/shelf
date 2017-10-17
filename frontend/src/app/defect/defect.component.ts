@@ -40,10 +40,10 @@ import { Defect } from '../model/defect';
       </ul>
       <ul *ngIf="defect.comments && defect.comments.length">
         <li *ngFor="let c of defect.comments">
-          {{c.createdAt | date: 'y-MM-dd HH:mm:ss'}} {{c.userId}}: {{c.content}}
+          {{c.createdAt | date: 'y-MM-dd HH:mm:ss'}} {{c.userId | username}}: {{c.content}}
         </li>
       </ul>
-      <form (ngSubmit)="comment(cf.value); message.value = '';">
+      <form (ngSubmit)="comment(message.value); message.value = '';">
         <div class="comment-field">
           <md-form-field >
             <input mdInput name="message" #message maxlength="256" placeholder="Comment" required>
@@ -65,7 +65,7 @@ import { Defect } from '../model/defect';
       <ul>
         <li *ngFor="let h of defect.histories" >
           <span class="hist-time"> {{h.history.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span>
-          <span class="user"> <strong>{{h.history.userId}}</strong></span>
+          <span class="user"> {{h.history.userId | username }} </span>
           <ul>
             <li *ngFor="let c of h.history.changes" >
               <strong> {{c.field}}</strong> => <i>{{c.value | slice:0:20}}</i>
@@ -91,6 +91,7 @@ import { Defect } from '../model/defect';
   .side-info>div:after {content: '.'; display: none; clear: both;}
   .side-info>div>label{margin-right: 10px; font-weight: 800;}
   .side-info>div>label:after {content: ':';}
+  h4 {margin: 5px 0;}
   `]
 })
 export class DefectComponent {
@@ -120,8 +121,8 @@ export class DefectComponent {
   }
 
   dataValid() {
-    return this.defect.title && this.defect.title.length > 0 &&
-      (this.releases.length == 0 || (this.releases.filter(r => r.checked).length));
+    return this.defect.title && this.defect.title.length > 0;
+     // && (this.releases.length == 0 || (this.releases.filter(r => r.checked).length));
   }
 
   save() {
