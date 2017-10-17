@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {Http} from "@angular/http";
+import {Http} from '@angular/http';
 import {Location} from '@angular/common';
-import {Router, ActivatedRoute} from "@angular/router";
+import {Router, ActivatedRoute} from '@angular/router';
 import {UserService} from './user.service';
 import {LoginService} from './login.service';
 
@@ -10,27 +10,27 @@ import {LoginService} from './login.service';
     template: `
     <div class="login-pannel">
         <form class="form-signin" #f="ngForm" (ngSubmit)="login(f.value)">
-            <h2 class="form-signin-heading">Please sign in</h2>
+            <h2>Sign in</h2>
             <h3 *ngIf="failedMessage" class="fail-message">{{failedMessage}}</h3>
-            <div class="row">
-                <input  name="username"  ngModel class="form-control" placeholder="ID" required autofocus>
-            </div>
-            <div class="row">
-                <input type="password" name="password" ngModel class="form-control" placeholder="Password" required>
-            </div>
+            <md-form-field>
+                <input name="username" ngModel mdInput placeholder="ID" required autofocus>
+            </md-form-field>
+            <md-form-field>
+                <input type="password" name="password" ngModel mdInput placeholder="Password" required>
+            </md-form-field>
             <!--
             <div class="checkbox">
                 <label> <input type="checkbox" value="remember-me" name="remember"> Remember me </label>
             </div>
             -->
             <div class="row">
-                <button class="btn btn-lg btn-primary btn-block" type="submit" [disabled]="proceeding">Sign in</button>
+                <button md-raised-button type="submit" [disabled]="!f.valid || proceeding">Sign in</button>
             </div>
         </form>
     </div>
   `,
     styles: [`
-    .login-pannel {margin:0; padding:0;position: absolute; top:0; left:0;z-index:9999;width:100%;height:100%;background: white;}
+    .login-pannel {width: 100%;height:100%; position: absolute; top:0; left:0; z-index:9999; background-color: white;}
     .form-signin { max-width: 330px;padding: 15px; margin: 0 auto;}
     .form-signin .form-control {width: 100%; font-size: 16px;}
     .form-signin .row {margin: 5px auto;}
@@ -40,7 +40,7 @@ import {LoginService} from './login.service';
 export class LoginComponent {
     proceeding;
     failedMessage;
-    
+
     private goto;
 
     constructor(private router: Router,
@@ -53,16 +53,16 @@ export class LoginComponent {
     login(data) {
         this.proceeding = true;
         this.loginService.login(data)
-            .subscribe(resp => {
-                if (resp.json().result == 'loggedin'){
+            .finally(() => { this.proceeding = false; })
+            .map(resp => resp.json())
+            .subscribe(r => {
+                if (r.result == 'loggedin') {
                     this.router.navigate([(this.goto ? this.goto : '/')]);
-                }
-                else {
-                    this.failedMessage = resp.json().result;
+                } else {
+                    this.failedMessage = r.result;
                 }
             },
-            err => {},
-            () => {this.proceeding = false}
+            err => { this.failedMessage = err.text(); }
             );
     }
 }

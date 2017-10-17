@@ -72,7 +72,7 @@ export class ShelfAppComponent {
 
     logoutApp() {
         this.loginService.logout()
-            .subscribe(status => this.router.navigate(['/login']));
+            .subscribe(status => this.router.navigate(['login']));
     }
 
     showAbout() {
