@@ -180,7 +180,6 @@ export class ContentComponent implements OnInit, AfterViewInit {
                 this.defects.summary({project: p['id']})
                     .subscribe(s => this.summary = s);
             });
-        console.log(this.sorter);
     }
 
     loadItems() {

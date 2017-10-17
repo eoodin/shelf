@@ -11,22 +11,23 @@ import { Defect } from '../model/defect';
   template: `
   <div class="defect-edit">
     <div>
-      <button md-icon-button (click)="location.back()"> <i class="material-icons">arrow_back</i></button>
+      <button md-icon-button (click)="location.back()"> <md-icon>arrow_back</md-icon> </button>
       <div class="actions">
-        <a md-button routerLink=".." (click)="save(false)">Save</a>
-        <a md-button *ngIf="!defect.id" [disabled]="saving" (click)="save(true)">Save and New</a>
+        <a md-button [disabled]="!title.value.length" routerLink=".." (click)="save()">Save</a>
+        <a md-button *ngIf="!defect.id" [disabled]="!title.value.length || saving" (click)="save()">Save and New</a>
       </div>
     </div>
-    <div>
-        <md-radio-group [(ngModel)]="defect.severity">
-          <md-radio-button *ngFor="let s of ['Blocker', 'Critical', 'Major', 'Minor']" [value]="s"> {{s}} </md-radio-button>
-        </md-radio-group>
-    </div>
     <div class="title-row">
-        <input type="text" [(ngModel)]="defect.title">
+      <input type="text" #title [(ngModel)]="defect.title" placeholder="Title" required>
+    </div>
+    <div>
+      <md-radio-group [(ngModel)]="defect.severity">
+        <md-radio-button *ngFor="let s of ['Blocker', 'Critical', 'Major', 'Minor']" [value]="s"> {{s}} </md-radio-button>
+      </md-radio-group>
     </div>
     <div class="description">
-      <rich-editor [model]="defect.description" (modelChange)="descriptionChange($event);" ></rich-editor>
+      <rich-editor [(model)]="defect.description"
+        uploadUrl="/api/file?type=image&api=ckeditor-uploadimage"></rich-editor>
     </div>
     <div *ngIf="defect.id" class="comments">
       <h4>Comments</h4>
@@ -36,13 +37,13 @@ import { Defect } from '../model/defect';
       <ul *ngIf="defect.comments && defect.comments.length">
         <li *ngFor="let c of defect.comments"> {{c.createdAt | date: 'y-MM-dd HH:mm:ss'}} {{c.userId}}: {{c.content}}</li>
       </ul>
-      <form (ngSubmit)="comment(message.value); message.value = '';">
+      <form (ngSubmit)="comment(cf.value); message.value = '';">
         <div class="comment-field">
           <md-form-field >
-            <input mdInput #message maxlength="256" placeholder="Comment">
+            <input mdInput name="message" #message maxlength="256" placeholder="Comment" required>
             <md-hint align="end">{{message.value.length}} / 256</md-hint>
           </md-form-field>
-          <button md-icon-button type="submit"><md-icon>check</md-icon></button>
+          <button md-icon-button type="submit" [disabled]="!message.value.length"><md-icon>check</md-icon></button>
         </div>
       </form>
     </div>
@@ -71,10 +72,11 @@ import { Defect } from '../model/defect';
   `,
   styles: [`
   :host {flex-grow: 1; display: flex;}
-  .defect-edit {flex-grow: 1; display: flex; flex-direction: column; padding: 10px;}
+  .defect-edit {flex-grow: 1; display: flex; flex-direction: column; padding-right: 5px;}
   .defect-edit .actions {display: inline-block; float: right;}
-  .defect-edit>div{margin: 7px 0;}
-  .title-row input {width: 100%; font-size: 16px; min-height: 26px;}
+  .defect-edit>div{margin-bottom: 10px;}
+  .title-row {margin-right: 3px;}
+  .title-row input {padding-left: 8px; width: 100%; font-size: 16px; min-height: 26px;}
   .description{flex-grow: 1; display: flex; min-height: 300px;}
   md-radio-button {margin: 0 7px;}
   .comment-field {display: flex;}
@@ -105,7 +107,7 @@ export class DefectComponent {
         });
   }
 
-  save(another) {
+  save() {
     var data = JSON.parse(JSON.stringify(this.defect));
     delete data['comments']; // TODO: filter out other fields as well.
     data.projectId = this.prjs.current.getValue()['id'];
@@ -123,7 +125,6 @@ export class DefectComponent {
   }
 
   descriptionChange(d) {
-    console.log(d);
     this.defect.description = d;
   }
 
