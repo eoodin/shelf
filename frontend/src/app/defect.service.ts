@@ -134,6 +134,10 @@ export class DefectService {
   }
 
   public save(id, changes) {
+    if (!changes.projectId) {
+      changes.projectId = this.projects.current.getValue()['id'];
+    }
+
     return this.http.patch('/api/defects/' + id, JSON.stringify(changes));
   }
 

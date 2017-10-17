@@ -7,23 +7,27 @@ import { DefectService } from '../defect.service';
 import { Defect } from '../model/defect';
 
 @Component({
-  selector: '[app-defect]',
+  selector: '[defect-details]',
   template: `
   <div class="defect-edit">
     <div>
       <button md-icon-button (click)="location.back()"> <md-icon>arrow_back</md-icon> </button>
       <div class="actions">
-        <a md-button [disabled]="!title.value.length" routerLink=".." (click)="save()">Save</a>
-        <a md-button *ngIf="!defect.id" [disabled]="!title.value.length || saving" (click)="save()">Save and New</a>
+        <a md-button [disabled]="!dataValid()" routerLink=".." (click)="save()">Save</a>
+        <a md-button *ngIf="!defect.id" [disabled]="!dataValid() || saving" (click)="save()">Save and New</a>
       </div>
     </div>
     <div class="title-row">
       <input type="text" #title [(ngModel)]="defect.title" placeholder="Title" required>
     </div>
     <div>
+      <label>Severity:</label>
       <md-radio-group [(ngModel)]="defect.severity">
-        <md-radio-button *ngFor="let s of ['Blocker', 'Critical', 'Major', 'Minor']" [value]="s"> {{s}} </md-radio-button>
+        <md-radio-button *ngFor="let s of SEVERITIES" [value]="s"> {{s}} </md-radio-button>
       </md-radio-group>
+      <label>Releases:</label>
+      <md-checkbox *ngFor="let release of releases;let i = index"
+        [(ngModel)]="releases[i].checked">{{release.name}}</md-checkbox>
     </div>
     <div class="description">
       <rich-editor [(model)]="defect.description"
@@ -35,7 +39,9 @@ import { Defect } from '../model/defect';
         <li >No comment</li>
       </ul>
       <ul *ngIf="defect.comments && defect.comments.length">
-        <li *ngFor="let c of defect.comments"> {{c.createdAt | date: 'y-MM-dd HH:mm:ss'}} {{c.userId}}: {{c.content}}</li>
+        <li *ngFor="let c of defect.comments">
+          {{c.createdAt | date: 'y-MM-dd HH:mm:ss'}} {{c.userId}}: {{c.content}}
+        </li>
       </ul>
       <form (ngSubmit)="comment(cf.value); message.value = '';">
         <div class="comment-field">
@@ -78,7 +84,7 @@ import { Defect } from '../model/defect';
   .title-row {margin-right: 3px;}
   .title-row input {padding-left: 8px; width: 100%; font-size: 16px; min-height: 26px;}
   .description{flex-grow: 1; display: flex; min-height: 300px;}
-  md-radio-button {margin: 0 7px;}
+  md-radio-button,md-checkbox {margin: 0 7px;}
   .comment-field {display: flex;}
   .comment-field md-form-field {flex-grow: 1;}
   .side-info { padding: 10px; width: 300px; }
@@ -88,6 +94,9 @@ import { Defect } from '../model/defect';
   `]
 })
 export class DefectComponent {
+  SEVERITIES = ['Blocker', 'Critical', 'Major', 'Minor'];
+  releases = [];
+
   defect;
   saving;
 
@@ -105,13 +114,21 @@ export class DefectComponent {
         .subscribe(() => {
           this.defect = new Defect();
         });
+      this.prjs.current.filter(p => p.id).subscribe(p => {
+        this.prjs.details(p.id).subscribe( detail => this.releases = detail.releases);
+      });
+  }
+
+  dataValid() {
+    return this.defect.title && this.defect.title.length > 0 &&
+      (this.releases.length == 0 || (this.releases.filter(r => r.checked).length));
   }
 
   save() {
     var data = JSON.parse(JSON.stringify(this.defect));
     delete data['comments']; // TODO: filter out other fields as well.
-    data.projectId = this.prjs.current.getValue()['id'];
     delete data['owner'];
+    data.releases = this.releases.filter( r => r.checked);
     this.saving = true;
     if (data['id']) {
       this.defects.save([data['id']], data)
