@@ -7,14 +7,13 @@ import { Observable } from 'rxjs';
   pure: false
 })
 export class NamePipe implements OnDestroy, PipeTransform {
-  private userName;
+  private userName = '';
   private subs;
 
-  private valueWrapper;
   constructor(private userService: UserService, private detectorRef: ChangeDetectorRef) { }
 
   transform(value: any, args?: any): any {
-    if (!name && (typeof value === 'string')) {
+    if (!this.subs && (typeof value === 'string')) {
       this.subs = this.userService.getUser(value).subscribe(u => {
         this.userName = u ? u.name : '';
         this.detectorRef.markForCheck();
