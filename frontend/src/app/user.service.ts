@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import {Subject, Observable} from 'rxjs';
+import {Subject, Observable, BehaviorSubject} from 'rxjs/Rx';
 import {HttpService} from './http.service';
 
 @Injectable()
 export class UserService {
-    private usersCache;
+    private usersCache = new BehaviorSubject<{}>({});
+    private userCacheLoaded = false;
 
     private _currentUser: Subject<any> = new Subject<any>();
 
@@ -27,16 +28,17 @@ export class UserService {
     }
 
     public getUser(id) {
-        if (!this.usersCache) {
-            this.usersCache = {};
-            return this.http.get('/api/users')
-                .map(resp => resp.json())
-                .do(users => users.forEach(u =>
-                    this.usersCache[u.id] = u
-                ))
-                .map(users => this.usersCache[id]);
+        if ( !this.userCacheLoaded) {
+            this.http.get('/api/users').subscribe(resp => {
+                let cache = {};
+                for (let u of resp.json()) {
+                    cache[u.id] = u;
+                }
+                this.usersCache.next(cache);
+            });
+            this.userCacheLoaded = true;
         }
 
-        return Observable.of(this.usersCache[id]);
+        return this.usersCache.map(users => users[id]);
     }
 }

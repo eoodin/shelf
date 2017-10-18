@@ -57,7 +57,7 @@ import { Defect } from '../model/defect';
 
   <div *ngIf="defect.id" class="side-info">
     <div> <label>Status</label><span>{{defect.status}}</span></div>
-    <div> <label>Reported by</label><span *ngIf="defect.creator">{{defect.creator.name}}</span></div>
+    <div> <label>Reported by</label><span *ngIf="defect.creator">{{defect.creatorId | username}}</span></div>
     <div> <label>Reported at</label><span>{{defect.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span></div>
     <div class="history">
       <h4>History</h4>

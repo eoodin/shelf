@@ -101,7 +101,7 @@ export class DefectService {
 
     if (sorting.by) {
       params.set('sortBy', sorting.by);
-      if (sorting.direction == 'desc') // TODO: why?
+      if (sorting.direction == 'desc')
         params.set('desc', 'true');
     }
 
@@ -110,13 +110,7 @@ export class DefectService {
 
     let options = new RequestOptions({ search: params });
     return this.http.get('/api/defects/', options)
-      .map(resp => resp.json())
-      .do(result => {
-        result.rows.forEach(defect => {
-          this.users.getUser(defect.creatorId).subscribe(u => defect.creator = u || {});
-          this.users.getUser(defect.ownerId).subscribe(u => defect.owner = u);
-        });
-      });
+      .map(resp => resp.json());
   }
 
   public summary(search) {

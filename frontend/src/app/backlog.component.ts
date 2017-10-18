@@ -1,8 +1,8 @@
 import { Component, ElementRef } from '@angular/core';
-import { ProjectService } from "./project.service";
+import { ProjectService } from './project.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { PreferenceService } from "./preference.service";
-import { StoryService } from "./story.service";
+import { PreferenceService } from './preference.service';
+import { StoryService } from './story.service';
 import {MdDialog, MdDialogRef} from '@angular/material';
 
 @Component({
@@ -40,11 +40,11 @@ import {MdDialog, MdDialogRef} from '@angular/material';
                 </ng-container>
                 <ng-container mdColumnDef="creator">
                     <md-header-cell *mdHeaderCellDef md-sort-header> Creator </md-header-cell>
-                    <md-cell *mdCellDef="let us"> {{us.creator.name}} </md-cell>
+                    <md-cell *mdCellDef="let us"> {{us.creatorId | username}} </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="operations">
                     <md-header-cell *mdHeaderCellDef> Operations </md-header-cell>
-                    <md-cell *mdCellDef="let us"> 
+                    <md-cell *mdCellDef="let us">
                         <i (click)="confirmDelete(us)" class="material-icons button">remove</i>
                     </md-cell>
                 </ng-container>
@@ -131,7 +131,7 @@ export class BacklogComponent {
     private confirmDelete(item) {
         let dialogRef = this.dialog.open(DeleteConfirmDialog);
         dialogRef.afterClosed().subscribe(result => {
-            if (result != 'yes') 
+            if (result != 'yes')
                 return;
             this.stories.delete(item.id)
                 .subscribe(() => this.loadItems());

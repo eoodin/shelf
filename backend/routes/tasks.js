@@ -99,7 +99,7 @@ module.exports = function(router) {
             models.task.findById(req.params.id).then(function(task) {
                 var origin = {};
                 var changes = {};
-                let skipFields = ['updatedAt', 'createdAt', 'owner', 'creatorId'];
+                let skipFields = ['updatedAt', 'createdAt', 'creatorId'];
                 for(let f in req.body) {
                     if (skipFields.indexOf(f) != -1) {
                         continue;
@@ -118,10 +118,11 @@ module.exports = function(router) {
                         origin.estimation = task.estimation;
                         changes.estimation = 0;
                     }
-                    // TODO: auto change status of defect?
                 }
 
                 task.update(changes).then(function(task) {
+                    res.json(task);
+                    /* TODO: recover task history:
                     models.change.create({
                         originalData: JSON.stringify(origin),
                         changedData: JSON.stringify(changes),
@@ -130,6 +131,7 @@ module.exports = function(router) {
                     }).then(function() {
                         res.json(task);
                     });
+                     */
                 });
             }).catch(function(errors){
                 logger.error(errors);

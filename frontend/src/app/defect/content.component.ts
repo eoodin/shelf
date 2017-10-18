@@ -62,19 +62,19 @@ import { UserService } from '../user.service';
                 <ng-container mdColumnDef="owner">
                     <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> Owner </md-header-cell>
                     <md-cell *mdCellDef="let element">
-                     <a *ngIf="element.owner" [mdMenuTriggerFor]="ownerSel"> {{element.owner.name}} </a>
-                     <a *ngIf="!element.owner" [mdMenuTriggerFor]="ownerSel"> Unassigned </a>
+                     <a *ngIf="element.ownerId" [mdMenuTriggerFor]="ownerSel"> {{element.ownerId | username}} </a>
+                     <a *ngIf="!element.ownerId" [mdMenuTriggerFor]="ownerSel"> Unassigned </a>
                      <md-menu #ownerSel="mdMenu">
                          <button *ngFor="let member of members"
                             (click)="assignTo(element, member)"  md-menu-item>{{member.name}}</button>
-                         <button *ngIf="element.owner"
+                         <button *ngIf="element.ownerId"
                             (click)="assignTo(element, null)" md-menu-item>Unassigned</button>
                      </md-menu>
                     </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="creator">
                     <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> Reporter </md-header-cell>
-                    <md-cell *mdCellDef="let element"> {{element.creator.name}} </md-cell>
+                    <md-cell *mdCellDef="let element"> {{element.creatorId | username}} </md-cell>
                 </ng-container>
                 <ng-container mdColumnDef="createdAt">
                     <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> Report date </md-header-cell>

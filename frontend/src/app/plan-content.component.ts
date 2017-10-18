@@ -61,11 +61,11 @@ import { ProjectService } from './project.service';
                     <ng-container mdColumnDef="owner">
                         <md-header-cell *mdHeaderCellDef> Owner </md-header-cell>
                         <md-cell *mdCellDef="let task">
-                        <a *ngIf="task.owner" [mdMenuTriggerFor]="ownerSel"> {{task.owner.name}} </a>
-                        <a *ngIf="!task.owner" [mdMenuTriggerFor]="ownerSel"> Unassigned </a>
+                        <a *ngIf="task.ownerId" [mdMenuTriggerFor]="ownerSel"> {{task.ownerId | username}} </a>
+                        <a *ngIf="!task.ownerId" [mdMenuTriggerFor]="ownerSel"> Unassigned </a>
                         <md-menu #ownerSel="mdMenu">
                             <button *ngFor="let member of team.members" (click)="assignTo(task, member)"  md-menu-item>{{member.name}}</button>
-                            <button *ngIf="task.owner" (click)="assignTo(task, null)" md-menu-item>Unassigned</button>
+                            <button *ngIf="task.ownerId" (click)="assignTo(task, null)" md-menu-item>Unassigned</button>
                         </md-menu>
                         </md-cell>
                     </ng-container>
@@ -193,8 +193,8 @@ export class PlanContentComponent implements AfterViewInit {
         let dlgRef = this.dialog.open(RemoveConfirmDialog, {data: item});
         dlgRef.afterClosed().filter(confirmed => confirmed).subscribe(confirmed => {
             this.tasks.delete(item.id)
-            .finally(() => { this.ui.rwd.show = false })
-            .subscribe(() => this.loadWorkItems())
+            .finally(() => this.ui.rwd.show = false)
+            .subscribe(() => this.loadWorkItems());
         });
     }
 
