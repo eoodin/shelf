@@ -80,13 +80,17 @@ import { UserService } from '../user.service';
                     <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> Report date </md-header-cell>
                     <md-cell *mdCellDef="let element"> {{element.createdAt | date: 'yyyy-MM-dd'}} </md-cell>
                 </ng-container>
+                <ng-container mdColumnDef="updatedAt">
+                    <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> Last update </md-header-cell>
+                    <md-cell *mdCellDef="let element"> {{element.updatedAt | date: 'yyyy-MM-dd'}} </md-cell>
+                </ng-container>
                 <ng-container mdColumnDef="comment">
                     <md-header-cell *mdHeaderCellDef> Last comment </md-header-cell>
-                    <md-cell *mdCellDef="let element">
+                    <md-cell *mdCellDef="let d">
                         <span class="last-comment"
-                            *ngIf="element.defectComments && element.defectComments.length"
-                            title="{{element.defectComments[0].comment.userId | username}}: {{element.defectComments[0].comment.content}}" >
-                            {{element.defectComments[0].comment.content}}
+                            *ngIf="d.defectComments && d.defectComments.length"
+                            title="{{d.defectComments[0].comment.userId | username}}: {{d.defectComments[0].comment.content}}" >
+                            {{d.defectComments[0].comment.content}}
                         </span>
                     </md-cell>
                 </ng-container>
@@ -130,7 +134,8 @@ import { UserService } from '../user.service';
     .mat-column-status {max-width: 90px;}
     .mat-column-sevrity {max-width: 70px;}
     .mat-column-creator {max-width: 90px;}
-    .mat-column-createdAt {max-width: 80px;}
+    .mat-column-creation {max-width: 80px;}
+    .mat-column-update {max-width: 80px;}
     .mat-column-owner {max-width: 93px;}
     .mat-column-operations {max-width: 90px;}
     .mat-column-title {flex-grow: 5;  white-space: nowrap; overflow:hidden; text-overflow: ellipsis;}
@@ -138,9 +143,7 @@ import { UserService } from '../user.service';
   `]
 })
 export class ContentComponent implements OnInit, AfterViewInit {
-    @ViewChild(MdSort) sorter: MdSort;
-
-    displayedColumns = ['id', 'status', 'severity', 'title', 'creator', 'createdAt', 'comment', 'owner', 'operations'];
+    displayedColumns = ['id', 'status', 'severity', 'title', 'creator', 'createdAt', 'updatedAt', 'comment', 'owner', 'operations'];
     loading = false;
     user;
     members = [];
