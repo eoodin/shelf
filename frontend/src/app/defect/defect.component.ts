@@ -40,7 +40,7 @@ import { Defect } from '../model/defect';
       </ul>
       <ul *ngIf="defect.comments && defect.comments.length">
         <li *ngFor="let c of defect.comments">
-          {{c.createdAt | date: 'y-MM-dd HH:mm:ss'}} {{c.userId | username}}: {{c.content}}
+          {{c.createdAt | date: 'y-MM-dd HH:mm'}} {{c.userId | username}}: {{c.content}}
         </li>
       </ul>
       <form (ngSubmit)="comment(message.value); message.value = '';">
@@ -58,17 +58,18 @@ import { Defect } from '../model/defect';
   <div *ngIf="defect.id" class="side-info">
     <div> <label>Status</label><span>{{defect.status}}</span></div>
     <div> <label>Reported by</label><span *ngIf="defect.creator">{{defect.creatorId | username}}</span></div>
-    <div> <label>Reported at</label><span>{{defect.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span></div>
+    <div> <label>Reported at</label><span>{{defect.createdAt | date: 'y-MM-dd HH:mm'}}</span></div>
     <div class="history">
       <h4>History</h4>
       <p *ngIf="!defect.histories.length">No history</p>
       <ul>
         <li *ngFor="let h of defect.histories" >
-          <span class="hist-time"> {{h.history.createdAt | date: 'y-MM-dd HH:mm:ss'}}</span>
+          <span class="hist-time"> {{h.history.createdAt | date: 'y-MM-dd HH:mm'}}</span>
           <span class="user"> {{h.history.userId | username }} </span>
           <ul>
             <li *ngFor="let c of h.history.changes" >
-              <strong> {{c.field}}</strong> => <i>{{c.value | slice:0:20}}</i>
+              <strong> {{c.field}}</strong> =>
+              <i title="{{c.value | htmltext | slice:0:400}}">{{c.value | htmltext}}</i>
             </li>
           </ul>
         </li>
@@ -92,6 +93,11 @@ import { Defect } from '../model/defect';
   .side-info>div>label{margin-right: 10px; font-weight: 800;}
   .side-info>div>label:after {content: ':';}
   h4 {margin: 5px 0;}
+  .history > ul { padding: 0; }
+  .history > ul > li { margin-bottom: 8px; }
+  .history > ul > li > ul { padding-left: 1em; }
+  .history > ul > li > ul li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .history li { list-style: none; }
   `]
 })
 export class DefectComponent {
