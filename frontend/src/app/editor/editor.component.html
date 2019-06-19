@@ -1,10 +1,15 @@
 <div class="container">
-  <!--
 <div class="toolbar">
   <ul class="tools">
-    <li><button md-icon-button>I</button></li>
+    <li>
+        <button mat-icon-button (click)="italic()">
+            <mat-icon>format_italic</mat-icon>
+        </button>
+        <button mat-icon-button (click)="bold()">
+            <mat-icon>format_bold</mat-icon>
+        </button>
+    </li>
   </ul>
 </div>
--->
 <iframe class="content" srcdoc="" showcaret="true"></iframe>
 </div>

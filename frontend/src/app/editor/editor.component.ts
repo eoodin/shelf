@@ -5,79 +5,98 @@ import { HttpService } from '../http.service';
 import { HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 
+const editorStyles = `
+body { font-family: Roboto, "Helvetica Neue", sans-serif; font-size: 14px; }`;
 
 class UploadResult {
     url: string;
 }
 
 @Component({
-  selector: 'rich-editor',
-  templateUrl: './editor.component.html',
-  styleUrls: ['./editor.component.css']
+    selector: 'rich-editor',
+    templateUrl: './editor.component.html',
+    styleUrls: ['./editor.component.css']
 })
 export class EditorComponent implements OnInit, OnDestroy {
-  private content = '';
+    private content = '';
 
-  @Input('uploadUrl')
-  private uploadUrl;
+    @Input('uploadUrl')
+    private uploadUrl;
 
-  @Output()
-  public modelChange = new Subject();
+    @Output()
+    public modelChange = new Subject();
 
-  @Input()
-  public set model(m) {
-    if (m && m == this.content) {
-      return;
+    @Input()
+    public set model(m) {
+        if (m && m == this.content) {
+            return;
+        }
+
+        this.content = m;
+        if (this.contentBody) {
+            this.contentBody.innerHTML = this.content || '';
+        }
     }
 
-    this.content = m;
-    if (this.contentBody) {
-      this.contentBody.innerHTML = this.content || '';
+    private contentBody;
+    private document;
+
+    constructor(private element: ElementRef, private http: HttpService) {
     }
-  }
 
-  private contentBody;
+    ngOnInit() {
+        const frame = this.element.nativeElement.querySelector('.content');
+        frame.addEventListener('load', () => {
+            this.contentBody = frame.contentDocument.body;
+            const style = frame.contentDocument.createElement('style');
+            style.innerText = editorStyles;
+            frame.contentDocument.head.append(style);
+            frame.contentDocument.designMode = 'on';
+            this.contentBody.innerHTML = this.content || '';
+            this.document = frame.contentWindow.document;
+            const uploadUrl = this.uploadUrl;
+            this.contentBody.addEventListener('beforeinput', (e) => {
+                if (e.inputType === 'insertFromPaste') {
+                    if (e.dataTransfer && e.dataTransfer.files.length) {
+                        const file = e.dataTransfer.files[0];
+                        const formData: FormData = new FormData();
+                        formData.append('upload', file, file.name);
+                        const headers = new HttpHeaders();
+                        headers.set('Accept', 'application/json');
+                        headers.delete('Content-Type');
+                        this.http.post<UploadResult>(uploadUrl, formData, {headers})
+                            .subscribe(data => this.document.execCommand('insertImage', false, data.url));
+                    }
+                }
+            });
 
-  constructor(private element: ElementRef, private http: HttpService) { }
+            this.contentBody.addEventListener('input', (e) => {
+                const currentContent = this.contentBody.innerHTML;
+                if (currentContent !== this.content) {
+                    this.content = currentContent;
+                    this.modelChange.next(currentContent);
+                }
+            });
+        });
+    }
 
-  ngOnInit() {
-    let frame = this.element.nativeElement.querySelector('.content');
-    frame.addEventListener('load', () => {
-      this.contentBody = frame.contentDocument.body;
-      frame.contentDocument.designMode = 'on';
-      this.contentBody.innerHTML = this.content || '';
-      let fdoc = frame.contentWindow.document;
-      let uploadUrl = this.uploadUrl;
-      this.contentBody.addEventListener('beforeinput', (e) => {
-        if (e.inputType == 'insertFromPaste') {
-          if (e.dataTransfer && e.dataTransfer.files.length) {
-            let file = e.dataTransfer.files[0];
-            let formData: FormData = new FormData();
-            formData.append('upload', file, file.name);
-            let headers = new HttpHeaders();
-            headers.set('Accept', 'application/json');
-            headers.delete('Content-Type');
-            this.http.post<UploadResult>(uploadUrl, formData, { headers: headers })
-              .subscribe( data => fdoc.execCommand('insertImage', false, data.url));
-          }
-        }
-      });
+    ngOnDestroy() {
+        const frame = this.element.nativeElement.querySelector('.content');
+    }
 
-      this.contentBody.addEventListener('input', (e) => {
-        var currentContent = this.contentBody.innerHTML;
-        if (currentContent !== this.content) {
-          this.content = currentContent;
-          this.modelChange.next(currentContent);
-        }
-      });
-    });
-  }
+    onEvent(e) {
+        console.log(e);
+    }
 
-  ngOnDestroy() {
-    let frame = this.element.nativeElement.querySelector('.content');
-  }
+    italic() {
+        this.document.execCommand('italic');
+        // const sel = this.document.getSelection();
+        // console.log('selection', sel);
+    }
 
-  onEvent(e) {
-    console.log(e);
-  }
+    bold() {
+        this.document.execCommand('bold');
+        // const sel = this.document.getSelection();
+        // console.log('selection', sel);
+    }
 }
