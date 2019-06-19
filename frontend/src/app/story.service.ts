@@ -13,6 +13,8 @@ export interface UserStory {
   status: string;
   title: string; 
   creator: string;
+  points: number;
+  description: string;
 }
 
 @Injectable()
