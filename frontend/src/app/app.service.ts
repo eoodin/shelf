@@ -9,7 +9,6 @@ export class AppService {
     constructor(private http: HttpService) {
         Observable.of(1).flatMap(() => http.get('api/app/info'))
         .retry(1)
-        .map(resp => resp.json())
         .subscribe(info => this._info.next(info));
     }
 

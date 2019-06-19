@@ -4,13 +4,14 @@ import {ProjectService} from '../project.service';
 @Component({
   selector: 'project-selector',
   template: `
-  <md-menu #projectSelect="mdMenu">
-    <button md-menu-item *ngFor="let p of excludeCurrent()"
+  <mat-menu #projectSelect="matMenu">
+    <button mat-menu-item *ngFor="let p of excludeCurrent()"
     (click)="projService.setCurrent(p)"> {{p.name}} </button>
-  </md-menu>
+  </mat-menu>
 
-  <button md-button [mdMenuTriggerFor]="projectSelect">
-    <span class="button-text">{{project.name}}</span><md-icon>keyboard_arrow_down</md-icon>
+  <button mat-button [matMenuTriggerFor]="projectSelect">
+    <span class="button-text">{{project.name}}</span>
+      <mat-icon aria-hidden="false" aria-label="Example home icon">keyboard_arrow_down</mat-icon>
   </button>
   `,
   styles: [`

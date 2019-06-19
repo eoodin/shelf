@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RequestOptions, URLSearchParams } from '@angular/http';
+import {HttpParams, HttpRequest} from '@angular/common/http';
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
 
 import {Subject, BehaviorSubject, Observable} from "rxjs";
@@ -26,8 +26,7 @@ export class StoryService extends DataSource<any> {
     }
 
   public getStory(id) {
-    return this.http.get('/api/stories/' + id)
-        .map(resp => resp.json())
+    return this.http.get<UserStory>('/api/stories/' + id)
         .do(story => this.enrich(story));
   }
 
@@ -48,13 +47,11 @@ export class StoryService extends DataSource<any> {
   }
 
   public save(data) {
-    return this.http.patch('/api/stories/' + data['id'], JSON.stringify(data))
-      .map(resp => resp.json());
+    return this.http.patch('/api/stories/' + data['id'], JSON.stringify(data));
   }
 
   public delete(id) {
-    return this.http.delete('/api/stories/' + id)
-      .map(resp => resp.json());
+    return this.http.delete('/api/stories/' + id);
   }
 
   public update(search) {
@@ -62,13 +59,12 @@ export class StoryService extends DataSource<any> {
   }
 
   public load(search) {
-    let params = new URLSearchParams();
+    let params = new HttpParams();
     for(let key in search) {
         params.set(key, search[key]);
     }
-    let options = new RequestOptions({ search: params });
-    return this.http.get('/api/stories/', options)
-      .map(resp => resp.json())
+
+    return this.http.get<UserStory[]>('/api/stories/', { params: params })
       .do(stories => {
         stories.forEach(s => this.enrich(s));
       });

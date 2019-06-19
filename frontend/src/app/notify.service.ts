@@ -8,7 +8,7 @@ if (window && 'Notification' in window) {
 
 @Injectable()
 export class NotifyService {
-  private icon = 'app/images/icon-128x128.png';
+  private icon = 'assets/images/icon-128x128.png';
   private notifier: Subject<Object>;
   constructor() {
     this.notifier = new Subject<Object>();
@@ -18,7 +18,7 @@ export class NotifyService {
     if (Notification) {
       Notification.requestPermission((permission) => {
         if (permission == 'denied')
-          alert('Notification disabled, enable it in browser settings.');
+          console.log('Notification disabled, enable it in browser settings.');
       });
     }
   }

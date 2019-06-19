@@ -9,9 +9,7 @@
       "outDir": "dist",
       "assets": [
         "assets",
-        "favicon.ico",
-        "spin.gif",
-        "app/images/icon-large.png"
+        "favicon.ico"
         ],
       "index": "index.html",
       "main": "main.ts",
@@ -21,7 +19,7 @@
       "styles": [
         "styles.css",
         "css-spinner.css",
-        "./assets/material-icons.css"
+        "assets/material-icons.css"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",

@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { MdDialog, MdDialogRef, MD_DIALOG_DATA, MdSort } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSort } from '@angular/material';
 import { TeamService } from '../team.service';
 
 @Component({
@@ -12,14 +12,14 @@ import { TeamService } from '../team.service';
         <li *ngFor="let team of teams" >
             <span>{{team.name}}</span>
             <!--
-            <button md-icon-button (click)="deleteTeam(team)">
-                <md-icon class="md-24" aria-label="Delete team">delete</md-icon>
+            <button mat-icon-button (click)="deleteTeam(team)">
+                <mat-icon class="mat-24" aria-label="Delete team">delete</mat-icon>
             </button>
             -->
         </li>
     </ul>
     <div>
-        <button md-raised-button color="primary" (click)="onCreate()">New Team</button>
+        <button mat-raised-button color="primary" (click)="onCreate()">New Team</button>
     </div>
 </div>
   `,
@@ -31,7 +31,7 @@ export class AdminTeamComponent {
     teams: any[];
 
     constructor(
-        public dialog: MdDialog,
+        public dialog: MatDialog,
         private teamService: TeamService) {
         teamService.teams.subscribe(teams => this.teams = teams);
     }
@@ -53,8 +53,8 @@ export class AdminTeamComponent {
 @Component({
     selector: 'create-team-dialog',
     template: `
-    <h2 md-dialog-title>New Team</h2>
-    <md-dialog-content class="item-details">
+    <h2 mat-dialog-title>New Team</h2>
+    <mat-dialog-content class="item-details">
         <div class="row">
             Team name:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="data.name">
         </div>
@@ -64,16 +64,16 @@ export class AdminTeamComponent {
         <div class="row">
             Members:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="data.users">
         </div>
-    </md-dialog-content>
-    <md-dialog-actions>
-        <button md-button md-dialog-close>Cancel</button>
-        <button md-button [md-dialog-close]="true">Add</button>
-    </md-dialog-actions>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button [mat-dialog-close]="true">Add</button>
+    </mat-dialog-actions>
 `
 })
 export class CreateTeamDialog {
     constructor(
-        public dialogRef: MdDialogRef<CreateTeamDialog>, 
-        @Inject(MD_DIALOG_DATA) public data: any
+        public dialogRef: MatDialogRef<CreateTeamDialog>,
+        @Inject(MAT_DIALOG_DATA) public data: any
     ) {}
 }

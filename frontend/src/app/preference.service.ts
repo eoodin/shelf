@@ -18,7 +18,6 @@ export class PreferenceService {
 
     private load(user) {
         this.http.get('/api/preferences')
-            .map(resp => resp.json())
             .subscribe(prefs => {
                 this._values.next(prefs);
             });

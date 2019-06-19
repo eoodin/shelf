@@ -3,13 +3,24 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
 import { ShelfAppComponent, AboutDialog } from './shelf.component';
 import { RouterModule } from '@angular/router';
-import { HttpModule, RequestOptions, Headers } from '@angular/http';
+import { HttpClientModule} from '@angular/common/http';
 import { PlanList } from './components/plan-list';
 import { Backlog } from './pages/backlog';
 import { Plans, CreatePlanDlg } from './pages/plans';
 import { WorkItems } from './pages/workitems';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
-import { MaterialModule, MdNativeDateModule } from '@angular/material';
+import {
+    MatFormFieldModule,
+    MatNativeDateModule,
+    MatOptionModule,
+    MatSidenavModule,
+    MatSelectModule,
+    MatCheckboxModule, MatMenuModule, MatDialogModule, MatDatepickerModule, MatButtonModule, MatRadioModule, MatInputModule
+} from '@angular/material';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { HttpService } from './http.service';
 import { LoginComponent } from './login.component';
@@ -39,7 +50,8 @@ import { NamePipe } from './user/name.pipe';
 import { HtmltextPipe } from './htmltext.pipe';
 
 
-let routes = [
+
+const routes = [
     { path: '', pathMatch: 'full', redirectTo: 'plans' },
     {
         path: 'backlog', component: Backlog,
@@ -73,15 +85,6 @@ let routes = [
     { path: 'items', component: WorkItems },
     { path: 'login', component: LoginComponent },
 ];
-
-export class ShelfRequestOptions extends RequestOptions {
-    constructor() {
-        super({
-            headers: new Headers({ 'Content-Type': 'application/json' }),
-            body: ''
-        });
-    }
-}
 
 @NgModule({
     declarations: [
@@ -127,17 +130,30 @@ export class ShelfRequestOptions extends RequestOptions {
         TaskService,
         AppService,
         LoginService,
-        { provide: RequestOptions, useClass: ShelfRequestOptions },
         { provide: LocationStrategy, useClass: HashLocationStrategy }
     ],
     imports: [
         BrowserModule,
-        HttpModule,
+        HttpClientModule,
         FormsModule,
-        MaterialModule,
         RouterModule.forRoot(routes),
         BrowserAnimationsModule,
-        MdNativeDateModule
+        MatNativeDateModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSidenavModule,
+        MatIconModule,
+        MatOptionModule,
+        MatSelectModule,
+        MatCheckboxModule,
+        MatTableModule,
+        MatMenuModule,
+        MatDialogModule,
+        MatDatepickerModule,
+        MatButtonModule,
+        MatRadioModule,
+        MatPaginatorModule,
+        MatSortModule
     ],
     entryComponents: [
         DeleteConfirmDialog,

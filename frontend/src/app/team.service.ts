@@ -33,7 +33,7 @@ export class TeamService {
 
     public load() {
         this.http.get('/api/teams/')
-            .subscribe(resp => this._teams.next(resp.json()));
+            .subscribe(resp => this._teams.next(resp));
     }
 
     public createTeam(name:string, scrumMaster:string, users:string) {
@@ -50,7 +50,6 @@ export class TeamService {
     private updateTeam(team) {
         if (team && team.id) {
             this.http.get('/api/team/' + team.id +'?members=1')
-                .map(response => response.json())
                 .subscribe(team => this._ownTeam.next(team));
         }
     }

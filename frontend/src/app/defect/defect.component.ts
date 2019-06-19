@@ -11,10 +11,10 @@ import { Defect } from '../model/defect';
   template: `
   <div class="defect-edit">
     <div>
-      <button md-icon-button (click)="location.back()"> <md-icon>arrow_back</md-icon> </button>
+      <button mat-icon-button (click)="location.back()"> <mat-icon>arrow_back</mat-icon> </button>
       <div class="actions">
-        <a md-button [disabled]="!dataValid()" routerLink=".." (click)="save()">Save</a>
-        <a md-button *ngIf="!defect.id" [disabled]="!dataValid() || saving" (click)="save()">Save and New</a>
+        <a mat-button [disabled]="!dataValid()" routerLink=".." (click)="save()">Save</a>
+        <a mat-button *ngIf="!defect.id" [disabled]="!dataValid() || saving" (click)="save()">Save and New</a>
       </div>
     </div>
     <div class="title-row">
@@ -22,12 +22,12 @@ import { Defect } from '../model/defect';
     </div>
     <div>
       <label>Severity:</label>
-      <md-radio-group [(ngModel)]="defect.severity">
-        <md-radio-button *ngFor="let s of SEVERITIES" [value]="s"> {{s}} </md-radio-button>
-      </md-radio-group>
+      <mat-radio-group [(ngModel)]="defect.severity">
+        <mat-radio-button *ngFor="let s of SEVERITIES" [value]="s"> {{s}} </mat-radio-button>
+      </mat-radio-group>
       <label>Releases:</label>
-      <md-checkbox *ngFor="let release of releases;let i = index"
-        [(ngModel)]="releases[i].checked">{{release.name}}</md-checkbox>
+      <mat-checkbox *ngFor="let release of releases;let i = index"
+        [(ngModel)]="releases[i].checked">{{release.name}}</mat-checkbox>
     </div>
     <div class="description">
       <rich-editor [(model)]="defect.description"
@@ -45,11 +45,11 @@ import { Defect } from '../model/defect';
       </ul>
       <form (ngSubmit)="comment(message.value); message.value = '';">
         <div class="comment-field">
-          <md-form-field >
-            <input mdInput name="message" #message maxlength="256" placeholder="Comment" required>
-            <md-hint align="end">{{message.value.length}} / 256</md-hint>
-          </md-form-field>
-          <button md-icon-button type="submit" [disabled]="!message.value.length"><md-icon>check</md-icon></button>
+          <mat-form-field >
+            <input matInput name="message" #message maxlength="256" placeholder="Comment" required>
+            <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+          </mat-form-field>
+          <button mat-icon-button type="submit" [disabled]="!message.value.length"><mat-icon>check</mat-icon></button>
         </div>
       </form>
     </div>
@@ -85,9 +85,9 @@ import { Defect } from '../model/defect';
   .title-row {margin-right: 3px;}
   .title-row input {padding-left: 8px; width: 100%; font-size: 16px; min-height: 26px;}
   .description{flex-grow: 1; display: flex; min-height: 300px;}
-  md-radio-button,md-checkbox {margin: 0 7px;}
+  mat-radio-button,mat-checkbox {margin: 0 7px;}
   .comment-field {display: flex;}
-  .comment-field md-form-field {flex-grow: 1;}
+  .comment-field mat-form-field {flex-grow: 1;}
   .side-info { padding: 10px; width: 300px; }
   .side-info>div:after {content: '.'; display: none; clear: both;}
   .side-info>div>label{margin-right: 10px; font-weight: 800;}

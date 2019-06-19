@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Params } from '@angular/router';
 import { HttpService } from './http.service';
 import { ProjectService } from './project.service';
-import { StoryService } from './story.service';
+import {StoryService, UserStory} from './story.service';
 
 declare var CKEDITOR;
 
@@ -13,7 +13,7 @@ declare var CKEDITOR;
   <div class="item-details">
     <form (ngSubmit)="save()">
         <div>
-            <button (click)="goBack()" md-button> <i class="material-icons">arrow_back</i> Back</button>
+            <button (click)="goBack()" mat-button> <i class="material-icons">arrow_back</i> Back</button>
         </div>
         <div>
             <h4 *ngIf="parent && parent.id"> Adding child to: #{{parent.id}} {{parent.title}} </h4>
@@ -28,7 +28,7 @@ declare var CKEDITOR;
             <rich-editor [(model)]="_item.description"></rich-editor>
         </div>
         <div>
-            <button [disabled]="saving" md-button>Save</button>
+            <button [disabled]="saving" mat-button>Save</button>
         </div>
     </form>
   </div>
@@ -42,7 +42,7 @@ declare var CKEDITOR;
 })
 export class StoryComponent implements OnDestroy {
     saving = false;
-    public _item = {title: '', points: 0, description: ''};
+    public _item: UserStory;
     public parent;
 
     constructor(private http: HttpService,
@@ -68,7 +68,7 @@ export class StoryComponent implements OnDestroy {
     }
 
     ngOnDestroy() {
-        // TODO: destory editor instance?
+        // TODO: destroy editor instance?
     }
 
     save() {

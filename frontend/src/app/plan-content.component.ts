@@ -1,5 +1,6 @@
 import { Component, Inject, AfterViewInit, ViewChild } from '@angular/core';
-import {MdDialog, MdDialogRef, MD_DIALOG_DATA} from '@angular/material';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+
 import { PreferenceService } from './preference.service';
 import * as moment from 'moment';
 import { PlanService } from './plan.service';
@@ -19,9 +20,9 @@ import { ProjectService } from './project.service';
     <div class="project-info">
         <div class="project-operations">
             <iframe #downloader style="display:none;"></iframe>
-            <button md-button (click)="exportCsv()"><i class="glyphicon glyphicon-export" aria-hidden="true"></i>Export as CSV</button>
-            <button md-button (click)="showAddItem()">New Task...</button>
-            <button md-button (click)="showMoveToPlan()" [disabled]="!selectedIds().length">Move...</button>
+            <button mat-button (click)="exportCsv()"><i class="glyphicon glyphicon-export" aria-hidden="true"></i>Export as CSV</button>
+            <button mat-button (click)="showAddItem()">New Task...</button>
+            <button mat-button (click)="showMoveToPlan()" [disabled]="!selectedIds().length">Move...</button>
         </div>
     </div>
     <div class="plan-body">
@@ -32,56 +33,56 @@ import { ProjectService } from './project.service';
             <div class="panel panel-default">
                 <div class="panel-heading work-items-heading">
                     <div>
-                        <md-checkbox [(ngModel)]="hideFinished" (change)="loadWorkItems()">Hide Finished</md-checkbox>
-                        <md-checkbox [(ngModel)]="onlyOwned" (change)="loadWorkItems()">Mine Only</md-checkbox>
+                        <mat-checkbox [(ngModel)]="hideFinished" (change)="loadWorkItems()">Hide Finished</mat-checkbox>
+                        <mat-checkbox [(ngModel)]="onlyOwned" (change)="loadWorkItems()">Mine Only</mat-checkbox>
                     </div>
                 </div>
-                <md-table [dataSource]="tasks">
-                    <ng-container mdColumnDef="id">
-                        <md-header-cell *mdHeaderCellDef> ID </md-header-cell>
-                        <md-cell *mdCellDef="let task"> {{task.id}} </md-cell>
+                <mat-table [dataSource]="tasks">
+                    <ng-container matColumnDef="id">
+                        <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
+                        <mat-cell *matCellDef="let task"> {{task.id}} </mat-cell>
                     </ng-container>
-                    <ng-container mdColumnDef="status">
-                        <md-header-cell *mdHeaderCellDef> Status </md-header-cell>
-                        <md-cell *mdCellDef="let task">
-                            <a [mdMenuTriggerFor]="statusSel">{{task.status}}</a>
-                            <md-menu #statusSel="mdMenu">
-                                <button *ngFor="let st of STATES" [class.hidden]="st == task.status" (click)="changeStatus(task, st)" md-menu-item>{{st}}</button>
-                            </md-menu>
-                        </md-cell>
+                    <ng-container matColumnDef="status">
+                        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+                        <mat-cell *matCellDef="let task">
+                            <a [matMenuTriggerFor]="statusSel">{{task.status}}</a>
+                            <mat-menu #statusSel="matMenu">
+                                <button *ngFor="let st of STATES" [class.hidden]="st == task.status" (click)="changeStatus(task, st)" mat-menu-item>{{st}}</button>
+                            </mat-menu>
+                        </mat-cell>
                     </ng-container>
-                    <ng-container mdColumnDef="title">
-                        <md-header-cell *mdHeaderCellDef> <span class="task glyphicon glyphicon-check"></span> Title </md-header-cell>
-                        <md-cell *mdCellDef="let task"> <a (click)="showItem(task)">{{task.title}}</a> </md-cell>
+                    <ng-container matColumnDef="title">
+                        <mat-header-cell *matHeaderCellDef> <span class="task glyphicon glyphicon-check"></span> Title </mat-header-cell>
+                        <mat-cell *matCellDef="let task"> <a (click)="showItem(task)">{{task.title}}</a> </mat-cell>
                     </ng-container>
-                    <ng-container mdColumnDef="priority">
-                        <md-header-cell *mdHeaderCellDef> Priority </md-header-cell>
-                        <md-cell *mdCellDef="let task"> {{PRI[task.priority]}} </md-cell>
+                    <ng-container matColumnDef="priority">
+                        <mat-header-cell *matHeaderCellDef> Priority </mat-header-cell>
+                        <mat-cell *matCellDef="let task"> {{PRI[task.priority]}} </mat-cell>
                     </ng-container>
-                    <ng-container mdColumnDef="owner">
-                        <md-header-cell *mdHeaderCellDef> Owner </md-header-cell>
-                        <md-cell *mdCellDef="let task">
-                        <a *ngIf="task.ownerId" [mdMenuTriggerFor]="ownerSel"> {{task.ownerId | username}} </a>
-                        <a *ngIf="!task.ownerId" [mdMenuTriggerFor]="ownerSel"> Unassigned </a>
-                        <md-menu #ownerSel="mdMenu">
-                            <button *ngFor="let member of team.members" (click)="assignTo(task, member)"  md-menu-item>{{member.name}}</button>
-                            <button *ngIf="task.ownerId" (click)="assignTo(task, null)" md-menu-item>Unassigned</button>
-                        </md-menu>
-                        </md-cell>
+                    <ng-container matColumnDef="owner">
+                        <mat-header-cell *matHeaderCellDef> Owner </mat-header-cell>
+                        <mat-cell *matCellDef="let task">
+                        <a *ngIf="task.ownerId" [matMenuTriggerFor]="ownerSel"> {{task.ownerId | username}} </a>
+                        <a *ngIf="!task.ownerId" [matMenuTriggerFor]="ownerSel"> Unassigned </a>
+                        <mat-menu #ownerSel="matMenu">
+                            <button *ngFor="let member of team.members" (click)="assignTo(task, member)"  mat-menu-item>{{member.name}}</button>
+                            <button *ngIf="task.ownerId" (click)="assignTo(task, null)" mat-menu-item>Unassigned</button>
+                        </mat-menu>
+                        </mat-cell>
                     </ng-container>
-                    <ng-container mdColumnDef="remaining">
-                        <md-header-cell *mdHeaderCellDef> Remaining </md-header-cell>
-                        <md-cell *mdCellDef="let task"> {{task.estimation}} </md-cell>
+                    <ng-container matColumnDef="remaining">
+                        <mat-header-cell *matHeaderCellDef> Remaining </mat-header-cell>
+                        <mat-cell *matCellDef="let task"> {{task.estimation}} </mat-cell>
                     </ng-container>
-                    <ng-container mdColumnDef="operations">
-                        <md-header-cell *mdHeaderCellDef> Operations </md-header-cell>
-                        <md-cell *mdCellDef="let task"> 
-                            <a title="Remove this work item" (click)="removingItem(task)" md-button>Delete</a>
-                        </md-cell>
+                    <ng-container matColumnDef="operations">
+                        <mat-header-cell *matHeaderCellDef> Operations </mat-header-cell>
+                        <mat-cell *matCellDef="let task"> 
+                            <a title="Remove this work item" (click)="removingItem(task)" mat-button>Delete</a>
+                        </mat-cell>
                     </ng-container>
-                    <md-header-row *mdHeaderRowDef="displayedColumns"></md-header-row>
-                    <md-row *mdRowDef="let row; columns: displayedColumns;"></md-row>
-                </md-table>
+                    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+                </mat-table>
             </div>
         </div>
     </div>
@@ -121,13 +122,13 @@ export class PlanContentComponent implements AfterViewInit {
 
     project = null;
 
-    @ViewChild('downloader') downloader;
+    @ViewChild(Component, {static: false, read: 'downloader'}) downloader;
 
     constructor(private plans: PlanService,
         public tasks: TaskService,
         private teams: TeamService,
         private pref: PreferenceService,
-        public dialog: MdDialog,
+        public dialog: MatDialog,
         private prjs: ProjectService) {
         prjs.current.subscribe(p => this.project = p);
         this.ui = {
@@ -298,8 +299,8 @@ export class PlanContentComponent implements AfterViewInit {
 @Component({
     selector: 'item-detail-diaolg',
     template: `
-    <h2 md-dialog-title>Item Details</h2>
-    <md-dialog-content class="item-details">
+    <h2 mat-dialog-title>Item Details</h2>
+    <mat-dialog-content class="item-details">
         <div class="row">
             <span class="field-label">Title:</span>
             <input type="text" class="work-item-title" [(ngModel)]="data.title">
@@ -317,11 +318,11 @@ export class PlanContentComponent implements AfterViewInit {
             Effort Estimation: <input type="text" [(ngModel)]="data.estimation">
             </div>
         </div>
-    </md-dialog-content>
-    <md-dialog-actions>
-        <button md-button md-dialog-close>Close</button>
-        <button md-button [md-dialog-close]="true">Save</button>
-    </md-dialog-actions>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button mat-dialog-close>Close</button>
+        <button mat-button [mat-dialog-close]="true">Save</button>
+    </mat-dialog-actions>
     `,
     styles: [`
     .row {margin: 5px; auto; display: flex;}
@@ -330,47 +331,47 @@ export class PlanContentComponent implements AfterViewInit {
 })
 export class ItemDetailDialog {
     constructor(
-        public dialogRef: MdDialogRef<ItemDetailDialog>,
-        @Inject(MD_DIALOG_DATA) public data: any
+        public dialogRef: MatDialogRef<ItemDetailDialog>,
+        @Inject(MAT_DIALOG_DATA) public data: any
     ) {}
 }
 
 @Component({
     selector: 'move-items-diaolg',
     template: `
-    <h2 md-dialog-title>Move selected items to plan</h2>
-    <md-dialog-content class="item-details">
+    <h2 mat-dialog-title>Move selected items to plan</h2>
+    <mat-dialog-content class="item-details">
         <select #moveTo class="form-control" required>
             <option *ngFor="let p of data.plans" [value]="p.id">{{p.name}}</option>
         </select>
-    </md-dialog-content>
-    <md-dialog-actions>
-        <button md-button md-dialog-close>Cancel</button>
-        <button md-button [md-dialog-close]="moveTo.value">Move</button>
-    </md-dialog-actions>`
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button [mat-dialog-close]="moveTo.value">Move</button>
+    </mat-dialog-actions>`
 })
 export class MoveItemsDialog {
     constructor(
-        public dialogRef: MdDialogRef<MoveItemsDialog>,
-        @Inject(MD_DIALOG_DATA) public data: any
+        public dialogRef: MatDialogRef<MoveItemsDialog>,
+        @Inject(MAT_DIALOG_DATA) public data: any
     ) { }
 }
 
 @Component({
     selector: 'confirm-remove-diaolg',
     template: `
-    <h2 md-dialog-title>Are you sure?</h2>
-    <md-dialog-content class="item-details">
+    <h2 mat-dialog-title>Are you sure?</h2>
+    <mat-dialog-content class="item-details">
         You are about to remove work item {{data.id}}. Are you sure?
-    </md-dialog-content>
-    <md-dialog-actions>
-        <button md-button md-dialog-close>Cancel</button>
-        <button md-button [md-dialog-close]="true">Remove</button>
-    </md-dialog-actions>`
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button [mat-dialog-close]="true">Remove</button>
+    </mat-dialog-actions>`
 })
 export class RemoveConfirmDialog {
     constructor(
-        public dialogRef: MdDialogRef<RemoveConfirmDialog>,
-        @Inject(MD_DIALOG_DATA) public data: any
+        public dialogRef: MatDialogRef<RemoveConfirmDialog>,
+        @Inject(MAT_DIALOG_DATA) public data: any
     ) { }
 }

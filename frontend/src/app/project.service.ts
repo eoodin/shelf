@@ -1,8 +1,16 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import {Subject, BehaviorSubject} from 'rxjs';
 import {HttpService} from './http.service';
 import {PreferenceService} from './preference.service';
+
+
+class Project {
+    public id;
+    public name;
+    releases;
+}
 
 @Injectable()
 export class ProjectService {
@@ -59,7 +67,6 @@ export class ProjectService {
     public load() {
         this.loading = true;
         this.http.get('/api/projects')
-            .map(resp => resp.json())
             .subscribe(
                 (projects) => {
                     this._projects.next(projects);
@@ -70,10 +77,10 @@ export class ProjectService {
     }
 
     addRelease(p, release) {
-        return this.http.post('/api/project/' + p.id + '/release', release).map(resp => resp.json());
+        return this.http.post('/api/project/' + p.id + '/release', release);
     }
 
     details(pid) {
-        return this.http.get('/api/project/' + pid + '/details').map(resp => resp.json());
+        return this.http.get<Project>('/api/project/' + pid + '/details');
     }
 }

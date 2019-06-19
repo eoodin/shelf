@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Http} from '@angular/http';
+// import {Http} from '@angular/common/http';
 import {Location} from '@angular/common';
 import {Router, ActivatedRoute} from '@angular/router';
 import {UserService} from './user.service';
@@ -12,19 +12,19 @@ import {LoginService} from './login.service';
         <form class="form-signin" #f="ngForm" (ngSubmit)="login(f.value)">
             <h2>Sign in</h2>
             <h3 *ngIf="failedMessage" class="fail-message">{{failedMessage}}</h3>
-            <md-form-field>
-                <input name="username" ngModel mdInput placeholder="ID" required autofocus>
-            </md-form-field>
-            <md-form-field>
-                <input type="password" name="password" ngModel mdInput placeholder="Password" required>
-            </md-form-field>
+            <mat-form-field>
+                <input name="username" ngModel matInput placeholder="ID" required autofocus>
+            </mat-form-field>
+            <mat-form-field>
+                <input type="password" name="password" ngModel matInput placeholder="Password" required>
+            </mat-form-field>
             <!--
             <div class="checkbox">
                 <label> <input type="checkbox" value="remember-me" name="remember"> Remember me </label>
             </div>
             -->
             <div class="row">
-                <button md-raised-button type="submit" [disabled]="!f.valid || proceeding">Sign in</button>
+                <button mat-raised-button type="submit" [disabled]="!f.valid || proceeding">Sign in</button>
             </div>
         </form>
     </div>
@@ -54,7 +54,6 @@ export class LoginComponent {
         this.proceeding = true;
         this.loginService.login(data)
             .finally(() => { this.proceeding = false; })
-            .map(resp => resp.json())
             .subscribe(r => {
                 if (r.result == 'loggedin') {
                     this.router.navigate([(this.goto ? this.goto : '/')]);

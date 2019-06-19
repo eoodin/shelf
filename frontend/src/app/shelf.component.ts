@@ -1,6 +1,6 @@
 import { Component, ViewContainerRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { Location } from '@angular/common';
 import { NotifyService } from './notify.service';
 import { Observable } from 'rxjs/Rx';
@@ -8,22 +8,22 @@ import { LoginService } from './login.service';
 import { ProjectService } from './project.service';
 import { AppService } from './app.service';
 import { UserService } from './user.service';
-import { MdDialog, MdDialogRef } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material';
 
 @Component({
     selector: 'shelf-app',
     template: `
     <div class="navbar">
         <nav>
-            <a class="brand" href="javascript:void(0);"><img class="nav-logo" src="/app/images/icon-large.png"/></a>
-            <button md-button [class.active]="getLinkStyle('/backlog')" [routerLink]="['/backlog']">Backlog</button>
-            <button md-button [class.active]="getLinkStyle('/plans')" [routerLink]="['/plans']">Plans</button>
-            <button md-button [class.active]="getLinkStyle('/defects')" [routerLink]="['/defects']">Defects</button>
-            <button md-button *ngIf="user.super"
+            <a class="brand" href="javascript:void(0);"><img class="nav-logo" src="assets/images/icon-large.png"/></a>
+            <button mat-button [class.active]="getLinkStyle('/backlog')" [routerLink]="['/backlog']">Backlog</button>
+            <button mat-button [class.active]="getLinkStyle('/plans')" [routerLink]="['/plans']">Plans</button>
+            <button mat-button [class.active]="getLinkStyle('/defects')" [routerLink]="['/defects']">Defects</button>
+            <button mat-button *ngIf="user.super"
                 [class.active]="getLinkStyle('/admin')" [routerLink]="['/admin']">Admin</button>
             <div style="flex-grow: 1;"></div>
-            <button md-button><a (click)="showAbout()">About</a></button>
-            <button md-button><a (click)="logoutApp()" >Logout</a></button>
+            <button mat-button><a (click)="showAbout()">About</a></button>
+            <button mat-button><a (click)="logoutApp()" >Logout</a></button>
         </nav>
     </div>
     <div class="workspace">
@@ -46,7 +46,7 @@ export class ShelfAppComponent {
     private ui;
     user = {super: false};
 
-    constructor(private dialog: MdDialog,
+    constructor(private dialog: MatDialog,
                 private router: Router,
                 private location: Location,
                 private notify: NotifyService,
@@ -84,21 +84,21 @@ export class ShelfAppComponent {
 @Component({
     selector: 'shelf-about-dialog',
     template: `
-    <h1 md-dialog-title>About Shelf</h1>
-    <div md-dialog-content>
+    <h1 mat-dialog-title>About Shelf</h1>
+    <div mat-dialog-content>
         <div>Release channel: {{info.branch}}</div>
         <div>Last commit: </div>
         <div><pre>{{info.commit}}</pre></div>
     </div>
-    <div md-dialog-actions>
-        <button md-button (click)="dialogRef.close()">OK</button>
+    <div mat-dialog-actions>
+        <button mat-button (click)="dialogRef.close()">OK</button>
     </div>
     `
 })
 export class AboutDialog {
     info;
     constructor(
-        public dialogRef: MdDialogRef<AboutDialog>,
+        public dialogRef: MatDialogRef<AboutDialog>,
         private apps: AppService) {
        this.apps.info.subscribe(info => this.info = info);
     }

@@ -8,7 +8,7 @@ import { Router, ActivatedRoute } from '@angular/router';
       <div class="info">
           <project-selector></project-selector>
           <div class="operations">
-              <a md-button routerLink="/defects/new">New Defect</a>
+              <a mat-button routerLink="/defects/new">New Defect</a>
           </div>
         </div>
       <router-outlet></router-outlet>

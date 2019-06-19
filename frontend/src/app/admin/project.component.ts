@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewChild, AfterViewInit  } from '@angular/core';
 import { Router } from '@angular/router';
-import { MdDialog, MdDialogRef, MD_DIALOG_DATA, MdSort } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSort } from '@angular/material';
 import { HttpService } from '../http.service';
 import { DefectService } from '../defect.service';
 import { TeamService } from '../team.service';
@@ -8,11 +8,7 @@ import { ProjectService } from '../project.service';
 import { PlanService } from '../plan.service';
 import { UserService } from '../user.service';
 import { BehaviorSubject } from 'rxjs';
-
-class Project {
-    public id;
-    public name;
-}
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'admin-project',
@@ -20,12 +16,12 @@ class Project {
   <div class="projects">
     <h3> projects </h3>
     <div class="projects-operation">
-        <button md-raised-button color="primary" (click)="onCreate()">New Project</button>
+        <button mat-raised-button color="primary" (click)="onCreate()">New Project</button>
     </div>
-    <md-select placeholder="Manage project"
+    <mat-select placeholder="Manage project"
         (change)="switchProject($event.value)" class="project-selector">
-        <md-option *ngFor="let p of projects" [value]="p"> {{ p.name }} </md-option>
-    </md-select>
+        <mat-option *ngFor="let p of projects" [value]="p"> {{ p.name }} </mat-option>
+    </mat-select>
 
       <dl *ngIf="project && project.id">
         <dt>Team</dt> <dd> {{ project.team.name }} </dd>
@@ -36,21 +32,21 @@ class Project {
             </ul>
         </dd>
       </dl>
-      <button md-icon-button>
-        <md-icon (click)="showCreateRelease = !showCreateRelease" aria-label="Create a release">create</md-icon>
+      <button mat-icon-button>
+        <mat-icon (click)="showCreateRelease = !showCreateRelease" aria-label="Create a release">create</mat-icon>
       </button>
       <form *ngIf="showCreateRelease" #f="ngForm"
         (ngSubmit)="addRelease(name.value, target.value); showCreateRelease = false">
-        <md-form-field>
-            <input #name mdInput required placeholder="Release name">
-        </md-form-field>
+        <mat-form-field>
+            <input #name matInput required placeholder="Release name">
+        </mat-form-field>
 
-        <md-form-field>
-            <input #target mdInput [mdDatepicker]="picker" placeholder="Choose a date">
-            <md-datepicker-toggle mdSuffix [for]="picker"></md-datepicker-toggle>
-            <md-datepicker #picker></md-datepicker>
-        </md-form-field>
-        <button type="submit" md-icon-button> <md-icon aria-label="Add">check</md-icon> </button>
+        <mat-form-field>
+            <input #target matInput [matDatepicker]="picker" placeholder="Choose a date">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <button type="submit" mat-icon-button> <mat-icon aria-label="Add">check</mat-icon> </button>
       </form>
     </div>
   `,
@@ -70,7 +66,7 @@ export class AdminProjectComponent {
     private po = new BehaviorSubject({});
 
     constructor(
-        public dialog: MdDialog,
+        public dialog: MatDialog,
         private prjs: ProjectService,
         private teamService: TeamService) {
             teamService.teams.subscribe(teams => this.teams = teams);
@@ -109,8 +105,8 @@ export class AdminProjectComponent {
 @Component({
     selector: 'create-project-dialog',
     template: `
-    <h2 md-dialog-title>Add New Project</h2>
-    <md-dialog-content class="item-details">
+    <h2 mat-dialog-title>Add New Project</h2>
+    <mat-dialog-content class="item-details">
         <div class="row">
             Project name:</div><div class="col-sm-5"> <input type="text" [(ngModel)]="data.projectName">
         </div>
@@ -122,14 +118,14 @@ export class AdminProjectComponent {
             </select>
             </div>
         </div>
-    </md-dialog-content>
-    <md-dialog-actions>
-        <button md-button md-dialog-close>Cancel</button>
-        <button md-button [md-dialog-close]="true">Create</button>
-    </md-dialog-actions>`
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button [mat-dialog-close]="true">Create</button>
+    </mat-dialog-actions>`
 })
 export class CreateProjectDialog {
-    constructor(public dialogRef: MdDialogRef<CreateProjectDialog>,
-        @Inject(MD_DIALOG_DATA) public data: any
+    constructor(public dialogRef: MatDialogRef<CreateProjectDialog>,
+        @Inject(MAT_DIALOG_DATA) public data: any
     ) {}
 }

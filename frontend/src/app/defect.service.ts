@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { RequestOptions, URLSearchParams } from '@angular/http';
+import {HttpParams, HttpRequest, HttpResponse} from '@angular/common/http';
 import { DataSource } from '@angular/cdk/collections';
 import { Observable } from 'rxjs';
+import { filter, map, count } from 'rxjs/operators';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 import { HttpService } from './http.service';
@@ -58,6 +59,22 @@ export class DefectPage  extends DataSource<Defect> {
   disconnect(): void { }
 }
 
+class DefectResponse {
+    count: number;
+    total: number;
+    rows: Defect[];
+}
+
+class ProjectSummary {
+    total: number;
+    open: number;
+    closed: number;
+    declined: number;
+    failed: number;
+    fixing: number;
+    testing: number;
+}
+
 @Injectable()
 export class DefectService {
   private query = new Subject<Object>();
@@ -91,8 +108,7 @@ export class DefectService {
   }
 
   public loadDefects(pid, filter, sorting, paging) {
-    let params = new URLSearchParams();
-
+    let params = new HttpParams();
     params.set('project', pid);
 
     for (let key in filter) {
@@ -108,23 +124,19 @@ export class DefectService {
     params.set('offset',  '' + (paging.pageIndex * paging.pageSize));
     params.set('size', paging.pageSize);
 
-    let options = new RequestOptions({ search: params });
-    return this.http.get('/api/defects/', options)
-      .map(resp => resp.json());
+    return this.http.get<DefectResponse>('/api/defects/', { params: params });
   }
 
   public summary(search) {
-    let params = new URLSearchParams();
+      let params = new HttpParams();
     for (let key in search) {
       params.set(key, search[key]);
     }
-    let options = new RequestOptions({ search: params });
-    return this.http.get('/api/defects/summary', options)
-      .map(resp => resp.json());
+    return this.http.get<ProjectSummary>('/api/defects/summary', {params: params});
   }
 
   public single(id) {
-    return this.http.get('/api/defects/' + id).map(resp => resp.json()).do(d => this.enrichDefect(d));
+    return this.http.get('/api/defects/' + id).do(d => this.enrichDefect(d));
   }
 
   public save(id, changes) {
@@ -132,16 +144,16 @@ export class DefectService {
   }
 
   public loadComments(defect) {
-    return this.http.get('/api/defects/' + defect.id + '/comments').map(resp => resp.json());
+    return this.http.get('/api/defects/' + defect.id + '/comments');
   }
 
   public addComment(defect, message) {
-    return this.http.post('/api/defects/' + defect.id + '/comments', {message: message}).map(resp => resp.json());
+    return this.http.post('/api/defects/' + defect.id + '/comments', {message: message});
   }
 
   public create(data) {
     data['projectId'] = this.projects.current.getValue()['id'];
-    return this.http.post('/api/defects/', JSON.stringify(data)).map(resp => resp.json());
+    return this.http.post('/api/defects/', JSON.stringify(data));
   }
 
   private enrichDefect(defect) {

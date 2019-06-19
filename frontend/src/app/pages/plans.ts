@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { MdDialog, MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { PlanService } from '../plan.service';
 import { TeamService } from '../team.service';
 import { PreferenceService } from '../preference.service';
@@ -9,26 +9,26 @@ import { Observable, Subject } from 'rxjs';
 @Component({
     selector: 'plans',
     template: `
-    <md-sidenav-container class="workspace">
-       <md-sidenav #sidenav class="sidenav">
+    <mat-sidenav-container class="workspace">
+       <mat-sidenav #sidenav class="sidenav">
           <plan-list (select)="sidenav.close()"></plan-list>
-       </md-sidenav>
+       </mat-sidenav>
         <div class="plan-content">
             <h3>
                 <a (click)="sidenav.open()">{{current.name}}</a>
-                <button md-icon-button (click)="showCreate()"><md-icon>create</md-icon></button>
+                <button mat-icon-button (click)="showCreate()"><mat-icon>create</mat-icon></button>
                 <a class="add-sprint-button" (click)="showCreator = true"><span class="glyphicon glyphicon-plus"></span></a>
                 <div class="team-switch">
                 <form>
-                    <md-select *ngIf="teams && teams.length" name="team">
-                        <md-option *ngFor="let team of teams" [value]="team" (onSelect)="switchTeam(team)" >{{team.name}}</md-option>
-                    </md-select>
+                    <mat-select *ngIf="teams && teams.length" name="team">
+                        <mat-option *ngFor="let team of teams" [value]="team" (onSelect)="switchTeam(team)" >{{team.name}}</mat-option>
+                    </mat-select>
                 </form>
                 </div>
             </h3>
             <router-outlet></router-outlet>
         </div>
-    </md-sidenav-container>
+    </mat-sidenav-container>
     `,
     styles: [`
     :host {width: 100%;}
@@ -37,7 +37,7 @@ import { Observable, Subject } from 'rxjs';
     .workspace{height: 100%;}
     .sidenav {background: #fff; padding: 10px;}
     .add-sprint-button{font-size: 14px;}
-    md-option {background-color: white;}
+    mat-option {background-color: white;}
     .plan-content {padding: 0 10px 10px 10px;}
     `]
 })
@@ -47,7 +47,7 @@ export class Plans {
     teams = [];
     lastSelectTeamId;
 
-    constructor(public dialog: MdDialog,
+    constructor(public dialog: MatDialog,
         private prefs: PreferenceService,
         private planService: PlanService,
         private teamService: TeamService) {
@@ -102,74 +102,74 @@ export class Plans {
 @Component({
     selector: 'create-plan-dialog',
     template: `
-    <h1 md-dialog-title>Create sprint</h1>
-    <div md-dialog-content>
+    <h1 mat-dialog-title>Create sprint</h1>
+    <div mat-dialog-content>
         <p>
-        <md-form-field>
-            <input mdInput type="text" [(ngModel)]="data.name" placeholder="Name">
-        </md-form-field>
+        <mat-form-field>
+            <input matInput type="text" [(ngModel)]="data.name" placeholder="Name">
+        </mat-form-field>
         </p>
 
         <table cellspacing="0" style="width: 100%;"><tr>
-        <td><md-form-field>
-            <input mdInput [mdDatepicker]="startPicker" [(ngModel)]="data.start" (change)="calcWorkdays()" name="start" placeholder="Start from">
-            <md-datepicker-toggle mdSuffix [for]="startPicker"></md-datepicker-toggle>
-            <md-datepicker #startPicker></md-datepicker>
-        </md-form-field></td>
-        <td><md-form-field>
-            <input mdInput [mdDatepicker]="duePicker" [(ngModel)]="data.end" (change)="calcWorkdays()" name="end" placeholder="Due date">
-            <md-datepicker-toggle mdSuffix [for]="duePicker"></md-datepicker-toggle>
-            <md-datepicker #duePicker></md-datepicker>
-        </md-form-field></td>
+        <td><mat-form-field>
+            <input matInput [matDatepicker]="startPicker" [(ngModel)]="data.start" (change)="calcWorkdays()" name="start" placeholder="Start from">
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field></td>
+        <td><mat-form-field>
+            <input matInput [matDatepicker]="duePicker" [(ngModel)]="data.end" (change)="calcWorkdays()" name="end" placeholder="Due date">
+            <mat-datepicker-toggle matSuffix [for]="duePicker"></mat-datepicker-toggle>
+            <mat-datepicker #duePicker></mat-datepicker>
+        </mat-form-field></td>
       </tr></table>
         <p>
-        <md-form-field>
-            <input mdInput type="number" [(ngModel)]="data.holiday" (change)="calcWorkdays()" placeholder="Holidays">
-        </md-form-field>
+        <mat-form-field>
+            <input matInput type="number" [(ngModel)]="data.holiday" (change)="calcWorkdays()" placeholder="Holidays">
+        </mat-form-field>
         </p>
         <p>
         Available effort {{sumAvailableHours() | number: '1.1-1'}} ({{ data.workdays - data.holiday }} days)
         </p>
         <p *ngIf="data.team">
-            <md-table #table [dataSource]="this" mdSort>
-                <ng-container mdColumnDef="name">
-                    <md-header-cell *mdHeaderCellDef> Name </md-header-cell>
-                    <md-cell *mdCellDef="let member"> {{member.name}} </md-cell>
+            <mat-table #table [dataSource]="this" matSort>
+                <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+                    <mat-cell *matCellDef="let member"> {{member.name}} </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="alloc">
-                    <md-header-cell *mdHeaderCellDef> Allocation </md-header-cell>
-                    <md-cell *mdCellDef="let member">
-                        <input mdInput [(ngModel)]="member.alloc" >
-                    </md-cell>
+                <ng-container matColumnDef="alloc">
+                    <mat-header-cell *matHeaderCellDef> Allocation </mat-header-cell>
+                    <mat-cell *matCellDef="let member">
+                        <input matInput [(ngModel)]="member.alloc" >
+                    </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="leave">
-                    <md-header-cell *mdHeaderCellDef> Leave(days) </md-header-cell>
-                    <md-cell *mdCellDef="let member">
-                        <input mdInput [(ngModel)]="member.leave">
-                    </md-cell>
+                <ng-container matColumnDef="leave">
+                    <mat-header-cell *matHeaderCellDef> Leave(days) </mat-header-cell>
+                    <mat-cell *matCellDef="let member">
+                        <input matInput [(ngModel)]="member.leave">
+                    </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="avail">
-                    <md-header-cell *mdHeaderCellDef> Hours </md-header-cell>
-                    <md-cell *mdCellDef="let member"> {{calcHours(member) | number: '1.1-1'}} </md-cell>
+                <ng-container matColumnDef="avail">
+                    <mat-header-cell *matHeaderCellDef> Hours </mat-header-cell>
+                    <mat-cell *matCellDef="let member"> {{calcHours(member) | number: '1.1-1'}} </mat-cell>
                 </ng-container>
-                <md-header-row *mdHeaderRowDef="['name', 'alloc', 'leave', 'avail']"></md-header-row>
-                <md-row *mdRowDef="let row; columns: ['name', 'alloc', 'leave', 'avail'];"></md-row>
-            </md-table>
+                <mat-header-row *matHeaderRowDef="['name', 'alloc', 'leave', 'avail']"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: ['name', 'alloc', 'leave', 'avail'];"></mat-row>
+            </mat-table>
         </p>
     </div>
-    <div md-dialog-actions>
-    <button md-button (click)="dialogRef.close(true)">OK</button>
-    <button md-button (click)="dialogRef.close(false)">Cancel</button>
+    <div mat-dialog-actions>
+    <button mat-button (click)="dialogRef.close(true)">OK</button>
+    <button mat-button (click)="dialogRef.close(false)">Cancel</button>
     </div>
   `,
     styles: [`
-    [md-dialog-content]{max-height: 500px; overflow-y: auto; }
-    md-form-field {width: 100%;}`]
+    [mat-dialog-content]{max-height: 500px; overflow-y: auto; }
+    mat-form-field {width: 100%;}`]
 })
 export class CreatePlanDlg extends DataSource<any> {
     constructor(
-        public dialogRef: MdDialogRef<CreatePlanDlg>,
-        @Inject(MD_DIALOG_DATA) public data: any,
+        public dialogRef: MatDialogRef<CreatePlanDlg>,
+        @Inject(MAT_DIALOG_DATA) public data: any,
         private teams: TeamService,
         private prefs: PreferenceService,
         private planService: PlanService) {

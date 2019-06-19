@@ -2,8 +2,13 @@ import { Component, OnInit, OnDestroy, Input, Output, ElementRef } from '@angula
 import { Subject } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { HttpService } from '../http.service';
-import { RequestMethod, Headers, RequestOptions } from '@angular/http';
+import { HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+
+
+class UploadResult {
+    url: string;
+}
 
 @Component({
   selector: 'rich-editor',
@@ -49,11 +54,10 @@ export class EditorComponent implements OnInit, OnDestroy {
             let file = e.dataTransfer.files[0];
             let formData: FormData = new FormData();
             formData.append('upload', file, file.name);
-            let headers = new Headers();
+            let headers = new HttpHeaders();
             headers.set('Accept', 'application/json');
             headers.delete('Content-Type');
-            this.http.post(uploadUrl, formData, new RequestOptions({ headers: headers }))
-              .map(res => res.json())
+            this.http.post<UploadResult>(uploadUrl, formData, { headers: headers })
               .subscribe( data => fdoc.execCommand('insertImage', false, data.url));
           }
         }

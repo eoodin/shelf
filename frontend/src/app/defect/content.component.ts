@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, AfterViewInit  } from '@angular/core';
 import { Router } from '@angular/router';
-import { MdDialog, MdDialogRef, MdSort, MdPaginator, Sort } from '@angular/material';
+import { MatDialog, MatDialogRef, MatSort, MatPaginator, Sort } from '@angular/material';
 import { HttpService } from '../http.service';
 import { DefectService } from '../defect.service';
 import { TeamService } from '../team.service';
@@ -25,90 +25,90 @@ import { UserService } from '../user.service';
                 <span >Fixing/Testing:</span><span class="value"> {{summary.fixing + summary.testing}}</span>
             </div>
             <div class="heding-right">
-                <md-checkbox [ngModel]="source.filters.getValue().noclosed"
-                    (change)="filterChange('noclosed', $event.checked)">Hide Closed</md-checkbox>
-                <md-checkbox [ngModel]="source.filters.getValue().nodeclined"
-                    (change)="filterChange('nodeclined', $event.checked)">Hide Declined</md-checkbox>
-                <md-checkbox [ngModel]="source.filters.getValue().ownonly"
-                    (change)="filterChange('ownonly', $event.checked)">Mine Only</md-checkbox>
+                <mat-checkbox [ngModel]="source.filters.getValue().noclosed"
+                    (change)="filterChange('noclosed', $event.checked)">Hide Closed</mat-checkbox>
+                <mat-checkbox [ngModel]="source.filters.getValue().nodeclined"
+                    (change)="filterChange('nodeclined', $event.checked)">Hide Declined</mat-checkbox>
+                <mat-checkbox [ngModel]="source.filters.getValue().ownonly"
+                    (change)="filterChange('ownonly', $event.checked)">Mine Only</mat-checkbox>
             </div>
             </div>
-            <md-table [dataSource]="source" mdSort (mdSortChange)="sort($event)"
-                [mdSortActive]="source.sorting.getValue().by">
-                <ng-container mdColumnDef="id">
-                    <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> ID </md-header-cell>
-                    <md-cell *mdCellDef="let element"> {{element.id}} </md-cell>
+            <mat-table [dataSource]="source" matSort (matSortChange)="sort($event)"
+                [matSortActive]="source.sorting.getValue().by">
+                <ng-container matColumnDef="id">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header [disableClear]="true"> ID </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="status">
-                    <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> Status </md-header-cell>
-                    <md-cell *mdCellDef="let element">
-                        <a [mdMenuTriggerFor]="statusSel">{{element.status}}</a>
-                        <md-menu #statusSel="mdMenu">
+                <ng-container matColumnDef="status">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header [disableClear]="true"> Status </mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                        <a [matMenuTriggerFor]="statusSel">{{element.status}}</a>
+                        <mat-menu #statusSel="matMenu">
                             <button *ngFor="let st of settableStatus(element)"
-                            (click)="changeStatus(element, st)"  md-menu-item>{{st}}</button>
-                        </md-menu>
-                    </md-cell>
+                            (click)="changeStatus(element, st)"  mat-menu-item>{{st}}</button>
+                        </mat-menu>
+                    </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="severity">
-                    <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> Severity </md-header-cell>
-                    <md-cell *mdCellDef="let element"> {{element.severity}} </md-cell>
+                <ng-container matColumnDef="severity">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header [disableClear]="true"> Severity </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.severity}} </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="title">
-                    <md-header-cell *mdHeaderCellDef> Title </md-header-cell>
-                    <md-cell *mdCellDef="let element">
+                <ng-container matColumnDef="title">
+                    <mat-header-cell *matHeaderCellDef> Title </mat-header-cell>
+                    <mat-cell *matCellDef="let element">
                         <a [routerLink]="['.', element.id]" title="{{element.title}}" > {{element.title}} </a>
-                    </md-cell>
+                    </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="owner">
-                    <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> Owner </md-header-cell>
-                    <md-cell *mdCellDef="let element">
-                     <a *ngIf="element.ownerId" [mdMenuTriggerFor]="ownerSel"> {{element.ownerId | username}} </a>
-                     <a *ngIf="!element.ownerId" [mdMenuTriggerFor]="ownerSel"> Unassigned </a>
-                     <md-menu #ownerSel="mdMenu">
+                <ng-container matColumnDef="owner">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header [disableClear]="true"> Owner </mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                     <a *ngIf="element.ownerId" [matMenuTriggerFor]="ownerSel"> {{element.ownerId | username}} </a>
+                     <a *ngIf="!element.ownerId" [matMenuTriggerFor]="ownerSel"> Unassigned </a>
+                     <mat-menu #ownerSel="matMenu">
                          <button *ngFor="let member of members"
-                            (click)="assignTo(element, member)"  md-menu-item>{{member.name}}</button>
+                            (click)="assignTo(element, member)"  mat-menu-item>{{member.name}}</button>
                          <button *ngIf="element.ownerId"
-                            (click)="assignTo(element, null)" md-menu-item>Unassigned</button>
-                     </md-menu>
-                    </md-cell>
+                            (click)="assignTo(element, null)" mat-menu-item>Unassigned</button>
+                     </mat-menu>
+                    </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="creator">
-                    <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> Reporter </md-header-cell>
-                    <md-cell *mdCellDef="let element"> {{element.creatorId | username}} </md-cell>
+                <ng-container matColumnDef="creator">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header [disableClear]="true"> Reporter </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.creatorId | username}} </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="createdAt">
-                    <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> Report date </md-header-cell>
-                    <md-cell *mdCellDef="let element"> {{element.createdAt | date: 'yyyy-MM-dd'}} </md-cell>
+                <ng-container matColumnDef="createdAt">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header [disableClear]="true"> Report date </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.createdAt | date: 'yyyy-MM-dd'}} </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="updatedAt">
-                    <md-header-cell *mdHeaderCellDef md-sort-header [disableClear]="true"> Last update </md-header-cell>
-                    <md-cell *mdCellDef="let element"> {{element.updatedAt | date: 'yyyy-MM-dd'}} </md-cell>
+                <ng-container matColumnDef="updatedAt">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header [disableClear]="true"> Last update </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.updatedAt | date: 'yyyy-MM-dd'}} </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="comment">
-                    <md-header-cell *mdHeaderCellDef> Last comment </md-header-cell>
-                    <md-cell *mdCellDef="let d">
+                <ng-container matColumnDef="comment">
+                    <mat-header-cell *matHeaderCellDef> Last comment </mat-header-cell>
+                    <mat-cell *matCellDef="let d">
                         <span class="last-comment"
                             *ngIf="d.defectComments && d.defectComments.length"
                             title="{{d.defectComments[0].comment.userId | username}}: {{d.defectComments[0].comment.content}}" >
                             {{d.defectComments[0].comment.content}}
                         </span>
-                    </md-cell>
+                    </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="operations">
-                    <md-header-cell *mdHeaderCellDef> Operations </md-header-cell>
-                    <md-cell *mdCellDef="let element">
-                        <a *ngIf="element.status == 'Open'" (click)="startFix(element)"  md-button>Start Fix</a>
-                        <a *ngIf="element.status == 'Fixed'" (click)="startTest(element)"  md-button>Start Test</a>
-                    </md-cell>
+                <ng-container matColumnDef="operations">
+                    <mat-header-cell *matHeaderCellDef> Operations </mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                        <a *ngIf="element.status == 'Open'" (click)="startFix(element)"  mat-button>Start Fix</a>
+                        <a *ngIf="element.status == 'Fixed'" (click)="startTest(element)"  mat-button>Start Test</a>
+                    </mat-cell>
                 </ng-container>
-                <md-header-row *mdHeaderRowDef="displayedColumns"></md-header-row>
-                <md-row *mdRowDef="let row; columns: displayedColumns;"></md-row>
-            </md-table>
+                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            </mat-table>
 
-            <md-paginator [length]="totalDefects" [pageSize]="source.paging.getValue().pageSize"
+            <mat-paginator [length]="totalDefects" [pageSize]="source.paging.getValue().pageSize"
                 [pageIndex]="source.paging.getValue().pageIndex"
                 [pageSizeOptions]="[10, 25, 50, 100]" (page)="source.paging.next($event)">
-            </md-paginator>
+            </mat-paginator>
           </div>
       </div>
   </div>
@@ -154,7 +154,7 @@ export class ContentComponent implements OnInit, AfterViewInit {
     totalDefects;
 
     constructor(
-        public dialog: MdDialog,
+        public dialog: MatDialog,
         private router: Router,
         private http: HttpService,
         private teams: TeamService,
@@ -212,7 +212,7 @@ export class ContentComponent implements OnInit, AfterViewInit {
                 .subscribe(
                 () => this.loadItems(),
                 (resp) => {
-                    window.alert('Error occurred: ' + resp.json()['error']);
+                    window.alert('Error occurred: ' + resp['error']);
                 },
                 () => this.loading = false);
         });
@@ -237,7 +237,7 @@ export class ContentComponent implements OnInit, AfterViewInit {
                 .subscribe(
                 () => this.loadItems(),
                 (resp) => {
-                    window.alert('Error occurred: ' + resp.json()['error']);
+                    window.alert('Error occurred: ' + resp['error']);
                 },
                 () => this.loading = false);
         });
@@ -259,21 +259,21 @@ export class ContentComponent implements OnInit, AfterViewInit {
 @Component({
     selector: 'select-plan-dialog',
     template: `
-    <h1 md-dialog-title>Create Task</h1>
-    <div md-dialog-content>
+    <h1 mat-dialog-title>Create Task</h1>
+    <div mat-dialog-content>
         You are about to create a task in following plan:
         <div>{{plan.name}}</div>
     </div>
-    <div md-dialog-actions>
-    <button md-button (click)="dialogRef.close(plan.id)">OK</button>
-    <button md-button (click)="dialogRef.close(null)">Cancel</button>
+    <div mat-dialog-actions>
+    <button mat-button (click)="dialogRef.close(plan.id)">OK</button>
+    <button mat-button (click)="dialogRef.close(null)">Cancel</button>
     </div>
     `
 })
 export class SelectPlanDialog {
     plan;
     constructor(
-        public dialogRef: MdDialogRef<SelectPlanDialog>,
+        public dialogRef: MatDialogRef<SelectPlanDialog>,
         private plans: PlanService) {
         this.plans.current
             .filter(plan => plan)

@@ -3,7 +3,7 @@ import { ProjectService } from './project.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PreferenceService } from './preference.service';
 import { StoryService } from './story.service';
-import {MdDialog, MdDialogRef} from '@angular/material';
+import {MatDialog, MatDialogRef} from '@angular/material';
 
 @Component({
     selector: 'backlog',
@@ -12,45 +12,45 @@ import {MdDialog, MdDialogRef} from '@angular/material';
         <div class="panel panel-default">
             <div class="panel-heading work-items-heading">
             <div class="heding-right">
-                <md-checkbox [(ngModel)]="hideFinished" (change)="filterChange($event)">Hide Finished</md-checkbox>
+                <mat-checkbox [(ngModel)]="hideFinished" (change)="filterChange($event)">Hide Finished</mat-checkbox>
             </div>
             </div>
-            <md-table #table [dataSource]="stories" mdSort>
-                <ng-container mdColumnDef="id">
-                    <md-header-cell *mdHeaderCellDef md-sort-header> ID </md-header-cell>
-                    <md-cell *mdCellDef="let us"> {{us.id}} </md-cell>
+            <mat-table #table [dataSource]="stories" matSort>
+                <ng-container matColumnDef="id">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
+                    <mat-cell *matCellDef="let us"> {{us.id}} </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="priority">
-                    <md-header-cell *mdHeaderCellDef> Priority </md-header-cell>
-                    <md-cell *mdCellDef="let us"> {{PRI[us.priority]}} </md-cell>
+                <ng-container matColumnDef="priority">
+                    <mat-header-cell *matHeaderCellDef> Priority </mat-header-cell>
+                    <mat-cell *matCellDef="let us"> {{PRI[us.priority]}} </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="status">
-                    <md-header-cell *mdHeaderCellDef> Status </md-header-cell>
-                    <md-cell *mdCellDef="let us">
-                        <a [mdMenuTriggerFor]="statusSel">{{us.status}}</a>
-                        <md-menu #statusSel="mdMenu">
-                            <button *ngFor="let st of STATES" [class.hidden]="st == us.status" (click)="changeStatus(us, st)" md-menu-item>{{st}}</button>
-                        </md-menu>
-                    </md-cell>
+                <ng-container matColumnDef="status">
+                    <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+                    <mat-cell *matCellDef="let us">
+                        <a [matMenuTriggerFor]="statusSel">{{us.status}}</a>
+                        <mat-menu #statusSel="matMenu">
+                            <button *ngFor="let st of STATES" [class.hidden]="st == us.status" (click)="changeStatus(us, st)" mat-menu-item>{{st}}</button>
+                        </mat-menu>
+                    </mat-cell>
                 </ng-container>
 
-                <ng-container mdColumnDef="title">
-                    <md-header-cell *mdHeaderCellDef> Title </md-header-cell>
-                    <md-cell *mdCellDef="let us"><a (click)="showItem(us)"> {{us.title}} </a>  </md-cell>
+                <ng-container matColumnDef="title">
+                    <mat-header-cell *matHeaderCellDef> Title </mat-header-cell>
+                    <mat-cell *matCellDef="let us"><a (click)="showItem(us)"> {{us.title}} </a>  </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="creator">
-                    <md-header-cell *mdHeaderCellDef md-sort-header> Creator </md-header-cell>
-                    <md-cell *mdCellDef="let us"> {{us.creatorId | username}} </md-cell>
+                <ng-container matColumnDef="creator">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> Creator </mat-header-cell>
+                    <mat-cell *matCellDef="let us"> {{us.creatorId | username}} </mat-cell>
                 </ng-container>
-                <ng-container mdColumnDef="operations">
-                    <md-header-cell *mdHeaderCellDef> Operations </md-header-cell>
-                    <md-cell *mdCellDef="let us">
+                <ng-container matColumnDef="operations">
+                    <mat-header-cell *matHeaderCellDef> Operations </mat-header-cell>
+                    <mat-cell *matCellDef="let us">
                         <i (click)="confirmDelete(us)" class="material-icons button">remove</i>
-                    </md-cell>
+                    </mat-cell>
                 </ng-container>
-                <md-header-row *mdHeaderRowDef="displayedColumns"></md-header-row>
-                <md-row *mdRowDef="let row; columns: displayedColumns;"></md-row>
-            </md-table>
+                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            </mat-table>
         </div>
     </div>
   `,
@@ -93,7 +93,7 @@ export class BacklogComponent {
     hideFinished = true;
 
     constructor(
-        public dialog: MdDialog,
+        public dialog: MatDialog,
         private ele: ElementRef,
         public stories: StoryService,
         private prs: ProjectService,
@@ -157,15 +157,15 @@ export class BacklogComponent {
 @Component({
     selector: 'delete-confirm-dialog',
     template: `
-    <h1 md-dialog-title>Deleting User Story</h1>
-    <div md-dialog-content>Do you want to delete the user story?</div>
-    <div md-dialog-actions>
-    <button md-button (click)="dialogRef.close('yes')">Yes</button>
-    <button md-button (click)="dialogRef.close('no')">Cancel</button>
+    <h1 mat-dialog-title>Deleting User Story</h1>
+    <div mat-dialog-content>Do you want to delete the user story?</div>
+    <div mat-dialog-actions>
+    <button mat-button (click)="dialogRef.close('yes')">Yes</button>
+    <button mat-button (click)="dialogRef.close('no')">Cancel</button>
     </div>
     `
 })
 export class DeleteConfirmDialog {
-    constructor(public dialogRef: MdDialogRef<DeleteConfirmDialog>) {
+    constructor(public dialogRef: MatDialogRef<DeleteConfirmDialog>) {
     }
 }

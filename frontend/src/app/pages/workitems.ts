@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {Http} from '@angular/http';
+import {HttpClient} from '@angular/common/http';
 import {ProjectService} from "../project.service";
 
 @Component({
@@ -10,6 +10,6 @@ import {ProjectService} from "../project.service";
     styles: [``]
 })
 export class WorkItems {
-    constructor(private http: Http, private prjs: ProjectService) {
+    constructor(private http: HttpClient, private prjs: ProjectService) {
     }
 }

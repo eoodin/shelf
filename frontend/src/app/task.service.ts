@@ -4,7 +4,7 @@ import { DataSource, CollectionViewer } from '@angular/cdk/collections';
 
 import { HttpService } from './http.service';
 import { UserService } from './user.service';
-import { RequestOptions, URLSearchParams } from '@angular/http';
+import {HttpParams } from '@angular/common/http';
 
 export interface Task {
   id: number;
@@ -42,18 +42,16 @@ export class TaskService extends DataSource<Task> {
   }
 
   public create(data) {
-    return this.http.post('/api/tasks/', JSON.stringify(data)).map(resp => resp.json());
+    return this.http.post('/api/tasks/', JSON.stringify(data));
   }
 
   public fetch(search) {
-    let params = new URLSearchParams();
+    let params = new HttpParams();
     for (let key in search) {
         params.set(key, search[key]);
     }
 
-    let options = new RequestOptions({ search: params });
-    return this.http.get('/api/tasks/', options)
-      .map(resp => resp.json());
+    return this.http.get<Task[]>('/api/tasks/', { params: params });
   }
 
   public moveToPlan(ids, planId) {

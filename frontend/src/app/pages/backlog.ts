@@ -9,7 +9,7 @@ import {Router, ActivatedRoute} from '@angular/router';
     <div class="project-info">
         <project-selector></project-selector>
         <div class="project-operations">
-            <a md-button routerLink="./new" (click)="newStory()">New Story</a>
+            <a mat-button routerLink="./new" (click)="newStory()">New Story</a>
         </div>
     </div>
     <router-outlet></router-outlet>

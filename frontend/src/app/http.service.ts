@@ -1,18 +1,20 @@
 import {Injectable} from '@angular/core';
-import {RequestOptionsArgs, Response, Http} from '@angular/http';
+import { HttpResponse, HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import {Location} from '@angular/common';
 import {ActivatedRoute} from '@angular/router';
-import {Observable, Subject, ReplaySubject} from 'rxjs/Rx';
+import {Observable, Subject, ReplaySubject} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {LoginService } from './login.service';
+
+const defaultHeaders: HttpHeaders = new HttpHeaders({'Content-Type': 'application/json'});
 
 @Injectable()
 export class HttpService {
     private authenticated = false;
-    private httpQueue: ReplaySubject<Object> = new ReplaySubject<Object>(20);
     private pausers = [];
 
     constructor(
-        private http: Http,
+        private http: HttpClient,
         private route: ActivatedRoute,
         private loginService: LoginService) {
         loginService.authenticated.subscribe(v => {
@@ -21,28 +23,48 @@ export class HttpService {
         });
     }
 
-    get(url: string, options?: RequestOptionsArgs): Observable<Response> {
-        return this.go(this.http.get(url, options));
+    get<T>(url: string, options?: {headers?: HttpHeaders, params?: HttpParams | {
+            [param: string]: string | string[];
+        }}): Observable<T> {
+        options = options || {};
+        options.headers = options.headers || defaultHeaders;
+        return this.go<T>(this.http.get<T>(url, options));
     }
 
-    post(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
-        return this.go(this.http.post(url, body, options));
+    post<T>(url: string, body: any, options?: {headers?: HttpHeaders, params?: HttpParams | {
+            [param: string]: string | string[];
+        }}): Observable<T> {
+        options = options || {};
+        options.headers = options.headers || defaultHeaders;
+        return this.go<T>(this.http.post<T>(url, body, options));
     }
 
-    put(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
-        return this.go(this.http.put(url, body, options));
+    put<T>(url: string, body: any, options?: {headers?: HttpHeaders, params?: HttpParams | {
+            [param: string]: string | string[];
+        }}): Observable<T> {
+        options = options || {};
+        options.headers = options.headers || defaultHeaders;
+        return this.go<T>(this.http.put<T>(url, body, options));
     }
 
-    delete(url: string, options?: RequestOptionsArgs): Observable<Response> {
-        return this.go(this.http.delete(url, options));
+    delete<T>(url: string, options?: {headers?: HttpHeaders, params?: HttpParams | {
+            [param: string]: string | string[];
+        }}): Observable<T> {
+        options = options || {};
+        options.headers = options.headers || defaultHeaders;
+        return this.go<T>(this.http.delete<T>(url, options));
     }
 
-    patch(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
-        return this.go(this.http.patch(url, body, options));
+    patch<T>(url: string, body: any, options?: {headers?: HttpHeaders, params?: HttpParams | {
+            [param: string]: string | string[];
+        }}): Observable<T> {
+        options = options || {};
+        options.headers = options.headers || defaultHeaders;
+        return this.go<T>(this.http.patch<T>(url, body, options));
     }
 
-    go(operation: Observable<Response>): Observable<Response> {
-        const pauser = new ReplaySubject(1);
+    go<T>(operation: Observable<T>): Observable<T> {
+        const pauser = new ReplaySubject<boolean>(1);
         let request = operation
             .do(() => {if (!this.authenticated) {this.loginService.authenticated.next(true);}},
                 err => this.error(err),
@@ -54,7 +76,7 @@ export class HttpService {
                     pauser.complete();
             }).share();
 
-        const pausable = pauser.switchMap(paused => paused ? Observable.never<Response>() : request);
+        const pausable = pauser.switchMap<boolean, T>(paused => paused ? Observable.never() : request);
         this.pausers.push(pauser);
         pauser.next(this.pausers.length > 1 && !this.authenticated);
 
