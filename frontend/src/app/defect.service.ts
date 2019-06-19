@@ -109,30 +109,30 @@ export class DefectService {
 
   public loadDefects(pid, filter, sorting, paging) {
     let params = new HttpParams();
-    params.set('project', pid);
+    params = params.append('project', pid);
 
     for (let key in filter) {
-      params.set(key, filter[key]);
+      params = params.append(key, filter[key]);
     }
 
     if (sorting.by) {
-      params.set('sortBy', sorting.by);
+      params = params.append('sortBy', sorting.by);
       if (sorting.direction == 'desc')
-        params.set('desc', 'true');
+        params = params.append('desc', 'true');
     }
 
-    params.set('offset',  '' + (paging.pageIndex * paging.pageSize));
-    params.set('size', paging.pageSize);
+    params = params.append('offset',  '' + (paging.pageIndex * paging.pageSize));
+    params = params.append('size', paging.pageSize);
 
     return this.http.get<DefectResponse>('/api/defects/', { params: params });
   }
 
   public summary(search) {
       let params = new HttpParams();
-    for (let key in search) {
-      params.set(key, search[key]);
-    }
-    return this.http.get<ProjectSummary>('/api/defects/summary', {params: params});
+      for (let key in search) {
+          params.append(key, search[key]);
+      }
+    return this.http.get<ProjectSummary>('/api/defects/summary', {params: search});
   }
 
   public single(id) {

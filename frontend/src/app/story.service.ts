@@ -61,7 +61,7 @@ export class StoryService extends DataSource<any> {
   public load(search) {
     let params = new HttpParams();
     for(let key in search) {
-        params.set(key, search[key]);
+        params = params.append(key, search[key]);
     }
 
     return this.http.get<UserStory[]>('/api/stories/', { params: params })

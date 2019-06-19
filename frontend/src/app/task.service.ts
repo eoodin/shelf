@@ -48,7 +48,7 @@ export class TaskService extends DataSource<Task> {
   public fetch(search) {
     let params = new HttpParams();
     for (let key in search) {
-        params.set(key, search[key]);
+        params = params.append(key, search[key]);
     }
 
     return this.http.get<Task[]>('/api/tasks/', { params: params });
