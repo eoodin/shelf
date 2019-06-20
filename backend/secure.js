@@ -30,12 +30,9 @@ module.exports = function(app) {
 
     passport.use('local', new LocalStrategy(function(username, password, done) {
         var encrypted = bCrypt.hashSync(password, salt, null);
-        console.log('salt: ', salt);
-        console.log('encrypted: ', encrypted);
-
         return models.user.findOne({where: {id: username}}).then(function(u) {
             return models.password.findOne({where: {userId: username}}).then(function(p) {
-                if(p.password === encrypted) {
+                if(p && p.password === encrypted) {
                     done(null, u);
                 } else {
                     done('login failed', u);
@@ -69,7 +66,7 @@ module.exports = function(app) {
 
     app.post('/passport/login', function(req, res, next) {
         if (usingLdap) {
-            return passport.authenticate('ldapauth', function(err, user, info) {
+            passport.authenticate('ldapauth', function(err, user, info) {
                 if (err || !user) {
                     return passport.authenticate('local', function (err, user, info) {
                         if (err) { return next(err); }
@@ -101,9 +98,10 @@ module.exports = function(app) {
                     res.json({"result": "loggedin"});
                 });
             })(req, res, next);
+            return;
         }
 
-        return passport.authenticate('local', function (err, user, info) {
+        passport.authenticate('local', function (err, user, info) {
             if (err) { return next(err); }
             if (!user) { return res.json({"result": "failed"}); }
             req.logIn(user, function(err) {
