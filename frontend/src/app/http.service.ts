@@ -1,9 +1,7 @@
 import {Injectable} from '@angular/core';
-import { HttpResponse, HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import {Location} from '@angular/common';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import {ActivatedRoute} from '@angular/router';
-import {Observable, Subject, ReplaySubject} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {Observable, ReplaySubject} from 'rxjs';
 import {LoginService } from './login.service';
 
 const defaultHeaders: HttpHeaders = new HttpHeaders({'Content-Type': 'application/json'});
@@ -84,8 +82,8 @@ export class HttpService {
     }
 
     private error(err) {
-        if (err.status == 403) {
-            this.loginService.requireAuth.next(true);
+        if (err.status === 403) {
+            this.loginService.requireAuth();
         }
     }
 

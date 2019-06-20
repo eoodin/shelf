@@ -11,7 +11,7 @@ import {LoginService} from './login.service';
     <div class="login-pannel">
         <form class="form-signin" #f="ngForm" (ngSubmit)="login(f.value)">
             <h2>Sign in</h2>
-            <h3 *ngIf="failedMessage" class="fail-message">{{failedMessage}}</h3>
+            <section class="row fail-message">{{failedMessage}}</section>
             <mat-form-field>
                 <input name="username" ngModel matInput placeholder="ID" required autofocus>
             </mat-form-field>
@@ -34,7 +34,7 @@ import {LoginService} from './login.service';
     .form-signin { max-width: 330px;padding: 15px; margin: 0 auto;}
     .form-signin .form-control {width: 100%; font-size: 16px;}
     .form-signin .row {margin: 5px auto;}
-    .fail-message {font-size: 1.5 em; color: #A33;}
+    .fail-message {font-weight: bold; color: #A33;}
     `]
 })
 export class LoginComponent {
@@ -47,7 +47,7 @@ export class LoginComponent {
                 private route: ActivatedRoute,
                 private users: UserService,
                 private loginService: LoginService) {
-        route.params.subscribe(params => this.goto = params['goto']);
+        route.queryParamMap.subscribe(map => this.goto = map.params.goto);
     }
 
     login(data) {
@@ -55,13 +55,13 @@ export class LoginComponent {
         this.loginService.login(data)
             .finally(() => { this.proceeding = false; })
             .subscribe(r => {
-                if (r.result == 'loggedin') {
+                if (r.result === 'loggedin') {
                     this.router.navigate([(this.goto ? this.goto : '/')]);
                 } else {
                     this.failedMessage = r.result;
                 }
             },
-            err => { this.failedMessage = err.text(); }
+            err => { this.failedMessage = err.error.error; console.log('error', err.error.error); }
             );
     }
 }
