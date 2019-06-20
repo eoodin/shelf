@@ -32,7 +32,7 @@ module.exports = function(router) {
     });
 
     router.route('/file/:id').get(function(req, res) {
-        models.file.findById(req.params.id).then(function(file) {
+        models.file.findByPk(req.params.id).then(function(file) {
             res.set({
                 'Content-Type': file.mimetype,
                 'Last-Modified': file.createdAt,

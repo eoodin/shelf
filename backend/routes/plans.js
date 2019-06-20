@@ -23,7 +23,7 @@ module.exports = function(router) {
     });
 
     route.post(function(req, res){
-        models.team.findById(req.body.teamId).then(function(t) {
+        models.team.findByPk(req.body.teamId).then(function(t) {
             models.plan.create({
                 type: 'sprint',
                 name: req.body.name,

@@ -9,7 +9,7 @@ module.exports = function(router) {
     });
 
     router.route('/project/:id/release').post((req, res) => {
-        return models.project.findById(req.params.id).then(p => {
+        return models.project.findByPk(req.params.id).then(p => {
             let r = { projectId: p.id, name: req.body.name, targetDate: req.body.targetDate };
             logger.info("creating release", r);
             return models.release.create(r).then(() => {
@@ -20,7 +20,7 @@ module.exports = function(router) {
     });
 
     router.route('/project/:id/details').get((req, res) => {
-        return models.project.findById(req.params.id, {include: [models.team, models.release]})
+        return models.project.findByPk(req.params.id, {include: [models.team, models.release]})
             .then(p => {
             res.json(p);
         });

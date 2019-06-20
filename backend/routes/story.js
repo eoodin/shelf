@@ -37,7 +37,7 @@ module.exports = function(router) {
                 return res.sendStatus(500);
             }
 
-            models.user.findById(req.user.id).then(function(u) {
+            models.user.findByPk(req.user.id).then(function(u) {
                 let def = {
                     parentId: req.body.parentId,
                     status: 'New',
@@ -59,7 +59,7 @@ module.exports = function(router) {
 
     router.route('/stories/:id')
         .get(function(req, res) {
-            models.story.findById(req.params.id).then(function(story) {
+            models.story.findByPk(req.params.id).then(function(story) {
                 res.json(story);
             }).catch(function(errors){
                 logger.error(errors);
@@ -67,7 +67,7 @@ module.exports = function(router) {
             });
         })
         .patch(function(req, res) {
-            models.story.findById(req.params.id).then(function(story) {
+            models.story.findByPk(req.params.id).then(function(story) {
                 var origin = {};
                 var changes = {};
                 for(let f in req.body) {
@@ -91,7 +91,7 @@ module.exports = function(router) {
             });
         })
         .delete(function(req, res){
-            models.story.findById(req.params.id).then(function(story) {
+            models.story.findByPk(req.params.id).then(function(story) {
                 story.destroy().then(function(story) {
                     res.json(req.params.id);
                 })

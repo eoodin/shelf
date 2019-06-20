@@ -49,7 +49,7 @@ module.exports = function(router) {
                 return res.sendStatus(403);
             }
 
-            models.user.findById(req.user.id).then(function(u) {
+            models.user.findByPk(req.user.id).then(function(u) {
                 let def = {
                     status: 'New',
                     title: req.body.title,
@@ -88,7 +88,7 @@ module.exports = function(router) {
 
     router.route('/task/:id')
         .get(function(req, res) {
-            models.task.findById(req.params.id).then(function(task) {
+            models.task.findByPk(req.params.id).then(function(task) {
                 res.json(task);
             }).catch(function(errors){
                 logger.error(errors);
@@ -96,7 +96,7 @@ module.exports = function(router) {
             });
         })
         .patch(function(req, res) {
-            models.task.findById(req.params.id).then(function(task) {
+            models.task.findByPk(req.params.id).then(function(task) {
                 var origin = {};
                 var changes = {};
                 let skipFields = ['updatedAt', 'createdAt', 'creatorId'];
@@ -139,7 +139,7 @@ module.exports = function(router) {
             });
         })
         .delete(function(req, res){
-            models.task.findById(req.params.id).then(function(task) {
+            models.task.findByPk(req.params.id).then(function(task) {
                 task.destroy().then(function(task) {
                     res.json(req.params.id);
                 })

@@ -1,7 +1,7 @@
 module.exports = function(router) {
     var models = require('../models');
     router.route('/users/me').get(function(req, res) {
-        models.user.find({
+        models.user.findOne({
                 include: [models.role, {model: models.team, as: 'teams'}],
                 where: {id: req.user.id}}).then(function(user) {
             res.json(user);
@@ -9,6 +9,6 @@ module.exports = function(router) {
     });
 
     router.route('/users').get(function(req, res) {
-        models.user.all().then(function(users) { res.json(users); });
+        models.user.findAll().then(function(users) { res.json(users); });
     });
 };

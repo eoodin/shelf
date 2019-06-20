@@ -62,7 +62,7 @@ module.exports = function(router) {
                 return res.sendStatus(403);
             }
 
-            models.user.findById(req.user.id).then(function(u) {
+            models.user.findByPk(req.user.id).then(function(u) {
                 let def = {
                     status: 'Open',
                     title: req.body.title,
@@ -132,7 +132,7 @@ module.exports = function(router) {
             });
         })
         .patch(function(req, res) {
-            models.defect.findById(req.params.id).then(function(d) {
+            models.defect.findByPk(req.params.id).then(function(d) {
                 var origin = {};
                 var changes = {};
                 for(let f in req.body) {
@@ -171,7 +171,7 @@ module.exports = function(router) {
             });
         })
         .delete(function(req, res){
-            models.defect.findById(req.params.id).then(function(d) {
+            models.defect.findByPk(req.params.id).then(function(d) {
                 d.destroy().then(function(d) {
                     res.json(req.params.id);
                 })
@@ -193,7 +193,7 @@ module.exports = function(router) {
             }
 
             models.sequelize.transaction(function(t) {
-                return models.defect.findById(req.params.id)
+                return models.defect.findByPk(req.params.id)
                     .then(function(defect) {
                         return models.task.create({
                                 status: 'InProgress',
@@ -226,7 +226,7 @@ module.exports = function(router) {
             }
 
             models.sequelize.transaction(function(t) {
-                return models.defect.findById(req.params.id).then(function(defect) {
+                return models.defect.findByPk(req.params.id).then(function(defect) {
                     return models.task.create({
                             status: 'InProgress',
                             title: 'Test fix for defect #' + defect.id + ': ' + defect.title,
@@ -254,7 +254,7 @@ module.exports = function(router) {
     router.route('/defects/:id/comments')
         .post(function(req, res) {
             models.sequelize.transaction(function(t) {
-                return models.defect.findById(req.params.id).then(defect => {
+                return models.defect.findByPk(req.params.id).then(defect => {
                     let comment = { content: req.body.message, userId: req.user.id };
                     return models.comment.create(comment).then((c) => {
                         let dc = {defectId: defect.id, commentId: c.id};
@@ -271,7 +271,7 @@ module.exports = function(router) {
             });
         })
         .get(function(req, res) {
-            return models.defect.findById(req.params.id).then(defect => {
+            return models.defect.findByPk(req.params.id).then(defect => {
                 return models.defectComment.findAll({where: {defectId: defect.id}, include: [{model: models.comment}]})
                     .then(cms => {
                         let comments = cms.map(c => c.comment).sort((a, b) => a.createdAt > b.createdAt);

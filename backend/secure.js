@@ -26,9 +26,9 @@ module.exports = function(app) {
         passport.use(new LdapStrategy(require(securityConfig)));
     }
     else {
-        logger.info('No ldap config, abbvertery password allowed');
+        logger.info('No ldap config, arbitrary password allowed');
         passport.use('local', new LocalStrategy(function(username, password, done) {
-            return models.user.find({where: {id: username}}).then(function(u) {
+            return models.user.findOne({where: {id: username}}).then(function(u) {
                 done(null, u);
             }, function(error) {
                 logger.error('Authenticate failed: ', error);
@@ -62,7 +62,7 @@ module.exports = function(app) {
                 if (err) { return next(err); }
                 if (!user) { return res.json({"result": "failed"}); }
                 user['id'] = user['uid'];
-                models.user.findById(user['id']).then(function(fu) {
+                models.user.findByPk(user['id']).then(function(fu) {
                     if (!fu) {
                         models.user.create({
                             id: user['id'],
