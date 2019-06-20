@@ -1,3 +1,4 @@
 **/*.log
 .idea/
-
+frontend/config/*
+backend/config/*

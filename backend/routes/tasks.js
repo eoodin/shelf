@@ -1,5 +1,6 @@
 module.exports = function(router) {
     var models = require('../models');
+    const Op = models.Sequelize.Op;
     var csv = require('../modules/csv');
     router.route('/tasks')
         .get(function(req, res) {
@@ -13,7 +14,7 @@ module.exports = function(router) {
             }
 
             if (req.query.nofinished == 'true') {
-                where['status'] = {$ne: 'Finished'}
+                where['status'] = {[Op.ne]: 'Finished'}
             }
             if (req.query.ownonly == 'true') {
                 where['ownerId'] = req.user.id;
@@ -79,7 +80,7 @@ module.exports = function(router) {
             logger.info('performing changes: ', changes);
             models.task.update(changes, {
                 where: {
-                    id: { $in: ids }
+                    id: { [Op.in]: ids }
                 }
             }).then(function (affected) {
                 res.json(affected);

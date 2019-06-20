@@ -1,5 +1,6 @@
 module.exports = function(router) {
     var models = require('../models');
+    const Op = models.Sequelize.Op;
     var csv = require('../modules/csv');
     router.route('/stories')
         .get(function(req, res) {
@@ -17,7 +18,7 @@ module.exports = function(router) {
 
             if (req.query.status) {
                 let status = req.query.status.split(',');
-                where['status'] = {$in : status};
+                where['status'] = {[Op.in] : status};
             }
 
             let ex = (req.query.exclude) ? req.query.exclude : [];    

@@ -1,5 +1,6 @@
 module.exports = function(router) {
     var models = require('../models');
+    const Op = models.Sequelize.Op;
 
     function composeWhere(req) {
         let where = {};
@@ -18,7 +19,7 @@ module.exports = function(router) {
         }
 
         if (excludeStatus.length) {
-            where['status'] = {$notIn: excludeStatus}
+            where['status'] = {[Op.notIn]: excludeStatus}
         }
         if (req.query.ownonly == 'true') {
             where['ownerId'] = req.user.id;
@@ -51,7 +52,10 @@ module.exports = function(router) {
                 }]
             }).then(function(defects) {
                  res.json(defects);
-            })
+            }).catch(function(errors){
+                logger.error(JSON.stringify(errors));
+                res.sendStatus(500);
+            });
         })
         .post(function(req, res) {
             if (!req.body.projectId) {
