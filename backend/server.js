@@ -57,7 +57,7 @@ if (cluster.isMaster) {
   
     res.status(500);
     res.json({ error: err });
-  })
+  });
   
   app.listen(httpPort);
   logger.log('info', 'Server worker ' + workerId + ' started.');

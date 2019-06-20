@@ -6,7 +6,9 @@ module.exports = function(app) {
     var LocalStrategy = require('passport-local').Strategy;
     var models = require('./models');
     var SequelizeStore = require('connect-session-sequelize')(session.Store);
-    
+    var bCrypt = require('bcrypt-nodejs');
+    const salt = '$2a$08$xulWdiRpc.s0zavA14rR2u';
+
     app.use(cookieParser());
     app.use(session({
         secret: 'supernova', 
@@ -25,16 +27,24 @@ module.exports = function(app) {
         var LdapStrategy = require('passport-ldapauth');
         passport.use(new LdapStrategy(require(securityConfig)));
     }
-    else {
-        logger.info('No ldap config, arbitrary password allowed');
-        passport.use('local', new LocalStrategy(function(username, password, done) {
-            return models.user.findOne({where: {id: username}}).then(function(u) {
-                done(null, u);
-            }, function(error) {
-                logger.error('Authenticate failed: ', error);
+
+    passport.use('local', new LocalStrategy(function(username, password, done) {
+        var encrypted = bCrypt.hashSync(password, salt, null);
+        console.log('salt: ', salt);
+        console.log('encrypted: ', encrypted);
+
+        return models.user.findOne({where: {id: username}}).then(function(u) {
+            return models.password.findOne({where: {userId: username}}).then(function(p) {
+                if(p.password === encrypted) {
+                    done(null, u);
+                } else {
+                    done('login failed', u);
+                }
             });
-        }));
-    }
+        }, function(error) {
+            logger.error('Authenticate failed: ', error);
+        });
+    }));
 
     passport.serializeUser(function(user, done) {
         done(null, user);
@@ -56,11 +66,21 @@ module.exports = function(app) {
             }
         });
 
-    if (usingLdap) {
-        app.post('/passport/login', function(req, res, next) {
-            passport.authenticate('ldapauth', function(err, user, info) {
-                if (err) { return next(err); }
-                if (!user) { return res.json({"result": "failed"}); }
+
+    app.post('/passport/login', function(req, res, next) {
+        if (usingLdap) {
+            return passport.authenticate('ldapauth', function(err, user, info) {
+                if (err || !user) {
+                    return passport.authenticate('local', function (err, user, info) {
+                        if (err) { return next(err); }
+                        if (!user) { return res.json({"result": "failed"}); }
+                        req.logIn(user, function(err) {
+                            if (err) { return next(err); }
+                            res.json({"result": "loggedin"});
+                        });
+                    })(req, res, next);
+                }
+
                 user['id'] = user['uid'];
                 models.user.findByPk(user['id']).then(function(fu) {
                     if (!fu) {
@@ -81,16 +101,17 @@ module.exports = function(app) {
                     res.json({"result": "loggedin"});
                 });
             })(req, res, next);
-        });
-    }
-    else {
-        app.post('/passport/login', function(req, res, next) {
-            let auth = passport.authenticate('local');
-            auth(req, res, next);
-        }, function(req, res) {
-            res.json({"result": "loggedin"});
-        });
-    }
+        }
+
+        return passport.authenticate('local', function (err, user, info) {
+            if (err) { return next(err); }
+            if (!user) { return res.json({"result": "failed"}); }
+            req.logIn(user, function(err) {
+                if (err) { return next(err); }
+                res.json({"result": "loggedin"});
+            });
+        })(req, res, next);
+    });
 
     app.get('/passport/logout', function(req, res) {
         req.logout();

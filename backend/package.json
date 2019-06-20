@@ -4,6 +4,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "bcrypt-nodejs": "^0.0.3",
     "connect-session-sequelize": "^6.0.0",
     "cookie-parser": "^1.4.4",
     "express": "^4.17.1",
