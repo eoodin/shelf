@@ -47,7 +47,7 @@ export class LoginComponent {
                 private route: ActivatedRoute,
                 private users: UserService,
                 private loginService: LoginService) {
-        route.queryParamMap.subscribe(map => this.goto = map.params.goto);
+        route.queryParamMap.subscribe(map => this.goto = map.get('goto'));
     }
 
     login(data) {

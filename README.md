@@ -21,23 +21,24 @@ TODOs
 Runtime setup
 =============
 1. Shelf was created purely by javascript, nodejs(lang level ES6) and npm are used
-2. Shelf requires angular-cli to run the server, install it globally would be handly:
+2. Shelf requires angular-cli to run the server, install it globally would be handy:
    npm install -g angular-cli
 
 3. Shelf need a database, you may setup mysql5.x as database. 
-   By default the schema name is shelf, credentials should be root/123456. You may change sequelize    configuration for your own database and schema.
+   By default the schema name is shelf, credentials should be root/123456. You may change sequelize 
+   configuration for your own database and schema.
 
 Run server
 ==========
 Shelf divided into frontend and backend server in sub folder respectively as npm projects, you need to run them separately.
 1. Start the backend:
-<backend subfolder> $ npm start
+<backend subfolder> $ yarn run start
 
 2. Start the frontend
-<frontend subfolder> $ npm start
+<frontend subfolder> $ yarn run start
 
 You may want to run them in backend at once, then you probably need a simple shell script on Linux:
- nohup npm start &> /dev/null &
+ nohup yarn run start &> /dev/null &
 
 Technical introduction
 ======================
