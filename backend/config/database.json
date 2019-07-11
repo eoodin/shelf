@@ -3,7 +3,7 @@
     "username": "shelf",
     "password": "123456",
     "database": "shelf",
-    "host": "loalhost",
+    "host": "localhost",
     "dialect": "mysql",
     "logging": true,
     "pool": {
