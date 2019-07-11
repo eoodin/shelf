@@ -329,7 +329,7 @@ module.exports = {
                   allowNull: false,
                   autoIncrement: true,
                   primaryKey: true,
-                  type: Sequelize.BIGINT
+                  type: Sequelize.STRING
               },
               email: {
                   type: Sequelize.STRING
