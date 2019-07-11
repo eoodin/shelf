@@ -3,6 +3,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
+
       return Promise.all([queryInterface.createTable('changes', {
           historyId: {
               allowNull: false,
@@ -303,6 +304,10 @@ module.exports = {
               scrumMaster: {
                   type: Sequelize.BIGINT, //TODO
               },
+              createdAt: {
+                  allowNull: false,
+                  type: Sequelize.DATE
+              },
               updatedAt: {
                   allowNull: false,
                   type: Sequelize.DATE
@@ -326,10 +331,10 @@ module.exports = {
           }),
           queryInterface.createTable('users', {
               id: {
+                  type: Sequelize.STRING,
+                  defaultValue: '',
                   allowNull: false,
-                  autoIncrement: true,
-                  primaryKey: true,
-                  type: Sequelize.STRING
+                  primaryKey: true
               },
               email: {
                   type: Sequelize.STRING
