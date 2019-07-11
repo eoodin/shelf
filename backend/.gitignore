@@ -30,8 +30,5 @@ typings
 .DS_Store
 Thumbs.db
 
-# Sensitive file
-config/security.json
-
 # Temporary files
 **/*.log
