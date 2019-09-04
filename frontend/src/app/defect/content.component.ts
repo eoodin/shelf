@@ -1,12 +1,13 @@
-import { Component, OnInit, ViewChild, AfterViewInit  } from '@angular/core';
-import { Router } from '@angular/router';
-import { MatDialog, MatDialogRef, MatSort, MatPaginator, Sort } from '@angular/material';
-import { HttpService } from '../http.service';
-import { DefectService } from '../defect.service';
-import { TeamService } from '../team.service';
-import { ProjectService } from '../project.service';
-import { PlanService } from '../plan.service';
-import { UserService } from '../user.service';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {MatDialog, MatDialogRef, Sort} from '@angular/material';
+import {HttpService} from '../http.service';
+import {DefectService} from '../defect.service';
+import {TeamService} from '../team.service';
+import {ProjectService} from '../project.service';
+import {PlanService} from '../plan.service';
+import {UserService} from '../user.service';
+import {filter, finalize} from 'rxjs/operators';
 
 @Component({
   selector: 'defect-content',
@@ -178,7 +179,7 @@ export class ContentComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit(): void {
         this.projectSerivce.current
-            .filter(p => p && p.id)
+            .pipe(filter(p => p && p.id))
             .subscribe(p => {
                 this.defects.summary({project: p['id']})
                     .subscribe(s => this.summary = s);
@@ -220,14 +221,14 @@ export class ContentComponent implements OnInit, AfterViewInit {
 
     assignTo(item, member) {
         this.loading = true;
-        var change = { 'ownerId': member ? member.id : null };
+        const change = { 'ownerId': member ? member.id : null };
         this.defects.save(item.id, change)
-            .finally(() => this.loading = false)
+            .pipe(finalize(() => this.loading = false))
             .subscribe(resp => this.loadItems());
     }
 
     startTest(item) {
-        let dialogRef = this.dialog.open(SelectPlanDialog);
+        const dialogRef = this.dialog.open(SelectPlanDialog);
         dialogRef.afterClosed().subscribe(result => {
             if (!result)
                 return;
@@ -276,7 +277,7 @@ export class SelectPlanDialog {
         public dialogRef: MatDialogRef<SelectPlanDialog>,
         private plans: PlanService) {
         this.plans.current
-            .filter(plan => plan)
+            .pipe(filter(plan => plan))
             .subscribe(p => this.plan = p);
     }
 }

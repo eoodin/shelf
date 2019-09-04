@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
-import { filter, map } from 'rxjs/operators';
-import {Subject, BehaviorSubject} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
+import {filter, map} from 'rxjs/operators';
 import {HttpService} from './http.service';
 import {PreferenceService} from './preference.service';
 
@@ -22,21 +21,26 @@ export class ProjectService {
 
     constructor(private http: HttpService, private prf: PreferenceService) {
         this._current
-            .filter(p => p != null)
-            .map(p => p.id)
-            .filter(p => !this.loading)
-            .subscribe(id => this.prf.setPreference('lastProjectId', id));
+            .pipe(
+                filter(p => p != null),
+                map(p => p.id),
+                filter(p => !this.loading)
+            ).subscribe(id => this.prf.setPreference('lastProjectId', id));
 
         this.prf.values
-            .filter(prefs => prefs['lastProjectId'])
+            .pipe(
+                filter(prefs => prefs['lastProjectId'])
+            )
             .subscribe(prefs => this.lastProjectId = prefs['lastProjectId']);
 
         this._projects
-            .filter((projects) => this.loading)
+            .pipe(
+                filter((projects) => this.loading)
+            )
             .subscribe((projects) => {
                 let select = projects[0];
-                let pref = this.prf.values
-                    .map(pref => pref['lastProjectId'])
+                this.prf.values
+                    .pipe(map(pref => pref['lastProjectId']))
                     .subscribe(lsp => {
                         if (lsp && lsp != select.id) {
                             select = projects.find(p => p.id == lsp);

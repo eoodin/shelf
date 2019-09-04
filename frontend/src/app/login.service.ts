@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Router, ActivatedRoute } from '@angular/router';
-import { ReplaySubject, Subject } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ReplaySubject, Subject} from 'rxjs';
+import {tap} from 'rxjs/operators';
 
 const defaultHeaders: HttpHeaders = new HttpHeaders({'Content-Type': 'application/json'});
 
@@ -35,14 +36,14 @@ export class LoginService {
 
   public login(data) {
     return this.http.post<LoginStatus>('/passport/login', JSON.stringify(data), {headers: defaultHeaders})
-      .do((resp) => {
+      .pipe(tap((resp) => {
         this.authenticatedSub.next((resp.result === 'loggedin'));
-      });
+      }));
   }
 
   public logout() {
     return this.http.get('/passport/logout', {headers: defaultHeaders})
-      .do(() => this.authenticatedSub.next(false));
+        .pipe(tap(() => this.authenticatedSub.next(false)));
   }
 
   public requireAuth() {

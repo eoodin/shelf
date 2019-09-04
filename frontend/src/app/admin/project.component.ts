@@ -84,7 +84,7 @@ export class AdminProjectComponent {
     onCreate() {
         let options = {teams: this.teams, projectName: '', teamId: 0};
         let dlgRef = this.dialog.open(CreateProjectDialog, {data: options});
-        dlgRef.afterClosed().filter(isCreate => isCreate).subscribe(() => {
+        dlgRef.afterClosed().pipe(filter(isCreate => isCreate)).subscribe(() => {
             this.prjs.create({projectName: options.projectName, teamId: options.teamId})
                 .subscribe(() => this.prjs.load());
         });

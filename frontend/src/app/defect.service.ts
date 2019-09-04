@@ -1,13 +1,12 @@
-import { Injectable } from '@angular/core';
-import {HttpParams, HttpRequest, HttpResponse} from '@angular/common/http';
-import { DataSource } from '@angular/cdk/collections';
-import { Observable } from 'rxjs';
-import { filter, map, count } from 'rxjs/operators';
-import { BehaviorSubject, Subject } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
+import {DataSource} from '@angular/cdk/collections';
+import {BehaviorSubject, combineLatest, Observable, Subject} from 'rxjs';
 
-import { HttpService } from './http.service';
-import { UserService } from './user.service';
-import { ProjectService } from './project.service';
+import {HttpService} from './http.service';
+import {UserService} from './user.service';
+import {ProjectService} from './project.service';
+import {filter, distinct, map, tap, debounceTime, switchMap} from 'rxjs/operators';
 
 export interface Defect {
   id: number;
@@ -39,21 +38,24 @@ export class DefectPage  extends DataSource<Defect> {
   }
 
   connect(): Observable<Defect[]> {
-    return this.defectsSub = Observable.combineLatest(
-      this.project.filter(p => p['id']).distinct(),
-      this.sorting.distinct(),
-      this.paging.distinct(),
+    return this.defectsSub = combineLatest(
+      this.project.pipe(filter(p => p['id']), distinct()),
+      this.sorting.pipe(distinct()),
+      this.paging.pipe(distinct()),
       this.filters)
-    .debounceTime(50)
-    .switchMap(criteria => {
-      let [proj, sort, page, f] = criteria;
-      return this.defectService.loadDefects(proj['id'], f, sort, page)
-        .do(results => {
-          this.total.next(results.count);
-          this.defects.next(results.rows);
-        })
-        .map(results => this.defects.getValue());
-    });
+        .pipe(
+            debounceTime(50),
+            switchMap(criteria => {
+                let [proj, sort, page, f] = criteria;
+                return this.defectService.loadDefects(proj['id'], f, sort, page)
+                    .pipe(
+                        tap(results => {
+                            this.total.next(results.count);
+                            this.defects.next(results.rows);
+                        }),
+                        map(results => this.defects.getValue()));
+            })
+        );
   }
 
   disconnect(): void { }
@@ -136,7 +138,7 @@ export class DefectService {
   }
 
   public single(id) {
-    return this.http.get('/api/defects/' + id).do(d => this.enrichDefect(d));
+    return this.http.get('/api/defects/' + id).pipe(tap(d => this.enrichDefect(d)));
   }
 
   public save(id, changes) {
@@ -162,7 +164,7 @@ export class DefectService {
     // ownerId => owner
     this.users.getUser(defect.ownerId).subscribe(u => defect.owner = u);
     // projectId => project
-    this.projects.projects.map(ps => ps[defect.projectId]).subscribe(p => defect.project = p);
+    this.projects.projects.pipe(map(ps => ps[defect.projectId])).subscribe(p => defect.project = p);
     // ensuer description not null
     if (defect.description == null) defect.description = '';
   }

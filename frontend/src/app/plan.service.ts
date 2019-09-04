@@ -5,6 +5,7 @@ import { DataSource, CollectionViewer } from '@angular/cdk/collections';
 import {PreferenceService} from "./preference.service";
 import {TeamService} from "./team.service";
 import {HttpService} from "./http.service";
+import {filter, map} from "rxjs/operators";
 
 export interface Plan {
 }
@@ -33,11 +34,11 @@ export class PlanService extends DataSource<Plan> {
     }
 
     public all() {
-        return this._plans.filter(ps => ps.length);
+        return this._plans.pipe(filter(ps => ps.length));
     }
 
     public get current() {
-        return this._current.filter(v => v != null);
+        return this._current.pipe(filter(v => v != null));
     }
 
     public setCurrent(plan) {
@@ -59,9 +60,9 @@ export class PlanService extends DataSource<Plan> {
     private planUpdated(plans: any) {
         plans.sort((a, b) => {return b.end.localeCompare(a.end);});
         this.pref.values
-            .map(prefs => prefs['lastSelectedPlan'])
+            .pipe(map(prefs => prefs['lastSelectedPlan']))
             .subscribe(lsp => {
-                var selectPlan = plans[0];
+                let selectPlan = plans[0];
                 for (var p of plans) {
                     if (p.id == lsp) {
                         selectPlan = p;

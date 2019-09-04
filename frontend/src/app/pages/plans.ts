@@ -4,7 +4,8 @@ import { PlanService } from '../plan.service';
 import { TeamService } from '../team.service';
 import { PreferenceService } from '../preference.service';
 import { DataSource } from '@angular/cdk/collections';
-import { Observable, Subject } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import {filter, map} from 'rxjs/operators';
 
 @Component({
     selector: 'plans',
@@ -48,9 +49,9 @@ export class Plans {
     lastSelectTeamId;
 
     constructor(public dialog: MatDialog,
-        private prefs: PreferenceService,
-        private planService: PlanService,
-        private teamService: TeamService) {
+                private prefs: PreferenceService,
+                private planService: PlanService,
+                private teamService: TeamService) {
         this.current = {};
         planService.current.subscribe(plan => this.current = plan);
         teamService.teams.subscribe(teams => this.setTeams(teams));
@@ -59,12 +60,12 @@ export class Plans {
     private setTeams(teams) {
         this.teams = teams;
         if (this.lastSelectTeamId) {
-            //TODO
+            // TODO
         }
     }
 
     showCreate() {
-        let data = {
+        const data = {
             name: '',
             start: '',
             end: '',
@@ -75,9 +76,9 @@ export class Plans {
             allocs: {},
             availableHours: 0
         };
-        let dialogRef = this.dialog.open(CreatePlanDlg, {data: data});
+        const dialogRef = this.dialog.open(CreatePlanDlg, {data});
         dialogRef.afterClosed().subscribe(result => {
-            if (!result) return;
+            if (!result) { return; }
 
             data.teamId = data.team.id;
             this.saveMemberAllocations(data.team);
@@ -86,9 +87,9 @@ export class Plans {
     }
 
     private saveMemberAllocations(team) {
-        let allocs = {};
-        for (let m of team.members) {
-            allocs[m.id] = m['alloc'];
+        const allocs = {};
+        for (const m of team.members) {
+            allocs[m.id] = m.alloc;
         }
 
         this.prefs.setPreference('members.allocs', JSON.stringify(allocs));
@@ -176,31 +177,33 @@ export class CreatePlanDlg extends DataSource<any> {
         super();
 
         this.data.start = new Date();
-        let et = new Date();
+        const et = new Date();
         et.setDate(et.getDate() + 13); // 2 weeks per sprint by default.
         this.data.end = et;
 
-        let se = et.toISOString();
+        const se = et.toISOString();
         this.data.name = se.substr(2, 2) + se.substr(5, 2) + (et.getDate() < 15 ? '2' : '4');
 
 
         this.prefs.values
-            .map(values => values['members.allocs'])
-            .filter(values => values)
-            .map(values => JSON.parse(values))
-            .subscribe(allocs => 
+            .pipe(
+                map(values => values['members.allocs']),
+                filter(values => values),
+                map(values => JSON.parse(values))
+            )
+            .subscribe(allocs =>
                 this.data.allocs = allocs
             );
 
         this.teams.ownTeam
-            .filter(team => team)
+            .pipe(filter(team => team))
             .subscribe(team => this.updateTeam(team));
     }
 
     connect(): Observable<any[]> {
-        return Observable.of(this.data.team.members);
+        return of(this.data.team.members);
     }
-    
+
     disconnect(): void { }
 
     sumAvailableHours() {
@@ -210,7 +213,7 @@ export class CreatePlanDlg extends DataSource<any> {
         }
 
         let sum = 0;
-        for (let m of this.data.team.members) {
+        for (const m of this.data.team.members) {
             sum += m.hours;
         }
 
@@ -220,27 +223,28 @@ export class CreatePlanDlg extends DataSource<any> {
     }
 
     calcHours(member) {
-        if (this.data.workdays <= 0)
+        if (this.data.workdays <= 0) {
             return 0;
+        }
 
         member.hours = member.alloc * (this.data.workdays - this.data.holiday - member.leave) * 8;
         return member.hours;
     }
 
     calcWorkdays() {
-        var sd = new Date(this.data.start);
-        var ed = new Date(this.data.end);
+        const sd = new Date(this.data.start);
+        const ed = new Date(this.data.end);
 
         if (sd.getTime() > ed.getTime()) {
             this.data.workdays = 0;
             return;
         }
 
-        var workDays = 0;
+        let workDays = 0;
         while (sd.getTime() <= ed.getTime()) {
-            let weekend = (sd.getDay() == 0 || sd.getDay() == 6);
+            const weekend = (sd.getDay() == 0 || sd.getDay() == 6);
             sd.setHours(sd.getHours() + 24);
-            if (weekend) continue;
+            if (weekend) { continue; }
             workDays++;
         }
 
@@ -249,9 +253,9 @@ export class CreatePlanDlg extends DataSource<any> {
 
 
     private updateTeam(team) {
-        for (let m of team.members) {
-            m['alloc'] = this.data.allocs[m.id] || 1;
-            m['leave'] = 0;
+        for (const m of team.members) {
+            m.alloc = this.data.allocs[m.id] || 1;
+            m.leave = 0;
         }
 
         this.data.team = team;

@@ -1,9 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-// import {Http} from '@angular/common/http';
-import {Location} from '@angular/common';
+import {Component} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {UserService} from './user.service';
 import {LoginService} from './login.service';
+import {finalize} from 'rxjs/operators';
 
 @Component({
     selector: 'app-login',
@@ -53,7 +52,7 @@ export class LoginComponent {
     login(data) {
         this.proceeding = true;
         this.loginService.login(data)
-            .finally(() => { this.proceeding = false; })
+            .pipe(finalize(() => { this.proceeding = false; }))
             .subscribe(r => {
                 if (r.result === 'loggedin') {
                     this.router.navigate([(this.goto ? this.goto : '/')]);

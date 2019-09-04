@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {Subject, Observable, BehaviorSubject} from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import {Subject, Observable, BehaviorSubject, of} from 'rxjs';
+import {filter, map, mergeMap, retry} from 'rxjs/operators';
 import {HttpService} from './http.service';
 
 class Role {
@@ -25,8 +25,7 @@ export class UserService {
     }
 
     public refresh() {
-         Observable.of(1).flatMap(() => this.http.get<User>('/api/users/me'))
-            .retry(1)
+         of(1).pipe(mergeMap(() => this.http.get<User>('/api/users/me')), retry(1))
             .subscribe(user => {
                 user.super = user.roles && user.roles.map(u => u.id).includes(1);
                 this._currentUser.next(user);
@@ -40,8 +39,8 @@ export class UserService {
     public getUser(id) {
         if ( !this.userCacheLoaded) {
             this.http.get<User[]>('/api/users').subscribe(users => {
-                let cache = {};
-                for (let u of users) {
+                const cache = {};
+                for (const u of users) {
                     cache[u.id] = u;
                 }
                 this.usersCache.next(cache);
@@ -49,6 +48,6 @@ export class UserService {
             this.userCacheLoaded = true;
         }
 
-        return this.usersCache.map(users => users[id]);
+        return this.usersCache.pipe(map(users => users[id]));
     }
 }

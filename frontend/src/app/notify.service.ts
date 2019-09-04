@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import {Subject} from "rxjs/Subject";
+import {Subject} from 'rxjs';
+import {share} from 'rxjs/operators';
 
-var Notification;
+let Notification;
 if (window && 'Notification' in window) {
   Notification = window['Notification'];
 }
@@ -13,12 +14,13 @@ export class NotifyService {
   constructor() {
     this.notifier = new Subject<Object>();
     this.notifier
-      .share()
+      .pipe(share())
       .subscribe(object => this.send(object));
     if (Notification) {
       Notification.requestPermission((permission) => {
-        if (permission == 'denied')
+        if (permission === 'denied') {
           console.log('Notification disabled, enable it in browser settings.');
+        }
       });
     }
   }
@@ -27,14 +29,14 @@ export class NotifyService {
     if (!Notification) {
       return;
     }
-    
+
     if (Notification.permission === 'granted') {
       return this.notifier.next({title: title, body: body});
     }
 
     if (Notification.permission !== 'denied') {
       Notification.requestPermission((permission) => {
-        if (permission === "granted") {
+        if (permission === 'granted') {
           this.notifier.next({title: title, body: body});
         }
       });
@@ -42,7 +44,7 @@ export class NotifyService {
   }
 
   private send(object) {
-    var notification = new Notification(object.title, {icon: this.icon, body: object.body});
-    notification.onclick = function() {};
+    const notification = new Notification(object.title, {icon: this.icon, body: object.body});
+    notification.onclick = () => {};
   }
 }

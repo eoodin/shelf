@@ -1,8 +1,7 @@
-import {Component, ViewEncapsulation, ChangeDetectionStrategy, Input, Output, EventEmitter} from '@angular/core';
+import {Component, EventEmitter, Output} from '@angular/core';
 import {PreferenceService} from '../preference.service';
 import {PlanService} from '../plan.service';
-import {TeamService} from '../team.service';
-
+import {filter} from 'rxjs/operators';
 
 @Component({
     selector: 'plan-list',
@@ -34,7 +33,7 @@ export class PlanList {
     constructor(private pref: PreferenceService,
                 private plans: PlanService) {
         this.plans.all()
-            .filter(plans => plans)
+            .pipe(filter(plans => plans))
             .subscribe(plans => this._plans = plans);
 
         this.plans.current
@@ -51,7 +50,7 @@ export class PlanList {
 
     clickedPlan(plan) {
         this.pref.values
-            .filter(p => p['lastSelectedPlan'] != plan.id)
+            .pipe(filter(p => p['lastSelectedPlan'] != plan.id))
             .subscribe(() => this.pref.setPreference('lastSelectedPlan', plan.id));
         this.plans.setCurrent(plan);
     }

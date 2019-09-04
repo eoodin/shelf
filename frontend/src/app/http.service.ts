@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import {ActivatedRoute} from '@angular/router';
-import {Observable, ReplaySubject} from 'rxjs';
+import {Observable, ReplaySubject, NEVER} from 'rxjs';
+import {tap, share, switchMap} from 'rxjs/operators';
 import {LoginService } from './login.service';
 
 const defaultHeaders: HttpHeaders = new HttpHeaders({'Content-Type': 'application/json'});
@@ -63,18 +64,21 @@ export class HttpService {
 
     go<T>(operation: Observable<T>): Observable<T> {
         const pauser = new ReplaySubject<boolean>(1);
-        let request = operation
-            .do(() => {if (!this.authenticated) {this.loginService.authenticated.next(true);}},
-                err => this.error(err),
-                () => {
-                    let p = this.pausers.indexOf(request);
-                    if (p != -1) {
-                        let removed = this.pausers.splice(p, 1);
-                    }
-                    pauser.complete();
-            }).share();
+        const request = operation
+            .pipe(
+                tap(() => {if (!this.authenticated) {this.loginService.authenticated.next(true);}},
+                    err => this.error(err),
+                    () => {
+                        const p = this.pausers.indexOf(request);
+                        if (p !== -1) {
+                            const removed = this.pausers.splice(p, 1);
+                        }
+                        pauser.complete();
+                    }),
+                share()
+            );
 
-        const pausable = pauser.switchMap<boolean, T>(paused => paused ? Observable.never() : request);
+        const pausable = pauser.pipe(switchMap(paused => paused ? NEVER : request));
         this.pausers.push(pauser);
         pauser.next(this.pausers.length > 1 && !this.authenticated);
 

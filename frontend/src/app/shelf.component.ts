@@ -1,21 +1,23 @@
-import { Component, ViewContainerRef } from '@angular/core';
-import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { Location } from '@angular/common';
-import { NotifyService } from './notify.service';
-import { Observable } from 'rxjs/Rx';
-import { LoginService } from './login.service';
-import { ProjectService } from './project.service';
-import { AppService } from './app.service';
-import { UserService } from './user.service';
-import { MatDialog, MatDialogRef } from '@angular/material';
+import {Component, ViewContainerRef} from '@angular/core';
+import {Router} from '@angular/router';
+import {Location} from '@angular/common';
+import {NotifyService} from './notify.service';
+import {LoginService} from './login.service';
+import {AppService} from './app.service';
+import {UserService} from './user.service';
+import {MatDialog, MatDialogRef} from '@angular/material';
+import {interval} from 'rxjs';
+import {filter, map} from 'rxjs/operators';
+
+// import {map} from 'rxjs/operators';
+// import {interval} from 'rxjs';
 
 @Component({
     selector: 'shelf-app',
     template: `
     <div class="navbar">
         <nav>
-            <a class="brand" href="javascript:void(0);"><img class="nav-logo" src="assets/images/icon-large.png"/></a>
+            <a class="brand" href="javascript:void(0);"><img class="nav-logo" src="assets/images/icon-large.png" alt="logo"/></a>
             <button mat-button [class.active]="getLinkStyle('/backlog')" [routerLink]="['/backlog']">Backlog</button>
             <button mat-button [class.active]="getLinkStyle('/plans')" [routerLink]="['/plans']">Plans</button>
             <button mat-button [class.active]="getLinkStyle('/defects')" [routerLink]="['/defects']">Defects</button>
@@ -42,8 +44,6 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 })
 export class ShelfAppComponent {
     private viewContainerRef: ViewContainerRef;
-    private app = {};
-    private ui;
     user = {super: false};
 
     constructor(private dialog: MatDialog,
@@ -54,10 +54,10 @@ export class ShelfAppComponent {
                 public userService: UserService,
                 rootView: ViewContainerRef) {
         this.viewContainerRef = rootView;
-        Observable.interval(1000 * 60)
-            .map(() => new Date())
-            .filter(now => now.getMinutes() == 0)
-            .filter(now => now.getHours() == 10 || now.getHours() == 17)
+        interval(1000 * 60)
+            .pipe(map(() => new Date()))
+            .pipe(filter(now => now.getMinutes() === 0))
+            .pipe(filter(now => now.getHours() === 10 || now.getHours() === 17))
             .subscribe(() => this.notify.notify('Update task status', 'Please contentChange task status.'));
         userService.currentUser.subscribe(u => this.user = u);
     }

@@ -4,6 +4,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { HttpService } from './http.service';
 import { ProjectService } from './project.service';
 import {StoryService, UserStory} from './story.service';
+import {filter, finalize, map, switchMap } from 'rxjs/operators';
 
 declare var CKEDITOR;
 
@@ -46,24 +47,27 @@ export class StoryComponent implements OnDestroy {
     public parent;
 
     constructor(private http: HttpService,
-        private route: ActivatedRoute,
-        private storyService: StoryService,
-        private location: Location,
-        private prjs: ProjectService) {
+                private route: ActivatedRoute,
+                private storyService: StoryService,
+                private location: Location,
+                private prjs: ProjectService) {
         this.route.params
-            .filter(params => params['id'])
-            .switchMap((params: Params) => this.storyService.getStory(+params['id']))
+            .pipe(
+                filter(params => params['id']),
+                switchMap((params: Params) => this.storyService.getStory(+params['id'])))
             .subscribe(item => this._item = item);
 
         this.route.url
-            .filter(urls => urls.length > 0)
-            .map(urls => urls[urls.length - 1].path)
-            .filter(lastSeg => lastSeg == 'new')
-            .subscribe(_ => {
+            .pipe(
+                filter(urls => urls.length > 0),
+                map(urls => urls[urls.length - 1].path),
+                filter(lastSeg => lastSeg == 'new')
+            ).subscribe(_ => {
                 this.route.queryParams
-                    .filter(params => params['parent'])
-                    .switchMap((params) => this.storyService.getStory(params['parent']))
-                    .subscribe(us => this.parent = us);
+                    .pipe(
+                        filter(params => params['parent']),
+                        switchMap((params) => this.storyService.getStory(params['parent']))
+                    ).subscribe(us => this.parent = us);
             });
     }
 
@@ -72,17 +76,17 @@ export class StoryComponent implements OnDestroy {
     }
 
     save() {
-        var data = JSON.parse(JSON.stringify(this._item));
+        const data = JSON.parse(JSON.stringify(this._item));
         data.projectId = this.prjs.current.getValue()['id'];
         if (data.id) {
             this.saving = true;
             this.storyService.save(data)
-                .finally(() => this.saving = false)
-                .subscribe(() => this.goBack())
+                .pipe(finalize(() => this.saving = false))
+                .subscribe(() => this.goBack());
         } else {
             this.saving = true;
             this.storyService.create(data, {parent: this.parent})
-                .finally(() => this.saving = false)
+                .pipe(finalize(() => this.saving = false))
                 .subscribe(() => this.goBack());
         }
     }

@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { DataSource, CollectionViewer } from '@angular/cdk/collections';
+import {Injectable} from '@angular/core';
+import {Observable, Subject} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
+import {CollectionViewer, DataSource} from '@angular/cdk/collections';
 
-import { HttpService } from './http.service';
-import { UserService } from './user.service';
-import {HttpParams } from '@angular/common/http';
+import {HttpService} from './http.service';
+import {UserService} from './user.service';
+import {HttpParams} from '@angular/common/http';
 
 export interface Task {
   id: number;
@@ -23,7 +24,7 @@ export class TaskService extends DataSource<Task> {
   }
 
   connect(collectionViewer: CollectionViewer): Observable<Task[]> {
-    return this.criteria.switchMap(criteria => this.fetch(criteria));
+    return this.criteria.pipe(switchMap(criteria => this.fetch(criteria)));
   }
 
   disconnect(collectionViewer: CollectionViewer): void { }

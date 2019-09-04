@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
-import {HttpParams, HttpRequest} from '@angular/common/http';
+import {HttpParams} from '@angular/common/http';
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
 
-import {Subject, BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, Observable} from 'rxjs';
+import {switchMap, tap} from 'rxjs/operators';
 import { HttpService } from './http.service';
 import { UserService } from './user.service';
 
 
 export interface UserStory {
   id: number;
-  priority: string; 
+  priority: string;
   status: string;
-  title: string; 
+  title: string;
   creator: string;
   points: number;
   description: string;
@@ -29,11 +30,11 @@ export class StoryService extends DataSource<any> {
 
   public getStory(id) {
     return this.http.get<UserStory>('/api/stories/' + id)
-        .do(story => this.enrich(story));
+        .pipe(tap(story => this.enrich(story)));
   }
 
   connect(collectionViewer: CollectionViewer): Observable<any[]> {
-    return this.criteria.switchMap(search => this.load(search));
+    return this.criteria.pipe(switchMap(search => this.load(search)));
   }
   disconnect(collectionViewer: CollectionViewer): void {
   }
@@ -62,14 +63,14 @@ export class StoryService extends DataSource<any> {
 
   public load(search) {
     let params = new HttpParams();
-    for(let key in search) {
+    for(const key in search) {
         params = params.append(key, search[key]);
     }
 
     return this.http.get<UserStory[]>('/api/stories/', { params: params })
-      .do(stories => {
+      .pipe(tap(stories => {
         stories.forEach(s => this.enrich(s));
-      });
+      }));
   }
 
   private enrich(story) {

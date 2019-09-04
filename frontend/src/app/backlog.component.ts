@@ -1,9 +1,10 @@
-import { Component, ElementRef } from '@angular/core';
-import { ProjectService } from './project.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import { PreferenceService } from './preference.service';
-import { StoryService } from './story.service';
+import {Component, ElementRef} from '@angular/core';
+import {ProjectService} from './project.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {PreferenceService} from './preference.service';
+import {StoryService} from './story.service';
 import {MatDialog, MatDialogRef} from '@angular/material';
+import {filter, tap} from 'rxjs/operators';
 
 @Component({
     selector: 'backlog',
@@ -87,7 +88,6 @@ export class BacklogComponent {
     projects = [];
     items = [];
     sort = {field: 'id', order: 'desc'};
-    requesting = false;
     PRI = ['High', 'Medium', 'Low'];
 
     hideFinished = true;
@@ -102,9 +102,10 @@ export class BacklogComponent {
         private pref: PreferenceService) {
         prs.projects.subscribe(ps => this.projects = ps);
         prs.current
-            .filter(p => p != this.project)
-            .do(p => this.project = p)
-            .subscribe(p => this.loadItems());
+            .pipe(
+                filter(p => p != this.project),
+                tap(p => this.project = p)
+            ).subscribe(p => this.loadItems());
     }
 
     loadItems() {

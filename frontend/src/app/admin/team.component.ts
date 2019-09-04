@@ -1,7 +1,7 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSort } from '@angular/material';
-import { TeamService } from '../team.service';
+import {Component, Inject} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
+import {TeamService} from '../team.service';
+import {filter} from 'rxjs/operators';
 
 @Component({
   selector: 'admin-team',
@@ -39,7 +39,7 @@ export class AdminTeamComponent {
     onCreate() {
         let options: any = {};
         let dlgRef = this.dialog.open(CreateTeamDialog, {data: options});
-        dlgRef.afterClosed().filter(isCreate => isCreate).subscribe(() => {
+        dlgRef.afterClosed().pipe(filter(isCreate => isCreate)).subscribe(() => {
             options.users = options.users.split(',');
             this.teamService.createTeam(options.name, options.scrumMaster, options.users);
         });

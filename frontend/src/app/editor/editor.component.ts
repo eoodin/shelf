@@ -1,9 +1,7 @@
-import { Component, OnInit, OnDestroy, Input, Output, ElementRef } from '@angular/core';
-import { Subject } from 'rxjs';
-import { DomSanitizer } from '@angular/platform-browser';
-import { HttpService } from '../http.service';
-import { HttpHeaders, HttpRequest } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import {Component, ElementRef, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Subject} from 'rxjs';
+import {HttpService} from '../http.service';
+import {HttpHeaders} from '@angular/common/http';
 
 const editorStyles = `
 body { font-family: Roboto, "Helvetica Neue", sans-serif; font-size: 14px; }`;

@@ -1,7 +1,8 @@
-import {Injectable} from "@angular/core";
-import {BehaviorSubject} from "rxjs";
-import {UserService} from "./user.service";
-import {HttpService} from "./http.service";
+import {Injectable} from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
+import {UserService} from './user.service';
+import {HttpService} from './http.service';
+import {filter, map} from 'rxjs/operators';
 
 @Injectable()
 export class TeamService {
@@ -11,20 +12,20 @@ export class TeamService {
     constructor(private http: HttpService,
                 private users: UserService
         ) {
-        this.users.currentUser
-            .filter(user => user && user.teams && user.teams.length)
-            // TODO: there should be a good way to identify current team.
-            .map(user => user.teams[0])
-            .subscribe(team => this.updateTeam(team));
+        // TODO: there should be a good way to identify current team.
+        this.users.currentUser.pipe(
+            filter(user => user && user.teams && user.teams.length),
+            map(user => user.teams[0])
+            ).subscribe(team => this.updateTeam(team));
         this.load();
     }
 
     get ownTeam() {
-        return this._ownTeam.filter(t => t.id);
+        return this._ownTeam.pipe(filter(t => t.id));
     }
 
     get teams() {
-        return this._teams.filter(ts => ts.length);
+        return this._teams.pipe(filter(ts => ts.length));
     }
 
     set teams(projects) {
@@ -36,21 +37,21 @@ export class TeamService {
             .subscribe(resp => this._teams.next(resp));
     }
 
-    public createTeam(name:string, scrumMaster:string, users:string) {
-        let data = {name: name, scrumMaster: scrumMaster, users: users};
+    public createTeam(name: string, scrumMaster: string, users: string) {
+        const data = {name, scrumMaster, users};
         this.http.post('/api/teams/', JSON.stringify(data))
             .subscribe(resp => this.load());
     }
 
-    public deleteTeam(id:string) {
+    public deleteTeam(id: string) {
         this.http.delete('/api/teams/' + id)
             .subscribe(response => this.load());
     }
-    
+
     private updateTeam(team) {
         if (team && team.id) {
-            this.http.get('/api/team/' + team.id +'?members=1')
-                .subscribe(team => this._ownTeam.next(team));
+            this.http.get('/api/team/' + team.id + '?members=1')
+                .subscribe(t => this._ownTeam.next(t));
         }
     }
 }

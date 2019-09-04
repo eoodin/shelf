@@ -7,6 +7,7 @@ import { PlanService } from './plan.service';
 import { TeamService } from './team.service';
 import { TaskService } from './task.service';
 import { ProjectService } from './project.service';
+import {filter, finalize} from 'rxjs/operators';
 
 @Component({
     selector: 'plan-content',
@@ -76,7 +77,7 @@ import { ProjectService } from './project.service';
                     </ng-container>
                     <ng-container matColumnDef="operations">
                         <mat-header-cell *matHeaderCellDef> Operations </mat-header-cell>
-                        <mat-cell *matCellDef="let task"> 
+                        <mat-cell *matCellDef="let task">
                             <a title="Remove this work item" (click)="removingItem(task)" mat-button>Delete</a>
                         </mat-cell>
                     </ng-container>
@@ -125,31 +126,31 @@ export class PlanContentComponent implements AfterViewInit {
     @ViewChild(Component, {static: false, read: 'downloader'}) downloader;
 
     constructor(private plans: PlanService,
-        public tasks: TaskService,
-        private teams: TeamService,
-        private pref: PreferenceService,
-        public dialog: MatDialog,
-        private prjs: ProjectService) {
+                public tasks: TaskService,
+                private teams: TeamService,
+                private pref: PreferenceService,
+                public dialog: MatDialog,
+                private prjs: ProjectService) {
         prjs.current.subscribe(p => this.project = p);
         this.ui = {
-            'loading': { 'show': false },
-            'awd': { 'show': false, 'loading': false, 'item': {} },
-            'mtd': { 'show': false },
-            'cpd': { 'show': false },
-            'rwd': { 'show': false }
+            loading: { show: false },
+            awd: { show: false, loading: false, item: {} },
+            mtd: { show: false },
+            cpd: { show: false },
+            rwd: { show: false }
         };
         this.current = this.sort =  this.team = {};
         this.teams.ownTeam
-            .filter(team => team)
+            .pipe(filter(team => team))
             .subscribe(team => this.team = team);
 
         this.plans.current
             .subscribe(plan => this.switchPlan(plan));
 
-        this.plans.all().subscribe(plans => this._plans = plans);
+        this.plans.all().subscribe(all => this._plans = all);
 
         pref.values
-            .filter(prefs => typeof (prefs['hideFinished']) != 'undefined')
+            .pipe(filter(prefs => typeof (prefs.hideFinished) != 'undefined'))
             .subscribe(ps => this.hideFinished = ps.hideFinished);
     }
 
@@ -159,8 +160,8 @@ export class PlanContentComponent implements AfterViewInit {
     }
 
     showMoveToPlan() {
-        let dlgRef = this.dialog.open(MoveItemsDialog, {data: {plans: this._plans}});
-        let ids = this.selectedIds();
+        const dlgRef = this.dialog.open(MoveItemsDialog, {data: {plans: this._plans}});
+        const ids = this.selectedIds();
         dlgRef.afterClosed().subscribe(pid => {
             if (pid) {
                 this.tasks.moveToPlan(ids, pid).subscribe(() => this.loadWorkItems());
@@ -169,21 +170,21 @@ export class PlanContentComponent implements AfterViewInit {
     }
 
     showAddItem() {
-        this.showItem({ 'planId': this.current['id'] });
+        this.showItem({ planId: this.current.id });
     }
 
     showItem(item) {
         this.ui.awd.item = JSON.parse(JSON.stringify(item));
-        let dlgRef = this.dialog.open(ItemDetailDialog, {data: this.ui.awd.item});
+        const dlgRef = this.dialog.open(ItemDetailDialog, {data: this.ui.awd.item});
         dlgRef.afterClosed().subscribe(save => {
             if (save) {
-                let data = this.ui.awd.item;
-                if (!data['id']) {
-                    data.projectId = this.project['id'];
+                const data = this.ui.awd.item;
+                if (!data.id) {
+                    data.projectId = this.project.id;
                     this.tasks.create(data).subscribe(result => this.loadWorkItems());
                 } else {
-                    let id = data['id'];
-                    delete data['id'];
+                    const id = data.id;
+                    delete data.id;
                     this.tasks.save(id, data).subscribe(result => this.loadWorkItems());
                 }
             }
@@ -191,35 +192,35 @@ export class PlanContentComponent implements AfterViewInit {
     }
 
     removingItem(item) {
-        let dlgRef = this.dialog.open(RemoveConfirmDialog, {data: item});
-        dlgRef.afterClosed().filter(confirmed => confirmed).subscribe(confirmed => {
+        const dlgRef = this.dialog.open(RemoveConfirmDialog, {data: item});
+        dlgRef.afterClosed().pipe(filter(confirmed => confirmed)).subscribe(confirmed => {
             this.tasks.delete(item.id)
-            .finally(() => this.ui.rwd.show = false)
+            .pipe(finalize(() => this.ui.rwd.show = false))
             .subscribe(() => this.loadWorkItems());
         });
     }
 
     changeStatus(item, status) {
         this.ui.loading.show = true;
-        var change = { 'status': status };
+        const change = { status: status };
         this.tasks.save(item.id, change)
-            .finally(() => this.ui.loading.show = false)
+            .pipe(finalize(() => this.ui.loading.show = false))
             .subscribe(resp => this.loadWorkItems());
     }
 
     changePriority(item, priority) {
         this.ui.loading.show = true;
-        var change = { 'priority': priority };
+        const change = { priority: priority };
         this.tasks.save(item.id, change)
-            .finally(() => this.ui.loading.show = false)
+            .pipe(finalize(() => this.ui.loading.show = false))
             .subscribe(resp => this.loadWorkItems());
     }
 
     assignTo(item, member) {
         this.ui.loading.show = true;
-        var change = { 'ownerId': member ? member.id : null };
+        const change = { ownerId: member ? member.id : null };
         this.tasks.save(item.id, change)
-            .finally(() => this.ui.loading.show = false)
+            .pipe(finalize(() => this.ui.loading.show = false))
             .subscribe(resp => this.loadWorkItems());
     }
 
@@ -229,29 +230,29 @@ export class PlanContentComponent implements AfterViewInit {
     }
 
     sortResult(field) {
-        if (field == this.sort['field'])
-            this.sort['order'] = this.sort['order'] == 'desc' ? 'asc' : 'desc';
-        else
-            this.sort['order'] = 'asc';
+        if (field == this.sort.field) {
+            this.sort.order = this.sort.order == 'desc' ? 'asc' : 'desc';
+        } else {
+            this.sort.order = 'asc';
+        }
 
-        this.sort['field'] = field;
+        this.sort.field = field;
         this.loadWorkItems();
     }
 
     loadWorkItems() {
-        let search = { planId: this.current['id'], exclude: 'description' };
-        if (this.sort['field']) {
-            search['sortBy'] = this.sort['field'];
-            if (this.sort['order'] == 'desc')
-                search['desc'] = 'true';
+        const search = { planId: this.current.id, exclude: 'description', sortBy: '', desc: 'false', nofinished: 'false', ownonly: 'false'};
+        if (this.sort.field) {
+            search.sortBy = this.sort.field;
+            if (this.sort.order == 'desc') {
+                search.desc = 'true';
+            }
         }
 
-        if (this.hideFinished) search['nofinished'] = 'true';
-        if (this.onlyOwned) search['ownonly'] = 'true';
+        if (this.hideFinished) { search.nofinished = 'true'; }
+        if (this.onlyOwned) { search.ownonly = 'true'; }
 
         this.tasks.update(search);
-        // this.tasks.fetch(search)
-        //     .subscribe(tasks => this.setWorkItems(tasks));
     }
 
     setWorkItems(items) {
@@ -260,8 +261,9 @@ export class PlanContentComponent implements AfterViewInit {
     }
 
     date(epoch) {
-        if (!epoch && epoch !== 0)
+        if (!epoch && epoch !== 0) {
             return '----------';
+        }
 
         return moment(epoch).format('YYYY-MM-DD');
     }
@@ -283,7 +285,7 @@ export class PlanContentComponent implements AfterViewInit {
     }
 
     exportCsv() {
-        this.downloader.nativeElement.src = '/api/tasks/?format=csv&planId=' + this.current['id']
+        this.downloader.nativeElement.src = '/api/tasks/?format=csv&planId=' + this.current.id;
     }
 
     selectedIds() {
