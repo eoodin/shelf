@@ -1,5 +1,5 @@
 module.exports = function(router) {
-    var models = require('../models');
+    const models = require('../models');
     router.route('/users/me').get(function(req, res) {
         models.user.findOne({
                 include: [models.role, {model: models.team, as: 'teams'}],
