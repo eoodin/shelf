@@ -62,4 +62,4 @@ Both internal and external authentication is supported. When external authentica
 Ideas:
 
 - Basic: user - group - role - api authentication
-- Project: 
+- Project: ACL

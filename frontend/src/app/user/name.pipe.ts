@@ -1,6 +1,5 @@
 import { Pipe, PipeTransform, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { UserService } from '../user.service';
-import { Observable } from 'rxjs';
 
 @Pipe({
   name: 'username',

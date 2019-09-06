@@ -9,9 +9,6 @@ import {MatDialog, MatDialogRef} from '@angular/material';
 import {interval} from 'rxjs';
 import {filter, map} from 'rxjs/operators';
 
-// import {map} from 'rxjs/operators';
-// import {interval} from 'rxjs';
-
 @Component({
     selector: 'shelf-app',
     template: `
@@ -43,7 +40,6 @@ import {filter, map} from 'rxjs/operators';
     `]
 })
 export class ShelfAppComponent {
-    private viewContainerRef: ViewContainerRef;
     user = {super: false};
 
     constructor(private dialog: MatDialog,
@@ -51,9 +47,7 @@ export class ShelfAppComponent {
                 private location: Location,
                 private notify: NotifyService,
                 private loginService: LoginService,
-                public userService: UserService,
-                rootView: ViewContainerRef) {
-        this.viewContainerRef = rootView;
+                private userService: UserService) {
         interval(1000 * 60)
             .pipe(map(() => new Date()))
             .pipe(filter(now => now.getMinutes() === 0))

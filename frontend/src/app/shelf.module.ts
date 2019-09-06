@@ -49,8 +49,6 @@ import { EditorComponent } from './editor/editor.component';
 import { NamePipe } from './user/name.pipe';
 import { HtmltextPipe } from './htmltext.pipe';
 
-
-
 const routes = [
     { path: '', pathMatch: 'full', redirectTo: 'plans' },
     {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {Subject, Observable, BehaviorSubject, of} from 'rxjs';
-import {filter, map, mergeMap, retry} from 'rxjs/operators';
+import {map, mergeMap, retry} from 'rxjs/operators';
 import {HttpService} from './http.service';
 
 class Role {

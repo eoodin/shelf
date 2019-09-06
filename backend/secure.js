@@ -11,8 +11,8 @@ module.exports = function(app) {
 
     app.use(cookieParser());
     app.use(session({
-        secret: 'supernova', 
-        saveUninitialized: true, 
+        secret: 'supernova',
+        saveUninitialized: true,
         resave: false,
         store: new SequelizeStore({db: models.sequelize})
         }));
@@ -115,4 +115,6 @@ module.exports = function(app) {
         req.logout();
         res.json({"result": "loggedout"});
     });
+
+    require('./acl')(app);
 };
