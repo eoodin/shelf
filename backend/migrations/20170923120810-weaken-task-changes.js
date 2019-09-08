@@ -1,5 +1,5 @@
 'use strict';
-const models = require('../models');
+const models = require('../src/models');
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -20,12 +20,12 @@ module.exports = {
           if (!ch.taskId) {
             continue;
           }
-          
+
           var nd = JSON.parse(ch.changedData);
-          
+
           for(let field in nd) {
             let value = nd[field];
-            if (field == 'changes' || field == 'children') 
+            if (field == 'changes' || field == 'children')
               delete nd[field];
             else if (field == 'creator' || field == 'createdBy')  {
               nd.creatorId = value ? value.id : nd.creatorId;
@@ -37,7 +37,7 @@ module.exports = {
               delete nd[field];
             }
           }
-          
+
           let fieldChanges = [];
           for (let f in nd) fieldChanges.push({field: f, value: nd[f] });
 

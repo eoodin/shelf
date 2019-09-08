@@ -1,17 +1,17 @@
 module.exports = function(router) {
     var models = require('../models');
     const Op = models.Sequelize.Op;
-    var csv = require('../modules/csv');
+    var csv = require('../../modules/csv');
     router.route('/stories')
         .get(function(req, res) {
             var orderField = req.query.sortBy ? req.query.sortBy : 'id';
             if (orderField == 'owner') orderField = 'ownerId';
-            
+
             let where = {};
             if (req.query.projectId) {
                 where = {projectId: req.query.projectId};
             }
-            
+
             if (req.query.parent) {
                 where['parentId'] = req.query.parent == 'null' ? null : req.query.parent;
             }
@@ -21,7 +21,7 @@ module.exports = function(router) {
                 where['status'] = {[Op.in] : status};
             }
 
-            let ex = (req.query.exclude) ? req.query.exclude : [];    
+            let ex = (req.query.exclude) ? req.query.exclude : [];
             models.story.findAll({
                 attributes: {exclude: ex},
                 where: where,
@@ -29,7 +29,7 @@ module.exports = function(router) {
                 include: [
                     {model: models.story, as: 'children'}
                 ],
-            }).then(function(stories) {   
+            }).then(function(stories) {
                 res.json(stories);
             })
         })

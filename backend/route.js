@@ -4,7 +4,7 @@ module.exports = function(app) {
     var router = express.Router();
     var fs        = require('fs');
 
-    let routesFolder = __dirname + '/routes'
+    let routesFolder = __dirname + '/controllers'
     fs.readdirSync(routesFolder)
         .filter(function(file) {
             return (file.indexOf('.') !== 0) && (file.slice(-3) === '.js');

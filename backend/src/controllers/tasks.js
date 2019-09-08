@@ -1,7 +1,7 @@
 module.exports = function(router) {
     var models = require('../models');
     const Op = models.Sequelize.Op;
-    var csv = require('../modules/csv');
+    var csv = require('../../modules/csv');
     router.route('/tasks')
         .get(function(req, res) {
             var orderField = req.query.sortBy ? req.query.sortBy : 'id';
@@ -24,7 +24,7 @@ module.exports = function(router) {
                 attributes: {exclude: ex},
                 where: where,
                 order: [[orderField, (req.query.desc ? 'desc' : 'asc')]]
-            }).then(function(tasks) {   
+            }).then(function(tasks) {
                 if ('csv' == req.query.format) {
                     res.set('Content-disposition', 'attachment; filename=plan' + (req.query.planId ? req.query.planId : '') + '.csv');
                     res.set('Content-Type', 'text/csv');
