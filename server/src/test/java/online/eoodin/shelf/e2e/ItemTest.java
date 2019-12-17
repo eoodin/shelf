@@ -29,6 +29,4 @@ public class ItemTest {
         List<Item> items = restTemplate.getForObject("/items", List.class);
         assertThat(items).hasSize(2);
     }
-
-
 }

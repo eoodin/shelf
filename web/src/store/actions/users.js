@@ -1,6 +1,8 @@
 export const USER_LOGIN = "USER_LOGIN";
 export const USER_LOGGED_IN = "USER_LOGGED_IN";
 export const USER_LOGOUT = "USER_LOGOUT";
+export const USER_FETCHING = "USER_FETCHING";
+export const USER_FETCHED = "USER_FETCHED";
 
 
 export const userLogin = (credential) => {
@@ -10,6 +12,16 @@ export const userLogin = (credential) => {
         }).then(
             () => dispatch({type: USER_LOGGED_IN, data: {username: 'john'}}),
             (error) => dispatch({})
+        );
+    };
+};
+
+export const fetchUser = () => {
+    return function(dispatch) {
+        dispatch({type: USER_FETCHING});
+        return fetch('/api/profile').then(
+            (user) => dispatch({type: USER_FETCHED, user: user}),
+            (error) => dispatch(console.log(error)),
         );
     };
 };

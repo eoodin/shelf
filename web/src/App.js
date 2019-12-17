@@ -6,12 +6,18 @@ import {Layout, Menu} from 'antd';
 import 'antd/dist/antd.css';
 
 import Login from './LoginView'
+import {fetchUser} from "./store/actions/users";
 
 const {Header, Content, Footer} = Layout;
 
 class App extends Component {
+
+    componentDidMount() {
+
+    }
+
     render() {
-        if (!this.props.user) {
+        if (!this.props.user.id) {
             return <Login/>
         }
 
@@ -48,5 +54,8 @@ const mapStateToProps = state => ({
     user: state.user,
 });
 
+const mapDispatchToProps = dispatch => ({
+    fetchUser: () => dispatch(fetchUser())
+});
 
-export default App = connect(mapStateToProps)(App);
+export default App = connect(mapStateToProps, mapDispatchToProps)(App);
