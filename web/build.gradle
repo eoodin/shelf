@@ -1,0 +1,14 @@
+plugins {
+    // Usage: 
+    // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
+    id "com.moowork.node" version "1.3.1"
+//    id "com.github.node-gradle.node" version "2.2.0"
+}
+
+group 'online.eoodin'
+version '1.0-SNAPSHOT'
+
+task myScript(type: NodeTask) {
+    script = file('src/scripts/my.js')
+    options = ['--node-option', '--another-node-option']
+}
