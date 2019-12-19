@@ -1,16 +1,7 @@
 package online.eoodin.shelf.model;
 
-public class LoginUserProfile {
-    private String csrf;
+public class AccessorInfo {
     private ShelfUser user;
-
-    public String getCsrf() {
-        return csrf;
-    }
-
-    public void setCsrf(String csrf) {
-        this.csrf = csrf;
-    }
 
     public ShelfUser getUser() {
         return user;

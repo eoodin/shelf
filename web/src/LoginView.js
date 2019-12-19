@@ -1,13 +1,18 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-import {Form, Icon, Input, Button, Checkbox} from 'antd';
+import {Button, Checkbox, Form, Icon, Input} from 'antd';
 
 import './LoginView.css';
 
-import {userLogin} from "./store/actions/users";
+import {userLogin} from "./store/actions/profile";
 
 class LoginView extends Component {
+
+    componentDidMount() {
+
+    }
+
     handleSubmit = e => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
@@ -30,7 +35,7 @@ class LoginView extends Component {
                         {getFieldDecorator('username', {
                             rules: [{required: true, message: 'Please input your username!'}],
                         })(
-                            <Input
+                            <Input test-data="username"
                                 prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                 placeholder="Username"
                             />,
@@ -41,6 +46,7 @@ class LoginView extends Component {
                             rules: [{required: true, message: 'Please input your Password!'}],
                         })(
                             <Input
+                                test-data="password"
                                 prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                 type="password"
                                 placeholder="Password"
@@ -65,12 +71,15 @@ class LoginView extends Component {
 
 const WrappedNormalLoginForm = Form.create({name: 'normal_login'})(LoginView);
 
+const mapStateToProps = state => ({
+    profile: state.profile,
+});
 
 const mapDispatchToProps = dispatch => ({
-    login: (credential) => dispatch(userLogin(credential))
+    login: (form) => dispatch(userLogin(form))
 });
 
 export default connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
 )(WrappedNormalLoginForm);

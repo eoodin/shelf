@@ -6,6 +6,10 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import store from './store';
 
+if (process.env.NODE_ENV === 'development') {
+    require('whatwg-fetch');
+}
+
 ReactDOM.render(
     <Provider store={store}>
         <App/>

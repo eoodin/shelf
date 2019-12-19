@@ -12,6 +12,13 @@ public class Item {
     @Column
     private String title;
 
+    public Item() { }
+
+    public Item(Long id, String title) {
+        this.id = id;
+        this.title = title;
+    }
+
     public Long getId() {
         return id;
     }
