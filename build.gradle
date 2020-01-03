@@ -1,15 +1,16 @@
-apply plugin: 'idea'
+plugins {
+  id "org.sonarqube" version "2.8"
+}
 
-ext {
-    log4jVersion = '2.9.1'
+sonarqube {
+  properties {
+    property "sonar.projectKey", "shelf"
+    property "sonar.organization", "shelf-developers"
+  }
 }
 
 group 'online.eoodin'
 version '1.0-SNAPSHOT'
 
+apply plugin: 'idea'
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-}
