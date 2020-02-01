@@ -4,6 +4,7 @@ import {Link, Route, Switch, useHistory, useRouteMatch} from "react-router-dom";
 import {Breadcrumb, Icon, Layout, Menu} from 'antd';
 
 import './AdminPage.css';
+import AdminProjects from "./AdminProjects";
 
 const {Content, Sider} = Layout;
 const {SubMenu} = Menu;
@@ -44,7 +45,7 @@ export default function () {
                         <Breadcrumb.Item>Bill</Breadcrumb.Item>
                     </Breadcrumb>
                     <Switch>
-                        <Route path={`${match.path}/projects`} render={() => <h1>Projects</h1>}/>
+                        <Route path={`${match.path}/projects`} render={() => <AdminProjects />}/>
                         <Route path={`${match.path}/teams`} render={() => <h1>Teams</h1>}/>
                     </Switch>
                 </Content>

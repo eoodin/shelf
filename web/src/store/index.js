@@ -6,8 +6,8 @@ import app from './reducer/app';
 import profile from './reducer/profile';
 
 const appReducer = combineReducers({
-    app: app,
-    profile: profile
+    app,
+    profile
 });
 
 let enhancers = [applyMiddleware(thunk, createLogger())];
